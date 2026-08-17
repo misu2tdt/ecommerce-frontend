@@ -41,7 +41,7 @@ export default async function ProductDetailPage({
 
   const product = result.data;
   return (
-      <article className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
+    <article className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
         <Link
           href="/products"
           className="text-sm font-semibold text-emerald-800 hover:text-emerald-950 focus-visible:outline-2 focus-visible:outline-emerald-800"
@@ -61,7 +61,7 @@ export default async function ProductDetailPage({
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-emerald-700">
               {product.category.name}
-              {product.brand ? ` · ${product.brand.name}` : ""}
+              {product.brand ? ` / ${product.brand.name}` : ""}
             </p>
             <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
               {product.name}
@@ -72,7 +72,7 @@ export default async function ProductDetailPage({
             <p className="mt-3 text-sm text-slate-500">
               {product.averageRating === null
                 ? "No reviews yet"
-                : `★ ${product.averageRating.toFixed(1)} from ${product.reviewCount} ${
+                : `Rating ${product.averageRating.toFixed(1)} / 5 from ${product.reviewCount} ${
                     product.reviewCount === 1 ? "review" : "reviews"
                   }`}
             </p>
@@ -147,7 +147,7 @@ export default async function ProductDetailPage({
             </div>
           )}
         </section>
-      </article>
+    </article>
   );
 }
 

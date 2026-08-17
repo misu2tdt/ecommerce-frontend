@@ -15,6 +15,10 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           <ProductMedia image={product.images[0]} productName={product.name} />
         </div>
         <div className="p-5">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+            {product.category.name}
+            {product.brand ? ` / ${product.brand.name}` : ""}
+          </p>
           <div className="flex items-start justify-between gap-3">
             <h2 className="font-semibold text-slate-900 group-hover:text-emerald-800">
               {product.name}
@@ -35,7 +39,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           <p className="mt-3 text-sm text-slate-500">
             {product.averageRating === null
               ? "No reviews yet"
-              : `★ ${product.averageRating.toFixed(1)} · ${product.reviewCount} ${
+              : `Rating ${product.averageRating.toFixed(1)} / 5 - ${product.reviewCount} ${
                   product.reviewCount === 1 ? "review" : "reviews"
                 }`}
           </p>
