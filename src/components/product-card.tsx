@@ -1,13 +1,20 @@
 import Link from "next/link";
+import type { ProductFilters } from "@/features/catalog/api";
+import { buildProductDetailHref } from "@/features/catalog/search-params";
 import { formatPriceRange } from "@/lib/money";
 import type { ProductSummary } from "@/types/catalog";
 import { ProductMedia } from "./product-media";
 
-export function ProductCard({ product }: { product: ProductSummary }) {
+interface ProductCardProps {
+  product: ProductSummary;
+  filters?: ProductFilters;
+}
+
+export function ProductCard({ product, filters = {} }: ProductCardProps) {
   return (
     <article className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <Link
-        href={`/products/${product.slug}`}
+        href={buildProductDetailHref(product.slug, filters)}
         className="block focus-visible:outline-2 focus-visible:outline-emerald-800"
         aria-label={`View ${product.name}`}
       >
