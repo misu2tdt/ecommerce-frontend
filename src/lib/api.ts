@@ -62,7 +62,7 @@ export async function apiFetch<T>(
   } catch (error) {
     if (error instanceof ApiError) throw error;
     throw new ApiError(
-      "Unable to reach the catalog service. Check that the backend is running.",
+      "Unable to reach the backend service. Check that it is running.",
       0,
     );
   }
@@ -80,7 +80,7 @@ function toRequestInit(options: ApiRequestOptions): RequestInit {
 export function apiErrorMessage(error: unknown): string {
   return error instanceof ApiError
     ? error.message
-    : "An unexpected catalog error occurred.";
+    : "An unexpected backend error occurred.";
 }
 
 function getApiBaseUrl(): string {
@@ -146,5 +146,5 @@ function normalizeErrorMessage(payload: unknown, status: number): string {
       return body.error;
     }
   }
-  return `Catalog request failed with status ${status}.`;
+  return `Backend request failed with status ${status}.`;
 }
