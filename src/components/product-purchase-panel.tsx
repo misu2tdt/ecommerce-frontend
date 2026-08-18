@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useActionState, useState } from "react";
+import {
+  addToCartAction,
+  type CartActionState,
+} from "@/features/cart/actions";
+import { formatAttributeLabel } from "@/lib/attributes";
 import { formatVnd } from "@/lib/money";
 import type { ProductVariant } from "@/types/catalog";
 
 export function ProductPurchasePanel({
   variants,
+  returnPath,
 }: {
   variants: ProductVariant[];
+  returnPath: string;
 }) {
   const [selectedVariantId, setSelectedVariantId] = useState(
     () => variants.find((variant) => variant.stock > 0)?.id ?? variants[0]?.id,
@@ -178,24 +186,72 @@ export function ProductPurchasePanel({
         </div>
       </div>
 
-      <button
-        type="button"
-        disabled
-        aria-describedby="purchase-note"
-        className="mt-6 min-h-12 w-full cursor-not-allowed rounded-lg bg-slate-200 px-5 py-3 font-semibold text-slate-500"
-      >
-        {available ? "Add to cart in Phase 4E" : "Unavailable"}
-      </button>
-      <p id="purchase-note" className="mt-2 text-center text-xs text-slate-500">
-        Cart actions are not enabled yet.
-      </p>
+      <AddToCartForm
+        key={`${selectedVariant.id}-${quantity}`}
+        variantId={selectedVariant.id}
+        quantity={quantity}
+        available={available}
+        returnPath={returnPath}
+      />
     </section>
   );
 }
 
-function formatAttributeLabel(key: string): string {
-  const label = key
-    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-    .replace(/[_-]+/g, " ");
-  return label.charAt(0).toUpperCase() + label.slice(1);
+const INITIAL_CART_STATE: CartActionState = {};
+
+function AddToCartForm({
+  variantId,
+  quantity,
+  available,
+  returnPath,
+}: {
+  variantId: number;
+  quantity: number;
+  available: boolean;
+  returnPath: string;
+}) {
+  const [state, formAction, pending] = useActionState(
+    addToCartAction,
+    INITIAL_CART_STATE,
+  );
+
+  return (
+    <form action={formAction} className="mt-6">
+      <input type="hidden" name="variantId" value={variantId} />
+      <input type="hidden" name="quantity" value={quantity} />
+      <input type="hidden" name="returnPath" value={returnPath} />
+      <button
+        type="submit"
+        disabled={!available || pending}
+        aria-describedby="purchase-note"
+        className="min-h-12 w-full rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white transition hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+      >
+        {!available ? "Unavailable" : pending ? "Adding..." : "Add to cart"}
+      </button>
+      <p id="purchase-note" className="mt-2 text-center text-xs text-slate-500">
+        Cart items do not reserve inventory.
+      </p>
+
+      {state.message && (
+        <div
+          role={state.status === "error" ? "alert" : "status"}
+          className={`mt-4 rounded-lg border px-4 py-3 text-sm ${
+            state.status === "error"
+              ? "border-red-200 bg-red-50 text-red-800"
+              : "border-emerald-200 bg-emerald-50 text-emerald-800"
+          }`}
+        >
+          <span>{state.message}</span>
+          {state.status === "success" && (
+            <Link
+              href="/cart"
+              className="ml-2 font-semibold underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-800"
+            >
+              View cart
+            </Link>
+          )}
+        </div>
+      )}
+    </form>
+  );
 }

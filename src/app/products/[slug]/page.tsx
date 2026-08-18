@@ -7,6 +7,7 @@ import { ProductPurchasePanel } from "@/components/product-purchase-panel";
 import { getProductBySlug } from "@/features/catalog/api";
 import {
   buildCatalogHref,
+  buildProductDetailHref,
   parseProductFilters,
   type CatalogSearchParams,
 } from "@/features/catalog/search-params";
@@ -34,6 +35,7 @@ export default async function ProductDetailPage({
   const { slug } = await params;
   const filters = parseProductFilters(await searchParams);
   const backHref = buildCatalogHref(filters);
+  const productHref = buildProductDetailHref(slug, filters);
   const result = await loadProduct(slug);
 
   if ("notFound" in result) notFound();
@@ -81,7 +83,10 @@ export default async function ProductDetailPage({
               "No description is available for this product."}
           </p>
 
-          <ProductPurchasePanel variants={product.variants} />
+          <ProductPurchasePanel
+            variants={product.variants}
+            returnPath={productHref}
+          />
         </div>
       </div>
     </article>
