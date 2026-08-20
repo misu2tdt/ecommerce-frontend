@@ -87,6 +87,15 @@ export default async function AccountPage() {
               Manage checkout destinations
             </span>
           </Link>
+          <Link
+            href="/wishlist"
+            className="rounded-xl border border-slate-200 p-4 font-semibold text-slate-900 hover:border-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 sm:col-span-2"
+          >
+            <span className="block text-lg">Your wishlist</span>
+            <span className="mt-1 block text-sm font-normal text-slate-600">
+              Revisit products you saved
+            </span>
+          </Link>
         </nav>
       </div>
     </section>

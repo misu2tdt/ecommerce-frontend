@@ -47,6 +47,9 @@ async function AuthNavigation() {
       <Link href="/cart" className={navLinkClass}>
         Cart
       </Link>
+      <Link href="/wishlist" className={navLinkClass}>
+        Wishlist
+      </Link>
       <Link href="/account" className={navLinkClass}>
         Account
       </Link>
