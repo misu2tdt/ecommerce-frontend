@@ -44,6 +44,11 @@ async function AuthNavigation() {
 
   return (
     <>
+      {user.role === "admin" && (
+        <Link href="/admin" className={navLinkClass}>
+          Admin
+        </Link>
+      )}
       <Link href="/cart" className={navLinkClass}>
         Cart
       </Link>

@@ -36,19 +36,25 @@ export async function apiFetch<T>(
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
   if (options.token) headers.set("Authorization", `Bearer ${options.token}`);
-  if (options.body !== undefined) {
+  const isFormData = options.body instanceof FormData;
+  if (options.body !== undefined && !isFormData) {
     headers.set("Content-Type", "application/json");
   }
 
   const requestInit = toRequestInit(options);
+  const requestBody: BodyInit | undefined =
+    options.body === undefined
+      ? undefined
+      : isFormData
+        ? (options.body as FormData)
+        : JSON.stringify(options.body);
 
   try {
     const response = await fetch(url, {
       ...requestInit,
       cache: options.cache ?? "no-store",
       headers,
-      body:
-        options.body === undefined ? undefined : JSON.stringify(options.body),
+      body: requestBody,
     });
     const payload = await readJson(response);
 
