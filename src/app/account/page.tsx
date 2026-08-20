@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FeedbackState } from "@/components/feedback-state";
 import { getCurrentUser } from "@/features/auth/current-user";
@@ -63,6 +64,15 @@ export default async function AccountPage() {
             <dd className="mt-2 font-semibold text-slate-950">{user.id}</dd>
           </div>
         </dl>
+
+        <div className="mt-8 border-t border-slate-200 pt-6">
+          <Link
+            href="/account/addresses"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-800 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+          >
+            Manage saved addresses
+          </Link>
+        </div>
       </div>
     </section>
   );

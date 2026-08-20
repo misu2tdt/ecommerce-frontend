@@ -177,11 +177,18 @@ export default async function CartPage() {
             {formatVnd(cart.totalPrice)}
           </p>
           <p className="mt-4 text-sm leading-6 text-slate-500">
-            Checkout and address selection will be added in Phase 4F.
+            The backend will validate current price, activity, and stock before
+            creating the Order.
           </p>
           <Link
+            href="/checkout"
+            className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-emerald-800 px-4 py-3 font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+          >
+            Continue to checkout
+          </Link>
+          <Link
             href="/products"
-            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-emerald-800 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-emerald-800 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
           >
             Continue shopping
           </Link>

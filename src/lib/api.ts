@@ -115,6 +115,8 @@ function appendQuery(url: URL, query: ApiQuery | undefined): void {
 
 async function readJson(response: Response): Promise<unknown> {
   if (response.status === 204) return undefined;
+  const text = await response.text();
+  if (!text.trim()) return undefined;
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
     if (!response.ok) return undefined;
@@ -124,7 +126,7 @@ async function readJson(response: Response): Promise<unknown> {
     );
   }
   try {
-    return await response.json();
+    return JSON.parse(text) as unknown;
   } catch {
     throw new ApiError(
       "The catalog service returned invalid JSON.",
