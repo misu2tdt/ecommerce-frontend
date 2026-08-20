@@ -65,14 +65,29 @@ export default async function AccountPage() {
           </div>
         </dl>
 
-        <div className="mt-8 border-t border-slate-200 pt-6">
+        <nav
+          aria-label="Account sections"
+          className="mt-8 grid gap-3 border-t border-slate-200 pt-6 sm:grid-cols-2"
+        >
+          <Link
+            href="/account/orders"
+            className="rounded-xl border border-slate-200 p-4 font-semibold text-slate-900 hover:border-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+          >
+            <span className="block text-lg">Your Orders</span>
+            <span className="mt-1 block text-sm font-normal text-slate-600">
+              Review purchases and Order status
+            </span>
+          </Link>
           <Link
             href="/account/addresses"
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-800 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className="rounded-xl border border-slate-200 p-4 font-semibold text-slate-900 hover:border-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
           >
-            Manage saved addresses
+            <span className="block text-lg">Saved addresses</span>
+            <span className="mt-1 block text-sm font-normal text-slate-600">
+              Manage checkout destinations
+            </span>
           </Link>
-        </div>
+        </nav>
       </div>
     </section>
   );

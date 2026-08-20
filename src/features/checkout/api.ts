@@ -9,7 +9,3 @@ export function checkoutCart(addressId: number): Promise<CheckoutOrder> {
     body: { addressId },
   });
 }
-
-export function getOrder(orderId: number): Promise<CheckoutOrder> {
-  return authenticatedApiFetch<CheckoutOrder>(`/orders/${orderId}`);
-}

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FeedbackState } from "@/components/feedback-state";
 import { buildLoginHref } from "@/features/auth/redirects";
-import { getOrder } from "@/features/checkout/api";
+import { getOrder } from "@/features/orders/api";
 import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatVnd } from "@/lib/money";
 import type { CheckoutOrder } from "@/types/order";
@@ -84,10 +84,22 @@ export default async function CheckoutSuccessPage({
           </div>
         </dl>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-8 grid gap-3 sm:grid-cols-2">
+          <Link
+            href={`/account/orders/${order.id}`}
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-800 px-5 py-2.5 font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+          >
+            View Order
+          </Link>
+          <Link
+            href="/account/orders"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-800 px-5 py-2.5 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+          >
+            View all Orders
+          </Link>
           <Link
             href="/products"
-            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-800 px-5 py-2.5 font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-700"
           >
             Continue shopping
           </Link>

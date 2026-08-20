@@ -21,7 +21,29 @@ export interface ShippingAddressSnapshot {
   countryCode: string;
 }
 
-export interface CheckoutOrder {
+export interface OrderItemProduct {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface OrderItemVariant {
+  id: number;
+  sku: string;
+  name: string;
+  attributes: Record<string, string>;
+  product: OrderItemProduct;
+}
+
+export interface OrderItem {
+  id: number;
+  quantity: number;
+  price: VndAmount;
+  lineTotal: VndAmount;
+  variant: OrderItemVariant;
+}
+
+export interface CustomerOrder {
   id: number;
   userId: number;
   totalPrice: VndAmount;
@@ -29,4 +51,7 @@ export interface CheckoutOrder {
   shippingAddress: ShippingAddressSnapshot;
   createdAt: string;
   updatedAt: string;
+  items: OrderItem[];
 }
+
+export type CheckoutOrder = CustomerOrder;
