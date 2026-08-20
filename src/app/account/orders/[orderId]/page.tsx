@@ -1,8 +1,11 @@
+import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CancelOrderControl } from "@/components/cancel-order-control";
 import { FeedbackState } from "@/components/feedback-state";
+import { PaymentCreationControl } from "@/components/payment-creation-control";
+import { PaymentHistory } from "@/components/payment-history";
 import {
   isCustomerCancellable,
   OrderStatusBadge,
@@ -10,11 +13,13 @@ import {
 } from "@/components/order-status";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { getOrder } from "@/features/orders/api";
+import { getOrderPayments } from "@/features/payments/api";
 import { formatAttributeLabel } from "@/lib/attributes";
 import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatDateTime } from "@/lib/dates";
 import { formatVnd } from "@/lib/money";
 import type { CustomerOrder } from "@/types/order";
+import type { Payment } from "@/types/payment";
 
 export const metadata: Metadata = {
   title: "Order details",
@@ -48,7 +53,7 @@ export default async function OrderDetailPage({
     );
   }
 
-  const order = result.data;
+  const { order, payments } = result.data;
   const shipping = order.shippingAddress;
   const locality = [
     shipping.ward,
@@ -56,6 +61,18 @@ export default async function OrderDetailPage({
     shipping.city,
     shipping.stateProvince,
   ].filter(Boolean);
+  const hasSucceededPayment = payments.some(
+    (payment) => payment.status === "succeeded",
+  );
+  const hasActivePayment = payments.some(
+    (payment) =>
+      payment.status === "pending" || payment.status === "processing",
+  );
+  const canCreatePayment =
+    order.status === "pending" && !hasSucceededPayment && !hasActivePayment;
+  const idempotencyKey = canCreatePayment
+    ? `order-${order.id}-attempt-${randomUUID()}`
+    : null;
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
@@ -84,11 +101,45 @@ export default async function OrderDetailPage({
       </div>
 
       <section aria-labelledby="lifecycle-heading" className="mt-8">
-        <h2 id="lifecycle-heading" className="mb-4 text-xl font-bold text-slate-950">
+        <h2
+          id="lifecycle-heading"
+          className="mb-4 text-xl font-bold text-slate-950"
+        >
           Order status
         </h2>
         <OrderStatusProgress status={order.status} />
       </section>
+
+      <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
+        <PaymentHistory payments={payments} />
+        {idempotencyKey ? (
+          <PaymentCreationControl
+            orderId={order.id}
+            idempotencyKey={idempotencyKey}
+          />
+        ) : hasSucceededPayment ? (
+          <PaymentNotice
+            tone="success"
+            title="Payment confirmed"
+            description="The backend received verified provider confirmation and updated this Order."
+            orderId={order.id}
+          />
+        ) : hasActivePayment ? (
+          <PaymentNotice
+            tone="processing"
+            title="Awaiting provider confirmation"
+            description="A Payment is pending or processing. Returning from MoMo does not prove success; recheck until the backend receives a verified final IPN."
+            orderId={order.id}
+          />
+        ) : (
+          <PaymentNotice
+            tone="neutral"
+            title="Payment unavailable"
+            description="This Order is not currently eligible for a new Payment attempt."
+            orderId={order.id}
+          />
+        )}
+      </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
         <section aria-labelledby="items-heading">
@@ -126,7 +177,10 @@ export default async function OrderDetailPage({
                   {attributes.length > 0 && (
                     <dl className="mt-4 flex flex-wrap gap-2">
                       {attributes.map(([key, value]) => (
-                        <div key={key} className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs">
+                        <div
+                          key={key}
+                          className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs"
+                        >
                           <dt className="inline font-semibold text-slate-500">
                             {formatAttributeLabel(key)}:{" "}
                           </dt>
@@ -195,14 +249,51 @@ export default async function OrderDetailPage({
   );
 }
 
-async function loadOrder(orderId: number): Promise<
-  | { data: CustomerOrder }
+function PaymentNotice({
+  tone,
+  title,
+  description,
+  orderId,
+}: {
+  tone: "success" | "processing" | "neutral";
+  title: string;
+  description: string;
+  orderId: number;
+}) {
+  const styles = {
+    success: "border-emerald-200 bg-emerald-50 text-emerald-950",
+    processing: "border-sky-200 bg-sky-50 text-sky-950",
+    neutral: "border-slate-200 bg-slate-50 text-slate-900",
+  } as const;
+  return (
+    <aside className={`rounded-2xl border p-5 ${styles[tone]}`}>
+      <h2 className="text-lg font-bold">{title}</h2>
+      <p className="mt-2 text-sm leading-6 opacity-80">{description}</p>
+      <Link
+        href={`/account/orders/${orderId}`}
+        prefetch={false}
+        className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-current bg-white px-4 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
+        Recheck status
+      </Link>
+    </aside>
+  );
+}
+
+async function loadOrder(
+  orderId: number,
+): Promise<
+  | { data: { order: CustomerOrder; payments: Payment[] } }
   | { unauthenticated: true }
   | { notFound: true }
   | { error: unknown }
 > {
   try {
-    return { data: await getOrder(orderId) };
+    const [order, payments] = await Promise.all([
+      getOrder(orderId),
+      getOrderPayments(orderId),
+    ]);
+    return { data: { order, payments } };
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       return { unauthenticated: true };
