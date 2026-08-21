@@ -16,12 +16,15 @@ import {
   deleteProductImage,
   deleteVariant,
   updateBrand,
+  updateAdminOrderStatus,
+  updateAdminReviewVisibility,
   updateCategory,
   updateProduct,
   updateProductImage,
   updateVariant,
   uploadProductImage,
 } from "./api";
+import type { OrderStatus } from "@/types/order";
 
 export interface AdminActionState {
   status?: "success" | "error";
@@ -237,6 +240,56 @@ export async function deleteImageAction(
   return { status: "success", message: "Image deleted." };
 }
 
+export async function updateOrderStatusAction(
+  _previousState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const orderId = readPositiveInteger(formData, "orderId");
+  const returnPath = orderId ? `/admin/orders/${orderId}` : "/admin/orders";
+  const denied = await requireAdmin(returnPath);
+  if (denied) return denied;
+  const status = readString(formData, "status");
+  if (!orderId || !isOrderStatus(status)) {
+    return { status: "error", message: "The Order status request is invalid." };
+  }
+  const failure = await captureFailure(() =>
+    updateAdminOrderStatus(orderId, status),
+  );
+  if (failure) return adminError(failure, "Unable to update this Order.");
+  revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/account/orders");
+  revalidatePath(`/account/orders/${orderId}`);
+  return { status: "success", message: `Order moved to ${status}.` };
+}
+
+export async function updateReviewVisibilityAction(
+  _previousState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const denied = await requireAdmin("/admin/reviews");
+  if (denied) return denied;
+  const reviewId = readPositiveInteger(formData, "reviewId");
+  const visibility = readString(formData, "isVisible");
+  if (!reviewId || !["true", "false"].includes(visibility)) {
+    return { status: "error", message: "The Review moderation request is invalid." };
+  }
+  const failure = await captureFailure(async () => {
+    await updateAdminReviewVisibility(
+      reviewId,
+      visibility === "true",
+    );
+  });
+  if (failure) return adminError(failure, "Unable to moderate this Review.");
+  revalidatePath("/admin/reviews");
+  revalidatePath("/products");
+  revalidatePath("/products/[slug]", "page");
+  return {
+    status: "success",
+    message: visibility === "true" ? "Review restored." : "Review hidden.",
+  };
+}
+
 async function requireAdmin(returnPath: string): Promise<AdminActionState | null> {
   let user;
   try { user = await getCurrentUser(); } catch (error) { return adminError(error, "Unable to verify ADMIN access."); }
@@ -268,3 +321,4 @@ function readPositiveInteger(formData: FormData, key: string) { return parsePosi
 function readNonNegativeInteger(formData: FormData, key: string) { const raw = readString(formData, key); if (!/^\d+$/.test(raw)) return null; const value = Number(raw); return Number.isSafeInteger(value) ? value : null; }
 function parseAttributes(raw: string): Record<string, string> | null { try { const value: unknown = JSON.parse(raw || "{}"); if (!value || typeof value !== "object" || Array.isArray(value)) return null; const entries = Object.entries(value); return entries.every(([key, item]) => key.trim() && typeof item === "string") ? Object.fromEntries(entries.map(([key, item]) => [key.trim(), (item as string).trim()])) : null; } catch { return null; } }
 function capitalize(value: string) { return value.charAt(0).toUpperCase() + value.slice(1); }
+function isOrderStatus(value: string): value is OrderStatus { return ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"].includes(value); }

@@ -5,6 +5,7 @@ import type {
   ProductVariant,
   VndAmount,
 } from "@/types/catalog";
+import type { CustomerOrder } from "@/types/order";
 
 export type ProductStatus = "active" | "inactive";
 
@@ -61,4 +62,22 @@ export interface ImageMetadataInput {
   altText?: string;
   position?: number;
   isPrimary?: boolean;
+}
+
+export type AdminOrder = CustomerOrder;
+
+export interface AdminReview {
+  id: number;
+  userId: number;
+  rating: number;
+  title: string | null;
+  body: string | null;
+  isVisible: boolean;
+  createdAt: string;
+  updatedAt: string;
+  product: {
+    id: number;
+    name: string;
+    slug: string;
+  };
 }

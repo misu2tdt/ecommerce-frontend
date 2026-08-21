@@ -3,6 +3,8 @@ import Link from "next/link";
 const links = [
   ["Dashboard", "/admin"],
   ["Products", "/admin/products"],
+  ["Orders", "/admin/orders"],
+  ["Reviews", "/admin/reviews"],
   ["Categories", "/admin/categories"],
   ["Brands", "/admin/brands"],
 ] as const;

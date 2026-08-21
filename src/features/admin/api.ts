@@ -3,13 +3,16 @@ import "server-only";
 import { authenticatedApiFetch } from "@/features/auth/api";
 import type { Brand, Category, ProductImage } from "@/types/catalog";
 import type {
+  AdminOrder,
   AdminProduct,
   AdminProductVariant,
+  AdminReview,
   ImageMetadataInput,
   NamedCatalogInput,
   ProductInput,
   VariantInput,
 } from "@/types/admin";
+import type { OrderStatus } from "@/types/order";
 
 export const getAdminProducts = () =>
   authenticatedApiFetch<AdminProduct[]>("/products/admin");
@@ -85,3 +88,30 @@ export const deleteProductImage = (productId: number, imageId: number) =>
   authenticatedApiFetch<void>(`/products/${productId}/images/${imageId}`, {
     method: "DELETE",
   });
+
+export const getAdminOrders = () =>
+  authenticatedApiFetch<AdminOrder[]>("/admin/orders");
+
+export const getAdminOrder = (orderId: number) =>
+  authenticatedApiFetch<AdminOrder>(`/admin/orders/${orderId}`);
+
+export const updateAdminOrderStatus = (
+  orderId: number,
+  status: OrderStatus,
+) =>
+  authenticatedApiFetch<AdminOrder>(`/admin/orders/${orderId}/status`, {
+    method: "PATCH",
+    body: { status },
+  });
+
+export const getAdminReviews = () =>
+  authenticatedApiFetch<AdminReview[]>("/admin/reviews");
+
+export const updateAdminReviewVisibility = (
+  reviewId: number,
+  isVisible: boolean,
+) =>
+  authenticatedApiFetch<{ productId: number; isVisible: boolean }>(
+    `/admin/reviews/${reviewId}/visibility`,
+    { method: "PATCH", body: { isVisible } },
+  );
