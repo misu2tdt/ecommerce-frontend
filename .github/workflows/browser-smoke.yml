@@ -1,0 +1,76 @@
+name: Browser smoke
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5434
+      DB_USERNAME: postgres
+      DB_PASSWORD: browser-test-only
+      DB_NAME: ecommerce_test
+      JWT_SECRET: browser-test-only-not-for-production
+      JWT_EXPIRES_IN: 15m
+      CLOUDINARY_CLOUD_NAME: browser-disabled
+      CLOUDINARY_API_KEY: browser-disabled
+      CLOUDINARY_API_SECRET: browser-disabled
+      PAYMENT_CURRENCY: VND
+      MOMO_PARTNER_CODE: browser-disabled
+      MOMO_ACCESS_KEY: browser-disabled
+      MOMO_SECRET_KEY: browser-disabled
+      MOMO_IDENTITY_SECRET: browser-test-identity
+      MOMO_ENDPOINT: https://momo.invalid
+      MOMO_REDIRECT_URL: http://localhost:3001/payment-return
+      MOMO_IPN_URL: http://localhost:3000/payments/webhooks/momo
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
+      E2E_BACKEND_DIR: ecommerce-backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: browser-test-only
+          POSTGRES_DB: ecommerce_test
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ecommerce_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: misu2tdt/ecommerce-backend
+          path: ecommerce-backend
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            ecommerce-backend/package-lock.json
+      - run: npm ci
+      - run: npm --prefix ecommerce-backend ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm --prefix ecommerce-backend run build
+      - run: npm --prefix ecommerce-backend run migration:run
+        env:
+          NODE_ENV: test
+      - run: npm --prefix ecommerce-backend run seed:demo:test
+        env:
+          NODE_ENV: test
+      - run: npm run build
+      - run: npm run test:smoke
