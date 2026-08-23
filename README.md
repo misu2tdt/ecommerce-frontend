@@ -39,3 +39,6 @@ credentials are not required to build or run the normal local UI.
 The browser smoke requires the sibling backend, its compiled output, a migrated
 and demo-seeded `ecommerce_test` database, and a locally installed Playwright
 Chromium binary. CI provisions each of those with inert provider configuration.
+
+See [docs/vercel-deployment.md](./docs/vercel-deployment.md) for the Vercel
+deployment contract and cross-origin authentication topology.
