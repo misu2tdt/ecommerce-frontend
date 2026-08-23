@@ -37,8 +37,8 @@ export function ProductCard({ product, filters = {} }: ProductCardProps) {
           {product.category.name}
           {product.brand ? ` / ${product.brand.name}` : ""}
         </p>
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="font-semibold text-slate-900 group-hover:text-emerald-800">
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <h2 className="min-w-0 break-words font-semibold text-slate-900 group-hover:text-emerald-800">
             <Link
               href={productHref}
               className="focus-visible:outline-2 focus-visible:outline-emerald-800"

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AddressForm } from "@/components/address-form";
 import { AddressMutationControls } from "@/components/address-mutation-controls";
 import { AddressSummary } from "@/components/address-summary";
+import { AccountNav } from "@/components/account-nav";
 import { FeedbackState } from "@/components/feedback-state";
 import { getAddresses } from "@/features/addresses/api";
 import { buildLoginHref, safeInternalPath } from "@/features/auth/redirects";
@@ -44,7 +45,8 @@ export default async function AddressesPage({
   const addresses = result.data;
   return (
     <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <AccountNav />
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
             Your account

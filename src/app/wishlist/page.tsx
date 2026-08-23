@@ -92,10 +92,10 @@ function WishlistCard({ item }: { item: WishlistItem }) {
           {product.category.name}
           {product.brand ? ` / ${product.brand.name}` : ""}
         </p>
-        <div className="mt-2 flex items-start justify-between gap-3">
+        <div className="mt-2 flex min-w-0 items-start justify-between gap-3">
           <Link
             href={href}
-            className="font-bold text-slate-950 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+            className="min-w-0 break-words font-bold text-slate-950 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
           >
             {product.name}
           </Link>

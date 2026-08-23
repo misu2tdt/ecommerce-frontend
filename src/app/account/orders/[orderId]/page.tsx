@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { AccountNav } from "@/components/account-nav";
 import { CancelOrderControl } from "@/components/cancel-order-control";
 import { FeedbackState } from "@/components/feedback-state";
 import { PaymentCreationControl } from "@/components/payment-creation-control";
@@ -76,9 +77,10 @@ export default async function OrderDetailPage({
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
+      <AccountNav />
       <Link
         href="/account/orders"
-        className="text-sm font-semibold text-emerald-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+        className="mt-8 inline-block text-sm font-semibold text-emerald-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
       >
         Back to all Orders
       </Link>

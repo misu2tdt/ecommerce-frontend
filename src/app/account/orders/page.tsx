@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AccountNav } from "@/components/account-nav";
 import { FeedbackState } from "@/components/feedback-state";
 import { OrderStatusBadge } from "@/components/order-status";
 import { buildLoginHref } from "@/features/auth/redirects";
@@ -36,7 +37,8 @@ export default async function OrdersPage() {
   const orders = result.data;
   return (
     <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+      <AccountNav />
+      <p className="mt-8 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
         Your account
       </p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
@@ -81,8 +83,8 @@ export default async function OrdersPage() {
 
               <ul className="mt-5 space-y-2 border-t border-slate-200 pt-5 text-sm text-slate-700">
                 {order.items.slice(0, 2).map((item) => (
-                  <li key={item.id} className="flex justify-between gap-4">
-                    <span>
+                  <li key={item.id} className="flex min-w-0 justify-between gap-4">
+                    <span className="min-w-0 break-words">
                       {item.variant.product.name} · {item.variant.name}
                     </span>
                     <span className="shrink-0 font-semibold">
