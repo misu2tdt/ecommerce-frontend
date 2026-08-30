@@ -1,5 +1,13 @@
 export type VndAmount = number;
 
+export type ProductSort =
+  | "featured"
+  | "price_asc"
+  | "price_desc"
+  | "name_asc"
+  | "name_desc"
+  | "newest";
+
 export interface Category {
   id: number;
   name: string;
@@ -60,4 +68,13 @@ export interface ProductSummary {
 
 export interface ProductDetail extends ProductSummary {
   variants: ProductVariant[];
+}
+
+export interface CatalogFilterOptions {
+  categories: Array<{ id: number; name: string; slug: string }>;
+  brands: Array<{ id: number; name: string; slug: string }>;
+  sizes: string[];
+  colors: string[];
+  minPrice: number;
+  maxPrice: number;
 }

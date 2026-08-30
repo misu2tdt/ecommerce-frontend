@@ -68,7 +68,7 @@ export async function apiFetch<T>(
   } catch (error) {
     if (error instanceof ApiError) throw error;
     throw new ApiError(
-      "Unable to reach the backend service. Check that it is running.",
+      "Service is temporarily unavailable. Please try again shortly.",
       0,
     );
   }
@@ -84,15 +84,21 @@ function toRequestInit(options: ApiRequestOptions): RequestInit {
 }
 
 export function apiErrorMessage(error: unknown): string {
-  return error instanceof ApiError
-    ? error.message
-    : "An unexpected backend error occurred.";
+  if (error instanceof ApiError) {
+    return error.status === 0 || error.status >= 500
+      ? "Service is temporarily unavailable. Please try again shortly."
+      : error.message;
+  }
+  return "Service is temporarily unavailable. Please try again shortly.";
 }
 
 function getApiBaseUrl(): string {
   const configured = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
   if (!configured) {
-    throw new ApiError("NEXT_PUBLIC_API_BASE_URL is not configured.", 0);
+    throw new ApiError(
+      "Service is temporarily unavailable. Please try again shortly.",
+      0,
+    );
   }
 
   try {
@@ -101,7 +107,7 @@ function getApiBaseUrl(): string {
     return url.toString().replace(/\/$/, "");
   } catch {
     throw new ApiError(
-      "NEXT_PUBLIC_API_BASE_URL must be a valid HTTP(S) URL.",
+      "Service is temporarily unavailable. Please try again shortly.",
       0,
     );
   }
@@ -127,7 +133,7 @@ async function readJson(response: Response): Promise<unknown> {
   if (!contentType.includes("application/json")) {
     if (!response.ok) return undefined;
     throw new ApiError(
-      "The catalog service returned an invalid response.",
+      "Service is temporarily unavailable. Please try again shortly.",
       response.status,
     );
   }
@@ -135,13 +141,16 @@ async function readJson(response: Response): Promise<unknown> {
     return JSON.parse(text) as unknown;
   } catch {
     throw new ApiError(
-      "The catalog service returned invalid JSON.",
+      "Service is temporarily unavailable. Please try again shortly.",
       response.status,
     );
   }
 }
 
 function normalizeErrorMessage(payload: unknown, status: number): string {
+  if (status >= 500) {
+    return "Service is temporarily unavailable. Please try again shortly.";
+  }
   if (typeof payload === "object" && payload !== null) {
     const body = payload as BackendErrorBody;
     if (Array.isArray(body.message) && body.message.length > 0) {
@@ -154,5 +163,5 @@ function normalizeErrorMessage(payload: unknown, status: number): string {
       return body.error;
     }
   }
-  return `Backend request failed with status ${status}.`;
+  return "Unable to complete the request. Please try again shortly.";
 }

@@ -2,7 +2,9 @@ import { apiFetch } from "@/lib/api";
 import type {
   Brand,
   Category,
+  CatalogFilterOptions,
   ProductDetail,
+  ProductSort,
   ProductSummary,
 } from "@/types/catalog";
 
@@ -10,6 +12,12 @@ export interface ProductFilters {
   category?: string;
   brand?: string;
   q?: string;
+  size?: string[];
+  color?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  sort?: ProductSort;
 }
 
 export function getProducts(
@@ -20,8 +28,18 @@ export function getProducts(
       q: filters.q,
       category: filters.category,
       brand: filters.brand,
+      size: filters.size,
+      color: filters.color,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+      inStock: filters.inStock ? "true" : undefined,
+      sort: filters.sort,
     },
   });
+}
+
+export function getCatalogFilterOptions(): Promise<CatalogFilterOptions> {
+  return apiFetch<CatalogFilterOptions>("/products/filters");
 }
 
 export function getProductBySlug(slug: string): Promise<ProductDetail> {
