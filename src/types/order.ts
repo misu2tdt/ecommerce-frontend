@@ -46,7 +46,12 @@ export interface OrderItem {
 export interface CustomerOrder {
   id: number;
   userId: number;
+  subtotalPrice: VndAmount;
+  discountPrice: VndAmount;
   totalPrice: VndAmount;
+  couponCode: string | null;
+  couponType: string | null;
+  couponValue: number | null;
   status: OrderStatus;
   shippingAddress: ShippingAddressSnapshot;
   createdAt: string;

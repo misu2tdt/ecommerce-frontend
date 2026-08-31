@@ -56,9 +56,16 @@ export function ProductCard({ product, filters = {} }: ProductCardProps) {
             {product.inStock ? "In stock" : "Out of stock"}
           </span>
         </div>
-        <p className="mt-3 font-bold text-emerald-900">
-          {formatPriceRange(product.minPrice, product.maxPrice)}
-        </p>
+        <div className="mt-3 flex flex-wrap items-baseline gap-2">
+          <span className="font-bold text-emerald-900">
+            {formatPriceRange(product.minPrice, product.maxPrice)}
+          </span>
+          {product.hasDiscount && (
+            <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700">
+              Sale options
+            </span>
+          )}
+        </div>
         <p className="mt-3 text-sm text-slate-500">
           {product.averageRating === null
             ? "No reviews yet"

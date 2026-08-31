@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { AddressSummary } from "@/components/address-summary";
+import { CouponEntryBox } from "@/components/coupon-entry-box";
 import {
   checkoutAction,
   type CheckoutActionState,
@@ -11,7 +12,17 @@ import type { Address } from "@/types/address";
 
 const INITIAL_STATE: CheckoutActionState = {};
 
-export function CheckoutForm({ addresses }: { addresses: Address[] }) {
+interface CheckoutFormProps {
+  addresses: Address[];
+  cartSubtotal: number;
+  initialCouponCode?: string;
+}
+
+export function CheckoutForm({
+  addresses,
+  cartSubtotal,
+  initialCouponCode = "",
+}: CheckoutFormProps) {
   const [state, formAction, pending] = useActionState(
     checkoutAction,
     INITIAL_STATE,
@@ -65,6 +76,14 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
         </Link>
       </div>
 
+      <div className="mt-6 border-t border-slate-200 pt-6">
+        <CouponEntryBox
+          initialSubtotal={cartSubtotal}
+          appliedCode={initialCouponCode}
+          showSummary={true}
+        />
+      </div>
+
       {state.message && (
         <div
           role="alert"
@@ -85,7 +104,7 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 min-h-12 w-full rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait disabled:opacity-60"
+        className="mt-6 min-h-12 w-full rounded-xl bg-emerald-800 px-5 py-3.5 text-base font-bold text-white shadow-xs transition hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait disabled:opacity-60"
       >
         {pending ? "Placing order..." : "Place order"}
       </button>

@@ -221,6 +221,37 @@ export default async function OrderDetailPage({
         <aside className="space-y-5 lg:sticky lg:top-6">
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-xl font-bold text-slate-950">
+              Payment breakdown
+            </h2>
+            <div className="mt-4 space-y-2.5 text-sm">
+              <div className="flex justify-between text-slate-600">
+                <span>Subtotal</span>
+                <span>{formatVnd(order.subtotalPrice ?? order.totalPrice)}</span>
+              </div>
+              {order.discountPrice > 0 && (
+                <div className="flex items-center justify-between font-semibold text-emerald-700">
+                  <span className="flex items-center gap-1.5">
+                    <span>Promotion</span>
+                    {order.couponCode && (
+                      <span className="rounded bg-emerald-100 px-1.5 py-0.5 font-mono text-xs font-bold text-emerald-800">
+                        {order.couponCode}
+                      </span>
+                    )}
+                  </span>
+                  <span>-{formatVnd(order.discountPrice)}</span>
+                </div>
+              )}
+              <div className="flex items-end justify-between border-t border-slate-200 pt-3">
+                <span className="font-bold text-slate-950">Total</span>
+                <span className="text-xl font-black text-emerald-950">
+                  {formatVnd(order.totalPrice)}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-950">
               Shipping address used
             </h2>
             <p className="mt-2 text-xs leading-5 text-slate-500">

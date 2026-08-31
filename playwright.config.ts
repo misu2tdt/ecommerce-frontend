@@ -32,6 +32,14 @@ export default defineConfig({
         ...process.env,
         NODE_ENV: "test",
         PORT: "3000",
+        DB_HOST: process.env.DB_HOST ?? "localhost",
+        DB_PORT: process.env.DB_PORT ?? "5432",
+        DB_USERNAME: process.env.DB_USERNAME ?? "postgres",
+        DB_PASSWORD:
+          process.env.ECOMMERCE_TEST_DB_PASSWORD ??
+          process.env.DB_PASSWORD ??
+          "",
+        DB_NAME: process.env.DB_NAME ?? "ecommerce_test",
         FRONTEND_ORIGIN: "http://localhost:3001",
         SWAGGER_ENABLED: "false",
       },

@@ -114,6 +114,35 @@ export function ProductPurchasePanel({
     return `${formatVnd(low)} – ${formatVnd(high)}`;
   }, [selectedVariant, variants, minPrice, maxPrice]);
 
+  // Compute compare-at price & discount percent
+  const compareAtInfo = useMemo(() => {
+    if (selectedVariant) {
+      if (
+        selectedVariant.compareAtPrice &&
+        selectedVariant.compareAtPrice > selectedVariant.price
+      ) {
+        const percent = Math.round(
+          (1 - selectedVariant.price / selectedVariant.compareAtPrice) * 100,
+        );
+        return {
+          type: "exact" as const,
+          compareAtDisplay: formatVnd(selectedVariant.compareAtPrice),
+          percent,
+        };
+      }
+      return null;
+    }
+    const hasDiscount = variants.some(
+      (v) => v.compareAtPrice && v.compareAtPrice > v.price,
+    );
+    if (hasDiscount) {
+      return {
+        type: "options" as const,
+      };
+    }
+    return null;
+  }, [selectedVariant, variants]);
+
   const isPurchasable = selectedVariant !== null && selectedVariant.stock > 0;
 
   // Determine purchase button label
@@ -150,9 +179,26 @@ export function ProductPurchasePanel({
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             {selectedVariant ? "Selected Price" : "Price Range"}
           </span>
-          <p className="mt-1 text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
-            {priceDisplay}
-          </p>
+          <div className="mt-1 flex flex-wrap items-baseline gap-3">
+            <p className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+              {priceDisplay}
+            </p>
+            {compareAtInfo?.type === "exact" && (
+              <>
+                <span className="text-base text-slate-400 line-through">
+                  {compareAtInfo.compareAtDisplay}
+                </span>
+                <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-700">
+                  -{compareAtInfo.percent}%
+                </span>
+              </>
+            )}
+            {compareAtInfo?.type === "options" && (
+              <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-700">
+                Sale options
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

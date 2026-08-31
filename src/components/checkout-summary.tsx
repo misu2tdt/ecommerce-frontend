@@ -48,8 +48,8 @@ export function CheckoutSummary({ cart }: { cart: Cart }) {
         </span>
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-500">
-        Prices and inventory are recalculated by the backend when the Order is
-        created. No shipping fee, tax, or coupon is added by this storefront.
+        Prices, promotions, and inventory are recalculated atomically by the
+        backend when the Order is placed.
       </p>
     </aside>
   );

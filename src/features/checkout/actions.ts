@@ -21,10 +21,16 @@ export async function checkoutAction(
     return { status: "error", message: "Choose a valid shipping address." };
   }
 
+  const rawCoupon = formData.get("couponCode");
+  const couponCode =
+    typeof rawCoupon === "string" && rawCoupon.trim().length > 0
+      ? rawCoupon.trim()
+      : undefined;
+
   let orderId: number | null = null;
   let failure: unknown;
   try {
-    const order = await checkoutCart(addressId);
+    const order = await checkoutCart(addressId, couponCode);
     orderId = order.id;
   } catch (error) {
     failure = error;

@@ -17,8 +17,18 @@ export const metadata: Metadata = {
   description: "Choose a saved shipping address and place your Order.",
 };
 
-export default async function CheckoutPage() {
-  const result = await loadCheckout();
+export default async function CheckoutPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ coupon?: string }>;
+}) {
+  const [result, resolvedParams] = await Promise.all([
+    loadCheckout(),
+    searchParams ?? Promise.resolve<{ coupon?: string }>({}),
+  ]);
+  const initialCoupon =
+    typeof resolvedParams?.coupon === "string" ? resolvedParams.coupon : "";
+
   if ("unauthenticated" in result) redirect(buildLoginHref("/checkout"));
   if ("error" in result) {
     return (
@@ -71,7 +81,11 @@ export default async function CheckoutPage() {
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           {addresses.length > 0 ? (
-            <CheckoutForm addresses={addresses} />
+            <CheckoutForm
+              addresses={addresses}
+              cartSubtotal={cart.totalPrice}
+              initialCouponCode={initialCoupon}
+            />
           ) : (
             <div>
               <h2 className="text-xl font-bold text-slate-950">

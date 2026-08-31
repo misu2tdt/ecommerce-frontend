@@ -41,6 +41,7 @@ export interface ProductVariant {
   sku: string;
   name: string;
   price: VndAmount;
+  compareAtPrice?: VndAmount | null;
   stock: number;
   attributes: Record<string, string>;
   position: number;
@@ -59,6 +60,9 @@ export interface ProductSummary {
   images: ProductImage[];
   minPrice: VndAmount | null;
   maxPrice: VndAmount | null;
+  minCompareAtPrice?: VndAmount | null;
+  maxCompareAtPrice?: VndAmount | null;
+  hasDiscount?: boolean;
   inStock: boolean;
   averageRating: number | null;
   reviewCount: number;
