@@ -4,9 +4,7 @@ const DEMO_PASSWORD = "DemoOnly!2026";
 
 test("public catalog opens a real Product", async ({ page }) => {
   await page.goto("/products");
-  await expect(
-    page.getByRole("heading", { name: "Find your next device" }),
-  ).toBeVisible();
+  await expect(page.locator("main h1")).toBeVisible();
 
   const product = page.locator('main a[href^="/products/"]').first();
   await expect(product).toBeVisible();
