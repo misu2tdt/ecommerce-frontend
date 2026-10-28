@@ -37,10 +37,10 @@ export async function SiteHeader() {
             <MobileNav user={user} />
             <Link
               href="/"
-              className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-title font-bold tracking-tight text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
+              className="flex min-w-0 items-center gap-1 sm:gap-1.5 overflow-hidden whitespace-nowrap text-title font-bold tracking-tight text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
             >
-              <span className="tracking-widest">VERVE</span>
-              <span className="text-body-sm font-semibold tracking-widest text-neutral-600">STUDIO</span>
+              <span className="tracking-wide sm:tracking-widest">VERVE</span>
+              <span className="text-body-sm font-semibold tracking-wide sm:tracking-widest text-neutral-600">STUDIO</span>
             </Link>
           </div>
 
