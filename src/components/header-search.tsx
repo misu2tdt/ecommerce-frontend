@@ -50,7 +50,7 @@ function HeaderSearchFallback({
           type="search"
           placeholder={placeholder}
           disabled
-          className="w-full rounded-full border border-slate-200 bg-slate-50/80 py-2 pl-9 pr-4 text-sm text-slate-900 placeholder:text-slate-500 sm:text-xs"
+          className="w-full rounded-full border border-slate-200 bg-slate-50/80 py-2.5 pl-9 pr-4 text-base text-slate-900 placeholder:text-slate-500 xl:py-2 xl:text-xs"
         />
         <svg
           aria-hidden="true"
@@ -116,7 +116,7 @@ function HeaderSearchForm({
           placeholder={placeholder}
           autoFocus={autoFocus}
           disabled={isPending}
-          className="w-full rounded-full border border-slate-200 bg-slate-50/80 py-2 pl-9 pr-4 text-sm text-slate-900 placeholder:text-slate-500 transition hover:bg-slate-100/80 focus:border-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-950/10 sm:text-xs"
+          className="w-full rounded-full border border-slate-200 bg-slate-50/80 py-2.5 pl-9 pr-4 text-base text-slate-900 placeholder:text-slate-500 transition hover:bg-slate-100/80 focus:border-slate-400 focus:bg-white focus:outline-2 focus:outline-offset-2 focus:outline-slate-900 xl:py-2 xl:text-xs"
         />
         <svg
           aria-hidden="true"

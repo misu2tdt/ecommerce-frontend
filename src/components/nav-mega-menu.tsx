@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+// Only a few direct links fit beside the search and account controls; every
+// other category stays reachable through "Shop All" and the mobile drawer.
 const navigationItems = [
   {
     name: "T-Shirts & Tops",
@@ -15,14 +17,6 @@ const navigationItems = [
   {
     name: "Outerwear",
     href: "/products?category=hoodies-outerwear",
-  },
-  {
-    name: "Pants & Shorts",
-    href: "/products?category=pants-shorts",
-  },
-  {
-    name: "Basics",
-    href: "/products?category=basics-accessories",
   },
 ];
 
@@ -81,13 +75,13 @@ export function NavMegaMenu() {
   return (
     <nav
       aria-label="Store navigation"
-      className="relative hidden items-center gap-1 lg:flex"
+      className="relative hidden flex-nowrap items-center gap-1 xl:flex"
       onKeyDown={handleKeyDown}
     >
       {/* Shop / Mega Menu Trigger */}
       <div
         ref={containerRef}
-        className="relative"
+        className="relative shrink-0"
         onMouseEnter={() => setDropdownOpen(true)}
         onMouseLeave={() => setDropdownOpen(false)}
         onBlur={handleBlur}
@@ -102,7 +96,7 @@ export function NavMegaMenu() {
               setDropdownOpen(true);
             }
           }}
-          className="group inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+          className="group inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
           aria-expanded={dropdownOpen}
           aria-controls="desktop-mega-menu-content"
         >
@@ -173,7 +167,7 @@ export function NavMegaMenu() {
         <Link
           key={item.href}
           href={item.href}
-          className="rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+          className="shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
         >
           {item.name}
         </Link>

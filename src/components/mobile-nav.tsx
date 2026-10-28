@@ -36,12 +36,12 @@ export function MobileNav(props: MobileNavProps) {
 
 function MobileNavTriggerFallback() {
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         type="button"
         disabled
         aria-label="Open mobile navigation menu"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-slate-400"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-lg p-2 text-slate-400"
       >
         <svg
           className="h-6 w-6"
@@ -142,7 +142,7 @@ function MobileNavContent({ user }: MobileNavProps) {
   }, [isOpen]);
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         ref={triggerRef}
         type="button"
@@ -150,7 +150,7 @@ function MobileNavContent({ user }: MobileNavProps) {
         aria-label="Open mobile navigation menu"
         aria-expanded={isOpen}
         aria-controls="mobile-navigation-drawer"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-slate-900"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-slate-900"
       >
         <svg
           className="h-6 w-6"

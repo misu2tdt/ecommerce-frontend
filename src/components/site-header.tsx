@@ -29,28 +29,28 @@ export async function SiteHeader() {
 
       {/* Main Navigation Bar */}
       <div className="border-b border-slate-200/80">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
           {/* Left: Mobile trigger & Brand Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-3">
             <MobileNav user={user} />
             <Link
               href="/"
-              className="flex items-center gap-1.5 text-lg font-black tracking-tight text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+              className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-lg font-black tracking-tight text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
             >
               <span className="tracking-widest">VERVE</span>
               <span className="text-xs font-semibold tracking-widest text-slate-500">STUDIO</span>
             </Link>
           </div>
 
-          {/* Center: Desktop Mega Navigation */}
-          <div className="hidden lg:flex lg:flex-1 lg:justify-center">
+          {/* Center: Desktop Mega Navigation (needs ~1280px; below that the drawer is used) */}
+          <div className="hidden xl:flex xl:min-w-0 xl:flex-1 xl:justify-center">
             <NavMegaMenu />
           </div>
 
           {/* Right: Search, Wishlist, Cart, Account */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-2">
             {/* Desktop Search */}
-            <div className="hidden w-48 md:block lg:w-60">
+            <div className="hidden w-44 md:block lg:w-60 xl:w-44 2xl:w-60">
               <HeaderSearch id="desktop-header-search-input" />
             </div>
 
@@ -58,7 +58,7 @@ export async function SiteHeader() {
             <Link
               href="/wishlist"
               aria-label="View saved wishlist items"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+              className="inline-flex h-11 w-11 items-center justify-center xl:h-9 xl:w-9 rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
             >
               <svg
                 className="h-5 w-5"
@@ -80,7 +80,7 @@ export async function SiteHeader() {
             <Link
               href="/cart"
               aria-label="View shopping cart"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+              className="inline-flex h-11 w-11 items-center justify-center xl:h-9 xl:w-9 rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
             >
               <svg
                 className="h-5 w-5"
@@ -119,11 +119,11 @@ function UserAuthSection({
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-0.5 sm:gap-1.5">
       {user.role === "admin" && (
         <Link
           href="/admin"
-          className="hidden rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900 transition hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-amber-900 sm:inline-block"
+          className="hidden min-h-11 items-center rounded-full bg-amber-100 px-2.5 text-xs font-bold text-amber-900 transition hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-amber-900 sm:inline-flex xl:min-h-0 xl:py-1"
         >
           Admin
         </Link>
@@ -131,7 +131,7 @@ function UserAuthSection({
       <Link
         href="/account"
         aria-label="View account profile"
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+        className="inline-flex h-11 w-11 items-center justify-center xl:h-9 xl:w-9 rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
       >
         <svg
           className="h-5 w-5"
@@ -151,7 +151,7 @@ function UserAuthSection({
       <form action={logoutAction} className="hidden sm:inline-block">
         <button
           type="submit"
-          className="rounded-full px-2.5 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-slate-900"
+          className="min-h-11 min-w-11 rounded-full px-2.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-slate-900 xl:min-h-0 xl:min-w-0 xl:py-1"
         >
           Sign Out
         </button>
@@ -162,16 +162,16 @@ function UserAuthSection({
 
 function GuestAuthButtons() {
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-0.5 sm:gap-1.5">
       <Link
         href="/login"
-        className="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900 xl:min-h-0 xl:min-w-0 xl:px-3 xl:py-1.5"
       >
         Sign In
       </Link>
       <Link
         href="/register"
-        className="hidden rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-slate-900 sm:inline-block"
+        className="hidden min-h-11 items-center justify-center rounded-full bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-slate-900 sm:inline-flex xl:min-h-0 xl:py-1.5"
       >
         Register
       </Link>
