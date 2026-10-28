@@ -1,14 +1,69 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8faf8;
-  --foreground: #17211b;
-}
+/*
+ * Design tokens. Neutral, photo-first: white surfaces, near-black text and
+ * primary buttons, neutral greys. Colour comes from photography; red marks a
+ * sale, amber a warning and green only a success or in-stock status.
+ * This file is the single source of truth for colour, type and font.
+ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: Arial, Helvetica, sans-serif;
+  /* One font family, loaded with next/font in src/app/layout.tsx */
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+
+  /* Brand: near-black, used for text, primary buttons and focus rings */
+  --color-brand: var(--color-neutral-900);
+  --color-brand-strong: var(--color-neutral-950);
+  --color-brand-soft: var(--color-neutral-100);
+
+  /* Surfaces and lines */
+  --color-surface: #ffffff;
+  --color-surface-muted: var(--color-neutral-50);
+  --color-line: var(--color-neutral-200);
+
+  /* Form field border: about 4.5:1 on white (WCAG non-text contrast needs 3:1) */
+  --color-field-border: #767676;
+
+  /* Status colours: sale price, and success (in stock, paid, saved) */
+  --color-sale: var(--color-red-600);
+  --color-success: var(--color-green-700);
+  --color-success-soft: var(--color-green-50);
+}
+
+@theme {
+  /* Type scale: size and line-height travel together */
+  --text-caption: 0.75rem; /* 12/16: badges, chips, counters, eyebrows only */
+  --text-caption--line-height: 1rem;
+  --text-body-sm: 0.875rem; /* 14/20 */
+  --text-body-sm--line-height: 1.25rem;
+  --text-body: 1rem; /* 16/24 */
+  --text-body--line-height: 1.5rem;
+  --text-title: 1.125rem; /* 18/28 */
+  --text-title--line-height: 1.75rem;
+
+  --tracking-eyebrow: 0.12em;
+}
+
+/* heading 24/32, then 30/36 from the sm breakpoint */
+@utility text-heading {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  @media (width >= 40rem) {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+/* display 36/40, then 48/52 from the lg breakpoint */
+@utility text-display {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  @media (width >= 64rem) {
+    font-size: 3rem;
+    line-height: 3.25rem;
+  }
 }
 
 button,
@@ -26,9 +81,8 @@ button:disabled {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-surface);
+  color: var(--color-brand);
 }
 
 @media (prefers-reduced-motion: reduce) {

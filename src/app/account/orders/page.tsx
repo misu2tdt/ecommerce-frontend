@@ -11,9 +11,12 @@ import { formatDateTime } from "@/lib/dates";
 import { formatVnd } from "@/lib/money";
 import type { CustomerOrder } from "@/types/order";
 
+import { buttonStyles } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { SITE_NAME } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Your Orders",
-  description: "Review your Evergreen Store Order history.",
+  description: `Review your ${SITE_NAME} Order history.`,
 };
 
 export default async function OrdersPage() {
@@ -38,13 +41,13 @@ export default async function OrdersPage() {
   return (
     <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
       <AccountNav />
-      <p className="mt-8 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+      <Eyebrow className="mt-8">
         Your account
-      </p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+      </Eyebrow>
+      <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
         Order history
       </h1>
-      <p className="mt-3 text-slate-600">
+      <p className="mt-3 text-neutral-600">
         Orders are shown newest first using the backend response order.
       </p>
 
@@ -62,26 +65,26 @@ export default async function OrdersPage() {
           {orders.map((order) => (
             <article
               key={order.id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+              className="rounded-md border border-line bg-surface p-5 sm:p-6"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="text-xl font-bold text-slate-950">
+                    <h2 className="text-title font-bold text-brand-strong">
                       Order #{order.id}
                     </h2>
                     <OrderStatusBadge status={order.status} />
                   </div>
-                  <p className="mt-2 text-sm text-slate-600">
+                  <p className="mt-2 text-body-sm text-neutral-600">
                     Placed {formatDateTime(order.createdAt)}
                   </p>
                 </div>
-                <p className="text-2xl font-bold text-emerald-900">
+                <p className="text-heading font-bold text-brand-strong">
                   {formatVnd(order.totalPrice)}
                 </p>
               </div>
 
-              <ul className="mt-5 space-y-2 border-t border-slate-200 pt-5 text-sm text-slate-700">
+              <ul className="mt-5 space-y-2 border-t border-line pt-5 text-body-sm text-neutral-700">
                 {order.items.slice(0, 2).map((item) => (
                   <li key={item.id} className="flex min-w-0 justify-between gap-4">
                     <span className="min-w-0 break-words">
@@ -94,14 +97,14 @@ export default async function OrdersPage() {
                 ))}
               </ul>
               {order.items.length > 2 && (
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-body-sm text-neutral-600">
                   +{order.items.length - 2} more line items
                 </p>
               )}
 
               <Link
                 href={`/account/orders/${order.id}`}
-                className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-800 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+                className={buttonStyles({ variant: "secondary", size: "md", className: "mt-5" })}
               >
                 View Order
               </Link>

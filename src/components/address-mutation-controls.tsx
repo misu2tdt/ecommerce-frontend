@@ -7,6 +7,7 @@ import {
   type AddressMutationState,
 } from "@/features/addresses/actions";
 
+import { buttonStyles } from "@/components/ui/button";
 const INITIAL_STATE: AddressMutationState = {};
 
 export function AddressMutationControls({
@@ -27,7 +28,7 @@ export function AddressMutationControls({
   const pending = settingDefault || deleting;
 
   return (
-    <div className="mt-5 border-t border-slate-200 pt-4">
+    <div className="mt-5 border-t border-line pt-4">
       <div className="flex flex-wrap gap-3">
         {!isDefault && (
           <form action={defaultAction}>
@@ -36,7 +37,7 @@ export function AddressMutationControls({
             <button
               type="submit"
               disabled={pending}
-              className="min-h-11 rounded-lg border border-emerald-700 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait disabled:opacity-55"
+              className={buttonStyles({ variant: "secondary", size: "md" })}
             >
               {settingDefault ? "Updating..." : "Make default"}
             </button>
@@ -48,7 +49,7 @@ export function AddressMutationControls({
           <button
             type="submit"
             disabled={pending}
-            className="min-h-11 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-wait disabled:opacity-55"
+            className="min-h-11 rounded-md border border-red-300 px-4 py-2 text-body-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-wait disabled:opacity-55"
           >
             {deleting ? "Deleting..." : "Delete address"}
           </button>
@@ -57,10 +58,10 @@ export function AddressMutationControls({
       {(defaultState.message || deleteState.message) && (
         <p
           role={defaultState.status === "error" || deleteState.status === "error" ? "alert" : "status"}
-          className={`mt-3 text-sm ${
+          className={`mt-3 text-body-sm ${
             defaultState.status === "error" || deleteState.status === "error"
               ? "text-red-700"
-              : "text-emerald-700"
+              : "text-success"
           }`}
         >
           {defaultState.message ?? deleteState.message}

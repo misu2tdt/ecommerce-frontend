@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { ProductFilters } from "@/features/catalog/api";
 import type { Brand, Category } from "@/types/catalog";
 
+import { buttonStyles } from "@/components/ui/button";
+import { fieldStyles } from "@/components/ui/field";
 interface CatalogFiltersProps {
   categories: Category[];
   brands: Brand[];
@@ -19,14 +21,14 @@ export function CatalogFilters({
     <form
       action="/products"
       method="get"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+      className="rounded-md border border-line bg-surface p-5 sm:p-6"
       aria-label="Filter products"
     >
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-[minmax(15rem,1.5fr)_1fr_1fr]">
         <div>
           <label
             htmlFor="catalog-search"
-            className="block text-sm font-semibold text-slate-800"
+            className="block text-body-sm font-semibold text-neutral-800"
           >
             Search
           </label>
@@ -37,14 +39,14 @@ export function CatalogFilters({
             maxLength={255}
             defaultValue={filters.q}
             placeholder="Search product names"
-            className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-700 focus:outline-2 focus:outline-emerald-700/25"
+            className={fieldStyles("mt-2")}
           />
         </div>
 
         <div>
           <label
             htmlFor="catalog-category"
-            className="block text-sm font-semibold text-slate-800"
+            className="block text-body-sm font-semibold text-neutral-800"
           >
             Category
           </label>
@@ -52,7 +54,7 @@ export function CatalogFilters({
             id="catalog-category"
             name="category"
             defaultValue={filters.category ?? ""}
-            className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 focus:border-emerald-700 focus:outline-2 focus:outline-emerald-700/25"
+            className={fieldStyles("mt-2")}
           >
             <option value="">All categories</option>
             {categories.map((category) => (
@@ -66,7 +68,7 @@ export function CatalogFilters({
         <div>
           <label
             htmlFor="catalog-brand"
-            className="block text-sm font-semibold text-slate-800"
+            className="block text-body-sm font-semibold text-neutral-800"
           >
             Brand
           </label>
@@ -74,7 +76,7 @@ export function CatalogFilters({
             id="catalog-brand"
             name="brand"
             defaultValue={filters.brand ?? ""}
-            className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 focus:border-emerald-700 focus:outline-2 focus:outline-emerald-700/25"
+            className={fieldStyles("mt-2")}
           >
             <option value="">All brands</option>
             {brands.map((brand) => (
@@ -89,19 +91,19 @@ export function CatalogFilters({
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
         <button
           type="submit"
-          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-800 px-5 py-2.5 font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-emerald-800"
+          className={buttonStyles({ variant: "primary", size: "md" })}
         >
           Apply filters
         </button>
         {active ? (
           <Link
             href="/products"
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:border-emerald-700 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+            className={buttonStyles({ variant: "secondary", size: "md" })}
           >
             Clear filters
           </Link>
         ) : (
-          <span className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 px-5 py-2.5 font-semibold text-slate-400">
+          <span className="inline-flex min-h-11 items-center justify-center rounded-md border border-line px-5 py-2.5 font-semibold text-neutral-500">
             Clear filters
           </span>
         )}

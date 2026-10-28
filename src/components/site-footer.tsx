@@ -1,5 +1,6 @@
 import Link from "next/link";
-
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { SITE_NAME } from "@/lib/site";
 const categories = [
   { label: "All Products", href: "/products" },
   { label: "T-Shirts & Tops", href: "/products?category=t-shirts-tops" },
@@ -25,34 +26,34 @@ const customerLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-slate-200 bg-slate-950 text-slate-400">
+    <footer className="border-t border-line bg-brand-strong text-neutral-400">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:gap-12">
           {/* Col 1: Brand Info */}
           <div className="col-span-2 md:col-span-1">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-base font-black tracking-tight text-white focus-visible:outline-2 focus-visible:outline-white"
+              className="inline-flex items-center gap-1.5 text-body font-bold tracking-tight text-white focus-visible:outline-2 focus-visible:outline-white"
             >
               <span className="tracking-widest">VERVE</span>
-              <span className="text-xs font-semibold tracking-widest text-slate-400">STUDIO</span>
+              <span className="text-body-sm font-semibold tracking-widest text-neutral-400">STUDIO</span>
             </Link>
-            <p className="mt-3 text-xs leading-relaxed text-slate-400">
+            <p className="mt-3 text-body-sm text-neutral-400">
               Modern commercial fashion storefront engineered for comfort,
               movement, and everyday utility. Powered by Next.js and NestJS.
             </p>
-            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-[11px] font-medium text-slate-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-brand px-3 py-1 text-body-sm font-semibold text-neutral-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-neutral-400" />
               <span>Live Fashion Catalog</span>
             </div>
           </div>
 
           {/* Col 2: Categories */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-200">
+            <Eyebrow className="text-neutral-200">
               Categories
-            </p>
-            <ul className="mt-4 space-y-2.5 text-xs">
+            </Eyebrow>
+            <ul className="mt-4 space-y-2.5 text-body-sm">
               {categories.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -68,18 +69,18 @@ export function SiteFooter() {
 
           {/* Col 3: Brands */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-200">
+            <Eyebrow className="text-neutral-200">
               Brands
-            </p>
-            <ul className="mt-4 space-y-2.5 text-xs">
+            </Eyebrow>
+            <ul className="mt-4 space-y-2.5 text-body-sm">
               {brands.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     className="group flex flex-col transition hover:text-white focus-visible:outline-2 focus-visible:outline-white"
                   >
-                    <span className="font-medium group-hover:underline">{item.label}</span>
-                    <span className="text-[10px] text-slate-400">{item.desc}</span>
+                    <span className="font-normal group-hover:underline">{item.label}</span>
+                    <span className="text-body-sm text-neutral-400">{item.desc}</span>
                   </Link>
                 </li>
               ))}
@@ -88,10 +89,10 @@ export function SiteFooter() {
 
           {/* Col 4: Customer Care */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-200">
+            <Eyebrow className="text-neutral-200">
               Customer Care
-            </p>
-            <ul className="mt-4 space-y-2.5 text-xs">
+            </Eyebrow>
+            <ul className="mt-4 space-y-2.5 text-body-sm">
               {customerLinks.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -103,16 +104,16 @@ export function SiteFooter() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-[11px] text-slate-400">
-              <p className="font-semibold text-slate-300">Need help with an order?</p>
+            <div className="mt-6 rounded-md border border-neutral-800 bg-neutral-900/60 p-3 text-body-sm text-neutral-400">
+              <p className="font-semibold text-neutral-300">Need help with an order?</p>
               <p className="mt-1">Check order status anytime in your account dashboard.</p>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-8 text-xs text-slate-400 sm:flex-row">
-          <p>&copy; {new Date().getFullYear()} VERVE STUDIO. Fictional portfolio fashion store.</p>
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-neutral-800/80 pt-8 text-body-sm text-neutral-400 sm:flex-row">
+          <p>&copy; {new Date().getFullYear()} {SITE_NAME}. Fictional portfolio fashion store.</p>
           <div className="flex items-center gap-6">
             <span>Currency: VND (₫)</span>
             <span>Deterministic Demo Data</span>

@@ -25,10 +25,10 @@ export function AccountNav() {
             key={href}
             href={href}
             aria-current={isCurrent ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-lg border px-4 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-emerald-800 ${
+            className={`inline-flex min-h-11 items-center rounded-md border px-4 py-2 text-body-sm font-semibold focus-visible:outline-2 focus-visible:outline-brand ${
               isCurrent
-                ? "border-emerald-800 bg-emerald-800 text-white"
-                : "border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:bg-emerald-50"
+                ? "border-brand bg-brand text-white"
+                : "border-line bg-surface text-neutral-700 hover:border-brand hover:bg-brand-soft"
             }`}
           >
             {label}

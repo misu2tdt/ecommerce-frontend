@@ -5,6 +5,8 @@ import { fetchCartQuote } from "@/features/promotions/actions";
 import { formatVnd } from "@/lib/money";
 import type { CartQuoteResponse } from "@/types/promotions";
 
+import { buttonStyles } from "@/components/ui/button";
+import { fieldStyles } from "@/components/ui/field";
 interface CouponEntryBoxProps {
   initialSubtotal: number;
   onQuoteChange?: (quote: CartQuoteResponse | null) => void;
@@ -82,24 +84,24 @@ export function CouponEntryBox({
       <div>
         <label
           htmlFor="promo-code-input"
-          className="block text-xs font-bold uppercase tracking-wider text-slate-700"
+          className="block uppercase text-neutral-700 text-caption font-semibold tracking-eyebrow"
         >
           Promo code
         </label>
         {appliedQuote?.coupon ? (
-          <div className="mt-2 flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-50/80 px-4 py-3">
+          <div className="mt-2 flex items-center justify-between rounded-md border border-success/30 bg-success-soft px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-6 items-center rounded-md bg-emerald-700 px-2 font-mono text-xs font-bold text-white">
+              <span className="inline-flex h-6 items-center rounded-md bg-brand px-2 font-mono text-body-sm font-bold text-white">
                 {appliedQuote.coupon.code}
               </span>
-              <span className="text-xs font-semibold text-emerald-900">
+              <span className="text-body-sm font-semibold text-brand-strong">
                 {appliedQuote.coupon.name}
               </span>
             </div>
             <button
               type="button"
               onClick={handleRemove}
-              className="text-xs font-bold text-slate-500 hover:text-rose-600 focus-visible:outline-2 focus-visible:outline-emerald-800"
+              className="text-body-sm font-bold text-neutral-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-brand"
             >
               Remove
             </button>
@@ -119,13 +121,13 @@ export function CouponEntryBox({
               }}
               placeholder="e.g. WELCOME10"
               disabled={isPending}
-              className="min-w-0 flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 focus:border-emerald-700 focus:outline-none focus:ring-1 focus:ring-emerald-700 disabled:bg-slate-100"
+              className={fieldStyles("min-w-0 flex-1 uppercase")}
             />
             <button
               type="button"
               onClick={() => applyCode(couponCode)}
               disabled={isPending || !couponCode.trim()}
-              className="shrink-0 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+              className={buttonStyles({ variant: "primary", size: "md", className: "shrink-0" })}
             >
               {isPending ? "Applying..." : "Apply"}
             </button>
@@ -133,7 +135,7 @@ export function CouponEntryBox({
         )}
 
         {errorMessage && (
-          <p role="alert" className="mt-2 text-xs font-medium text-rose-600">
+          <p role="alert" className="mt-2 text-body-sm font-normal text-red-600">
             {errorMessage}
           </p>
         )}
@@ -141,20 +143,20 @@ export function CouponEntryBox({
 
       {/* Pricing Summary Breakdown */}
       {showSummary && (
-        <div className="space-y-2.5 border-t border-slate-200 pt-4 text-sm">
-          <div className="flex justify-between text-slate-600">
+        <div className="space-y-2.5 border-t border-line pt-4 text-body-sm">
+          <div className="flex justify-between text-neutral-600">
             <span>Subtotal</span>
             <span>{formatVnd(currentSubtotal)}</span>
           </div>
           {currentDiscount > 0 && (
-            <div className="flex justify-between font-semibold text-emerald-700">
+            <div className="flex justify-between font-semibold text-success">
               <span>Promotion discount</span>
               <span>-{formatVnd(currentDiscount)}</span>
             </div>
           )}
-          <div className="flex items-end justify-between border-t border-slate-200 pt-3">
-            <span className="text-base font-bold text-slate-950">Total</span>
-            <span className="text-2xl font-black text-emerald-950">
+          <div className="flex items-end justify-between border-t border-line pt-3">
+            <span className="text-body font-bold text-brand-strong">Total</span>
+            <span className="text-heading font-bold text-brand-strong">
               {formatVnd(currentTotal)}
             </span>
           </div>

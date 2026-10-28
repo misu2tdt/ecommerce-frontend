@@ -27,10 +27,10 @@ export function CartItemControls({
   const pending = updating || removing;
 
   return (
-    <div className="mt-5 border-t border-slate-200 pt-4">
+    <div className="mt-5 border-t border-line pt-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-slate-800">Quantity</p>
+          <p className="text-body-sm font-semibold text-neutral-800">Quantity</p>
           <div className="mt-2 flex items-center gap-2" aria-label="Cart item quantity">
             <form action={updateAction}>
               <input type="hidden" name="itemId" value={itemId} />
@@ -39,14 +39,14 @@ export function CartItemControls({
                 type="submit"
                 disabled={pending || quantity <= 1}
                 aria-label="Decrease cart quantity"
-                className="h-11 w-11 rounded-lg border border-slate-300 bg-white text-xl font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:opacity-45"
+                className="h-11 w-11 rounded-md border border-field-border bg-surface text-title font-semibold text-neutral-800 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-45"
               >
                 -
               </button>
             </form>
             <output
               aria-live="polite"
-              className="flex h-11 min-w-12 items-center justify-center rounded-lg bg-slate-100 px-3 font-semibold text-slate-950"
+              className="flex h-11 min-w-12 items-center justify-center rounded-md bg-brand-soft px-3 font-semibold text-brand-strong"
             >
               {quantity}
             </output>
@@ -57,7 +57,7 @@ export function CartItemControls({
                 type="submit"
                 disabled={pending}
                 aria-label="Increase cart quantity"
-                className="h-11 w-11 rounded-lg border border-slate-300 bg-white text-xl font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait disabled:opacity-55"
+                className="h-11 w-11 rounded-md border border-field-border bg-surface text-title font-semibold text-neutral-800 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-wait disabled:opacity-55"
               >
                 +
               </button>
@@ -70,7 +70,7 @@ export function CartItemControls({
           <button
             type="submit"
             disabled={pending}
-            className="min-h-11 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-wait disabled:opacity-55"
+            className="min-h-11 rounded-md border border-red-300 px-4 py-2 text-body-sm font-semibold text-red-700 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-wait disabled:opacity-55"
           >
             {removing ? "Removing..." : "Remove item"}
           </button>
@@ -80,15 +80,15 @@ export function CartItemControls({
       {updateState.message && (
         <p
           role={updateState.status === "error" ? "alert" : "status"}
-          className={`mt-3 text-sm ${
-            updateState.status === "error" ? "text-red-700" : "text-emerald-700"
+          className={`mt-3 text-body-sm ${
+            updateState.status === "error" ? "text-red-700" : "text-success"
           }`}
         >
           {updateState.message}
         </p>
       )}
       {removeState.status === "error" && (
-        <p role="alert" className="mt-3 text-sm text-red-700">
+        <p role="alert" className="mt-3 text-body-sm text-red-700">
           {removeState.message}
         </p>
       )}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { buttonStyles } from "@/components/ui/button";
 interface SizeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -85,7 +86,7 @@ export function SizeGuideModal({
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-neutral-900/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -93,18 +94,18 @@ export function SizeGuideModal({
       {/* Modal Dialog Content */}
       <div
         ref={dialogRef}
-        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl sm:p-8"
+        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-md bg-surface p-6 shadow-2xl sm:p-8"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+        <div className="flex items-center justify-between border-b border-line pb-4">
           <div>
             <h2
               id="size-guide-modal-title"
-              className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl"
+              className="text-title font-bold tracking-tight text-brand sm:text-heading"
             >
               Size & Fit Guide
             </h2>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-body-sm text-neutral-600">
               General garment measurements for standard fit guidance.
             </p>
           </div>
@@ -113,7 +114,7 @@ export function SizeGuideModal({
             type="button"
             onClick={onClose}
             aria-label="Close size guide"
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-emerald-800"
+            className="rounded-md p-2 text-neutral-500 hover:bg-brand-soft hover:text-neutral-700 focus-visible:outline-2 focus-visible:outline-brand"
           >
             <svg
               className="h-5 w-5"
@@ -132,15 +133,15 @@ export function SizeGuideModal({
         </div>
 
         {/* View Switcher Controls */}
-        <div className="mt-6 flex gap-2 border-b border-slate-200 pb-3">
+        <div className="mt-6 flex gap-2 border-b border-line pb-3">
           <button
             type="button"
             aria-pressed={viewSection === "tops"}
             onClick={() => setViewSection("tops")}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-emerald-800 ${
+            className={`rounded-md px-4 py-2 text-body-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-brand ${
               viewSection === "tops"
-                ? "bg-emerald-800 text-white shadow-xs"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                ? "bg-brand text-white"
+                : "bg-brand-soft text-neutral-700 hover:bg-neutral-200"
             }`}
           >
             Tops & Outerwear
@@ -149,10 +150,10 @@ export function SizeGuideModal({
             type="button"
             aria-pressed={viewSection === "bottoms"}
             onClick={() => setViewSection("bottoms")}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-emerald-800 ${
+            className={`rounded-md px-4 py-2 text-body-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-brand ${
               viewSection === "bottoms"
-                ? "bg-emerald-800 text-white shadow-xs"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                ? "bg-brand text-white"
+                : "bg-brand-soft text-neutral-700 hover:bg-neutral-200"
             }`}
           >
             Pants & Shorts
@@ -163,8 +164,8 @@ export function SizeGuideModal({
         <div className="mt-6">
           {viewSection === "tops" ? (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-700">
-                <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase font-bold text-slate-600">
+              <table className="w-full text-left text-body-sm text-neutral-700">
+                <thead className="border-b border-line bg-surface-muted text-caption uppercase font-bold text-neutral-600">
                   <tr>
                     <th scope="col" className="px-4 py-3">Size</th>
                     <th scope="col" className="px-4 py-3">Chest (cm)</th>
@@ -172,33 +173,33 @@ export function SizeGuideModal({
                     <th scope="col" className="px-4 py-3">Shoulder (cm)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
+                <tbody className="divide-y divide-neutral-100 font-normal">
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">S</td>
+                    <td className="px-4 py-3 font-bold text-brand">S</td>
                     <td className="px-4 py-3">92 - 96</td>
                     <td className="px-4 py-3">68</td>
                     <td className="px-4 py-3">43</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">M</td>
+                    <td className="px-4 py-3 font-bold text-brand">M</td>
                     <td className="px-4 py-3">97 - 101</td>
                     <td className="px-4 py-3">70</td>
                     <td className="px-4 py-3">45</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">L</td>
+                    <td className="px-4 py-3 font-bold text-brand">L</td>
                     <td className="px-4 py-3">102 - 107</td>
                     <td className="px-4 py-3">72</td>
                     <td className="px-4 py-3">47</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">XL</td>
+                    <td className="px-4 py-3 font-bold text-brand">XL</td>
                     <td className="px-4 py-3">108 - 113</td>
                     <td className="px-4 py-3">74</td>
                     <td className="px-4 py-3">49</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">2XL / XXL</td>
+                    <td className="px-4 py-3 font-bold text-brand">2XL / XXL</td>
                     <td className="px-4 py-3">114 - 120</td>
                     <td className="px-4 py-3">76</td>
                     <td className="px-4 py-3">51</td>
@@ -208,8 +209,8 @@ export function SizeGuideModal({
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-700">
-                <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase font-bold text-slate-600">
+              <table className="w-full text-left text-body-sm text-neutral-700">
+                <thead className="border-b border-line bg-surface-muted text-caption uppercase font-bold text-neutral-600">
                   <tr>
                     <th scope="col" className="px-4 py-3">Waist Size</th>
                     <th scope="col" className="px-4 py-3">Waist (cm)</th>
@@ -217,33 +218,33 @@ export function SizeGuideModal({
                     <th scope="col" className="px-4 py-3">Inseam (cm)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
+                <tbody className="divide-y divide-neutral-100 font-normal">
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">28 (S)</td>
+                    <td className="px-4 py-3 font-bold text-brand">28 (S)</td>
                     <td className="px-4 py-3">71 - 74</td>
                     <td className="px-4 py-3">90 - 93</td>
                     <td className="px-4 py-3">76</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">30 (M)</td>
+                    <td className="px-4 py-3 font-bold text-brand">30 (M)</td>
                     <td className="px-4 py-3">76 - 79</td>
                     <td className="px-4 py-3">95 - 98</td>
                     <td className="px-4 py-3">77</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">32 (L)</td>
+                    <td className="px-4 py-3 font-bold text-brand">32 (L)</td>
                     <td className="px-4 py-3">81 - 84</td>
                     <td className="px-4 py-3">100 - 103</td>
                     <td className="px-4 py-3">78</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">34 (XL)</td>
+                    <td className="px-4 py-3 font-bold text-brand">34 (XL)</td>
                     <td className="px-4 py-3">86 - 89</td>
                     <td className="px-4 py-3">105 - 108</td>
                     <td className="px-4 py-3">79</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-bold text-slate-900">36 (2XL)</td>
+                    <td className="px-4 py-3 font-bold text-brand">36 (2XL)</td>
                     <td className="px-4 py-3">91 - 95</td>
                     <td className="px-4 py-3">110 - 114</td>
                     <td className="px-4 py-3">80</td>
@@ -255,8 +256,8 @@ export function SizeGuideModal({
         </div>
 
         {/* General Measuring Tips */}
-        <div className="mt-6 rounded-xl bg-slate-50 p-4 text-xs leading-relaxed text-slate-600 border border-slate-200">
-          <p className="font-semibold text-slate-800">Measuring Tips:</p>
+        <div className="mt-6 rounded-md bg-surface-muted p-4 text-body-sm text-neutral-600 border border-line">
+          <p className="font-semibold text-neutral-800">Measuring Tips:</p>
           <ul className="mt-1 list-disc pl-4 space-y-1">
             <li><strong>Chest:</strong> Measure around the fullest part of your chest, keeping the tape horizontal.</li>
             <li><strong>Waist:</strong> Measure around your natural waistline where your waistband typically sits.</li>
@@ -269,7 +270,7 @@ export function SizeGuideModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+            className={buttonStyles({ variant: "primary", size: "md" })}
           >
             Close
           </button>

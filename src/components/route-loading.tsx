@@ -11,13 +11,13 @@ export function RouteLoading({ label, width = "wide" }: RouteLoadingProps) {
       aria-live="polite"
     >
       <span className="sr-only">{label}</span>
-      <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
-      <div className="mt-3 h-10 w-64 max-w-full animate-pulse rounded bg-slate-200" />
+      <div className="h-4 w-28 animate-pulse rounded bg-neutral-200" />
+      <div className="mt-3 h-10 w-64 max-w-full animate-pulse rounded bg-neutral-200" />
       <div className="mt-8 grid gap-5 sm:grid-cols-2">
         {Array.from({ length: 4 }, (_, index) => (
           <div
             key={index}
-            className="h-40 animate-pulse rounded-2xl border border-slate-200 bg-white"
+            className="h-40 animate-pulse rounded-md border border-line bg-surface"
           />
         ))}
       </div>

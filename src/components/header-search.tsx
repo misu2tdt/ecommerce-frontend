@@ -50,11 +50,11 @@ function HeaderSearchFallback({
           type="search"
           placeholder={placeholder}
           disabled
-          className="w-full rounded-full border border-slate-200 bg-slate-50/80 py-2.5 pl-9 pr-4 text-base text-slate-900 placeholder:text-slate-500 xl:py-2 xl:text-xs"
+          className="w-full rounded-md border border-field-border bg-surface-muted py-2.5 pl-9 pr-4 text-body text-brand placeholder:text-neutral-600 xl:py-2 xl:text-body-sm"
         />
         <svg
           aria-hidden="true"
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -116,11 +116,11 @@ function HeaderSearchForm({
           placeholder={placeholder}
           autoFocus={autoFocus}
           disabled={isPending}
-          className="w-full rounded-full border border-slate-200 bg-slate-50/80 py-2.5 pl-9 pr-4 text-base text-slate-900 placeholder:text-slate-500 transition hover:bg-slate-100/80 focus:border-slate-400 focus:bg-white focus:outline-2 focus:outline-offset-2 focus:outline-slate-900 xl:py-2 xl:text-xs"
+          className="w-full rounded-md border border-field-border bg-surface-muted py-2.5 pl-9 pr-4 text-body text-brand placeholder:text-neutral-600 transition hover:bg-brand-soft focus:bg-surface focus:outline-2 focus:outline-offset-2 focus:outline-brand xl:py-2 xl:text-body-sm"
         />
         <svg
           aria-hidden="true"
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -138,7 +138,7 @@ function HeaderSearchForm({
           type="button"
           onClick={() => setQuery("")}
           aria-label="Clear search query"
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:text-slate-600 focus-visible:outline-2 focus-visible:outline-slate-900"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-neutral-500 hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
         >
           <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
             <path

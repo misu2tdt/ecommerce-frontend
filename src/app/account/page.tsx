@@ -6,9 +6,11 @@ import { getCurrentUser } from "@/features/auth/current-user";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { apiErrorMessage } from "@/lib/api";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { SITE_NAME } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Account",
-  description: "Your authenticated Evergreen Store account.",
+  description: `Your authenticated ${SITE_NAME} account.`,
 };
 
 export default async function AccountPage() {
@@ -29,70 +31,70 @@ export default async function AccountPage() {
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+      <div className="rounded-md border border-line bg-surface p-6 sm:p-8">
+        <Eyebrow>
           Authenticated account
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+        </Eyebrow>
+        <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
           Your account
         </h1>
-        <p className="mt-3 text-slate-600">
+        <p className="mt-3 text-neutral-600">
           This identity was verified by the NestJS backend for this request.
         </p>
 
         <dl className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl bg-slate-50 p-4">
-            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <div className="rounded-md bg-surface-muted p-4">
+            <dt className="uppercase text-neutral-600 text-caption font-semibold tracking-eyebrow">
               Email
             </dt>
-            <dd className="mt-2 break-all font-semibold text-slate-950">
+            <dd className="mt-2 break-all font-semibold text-brand-strong">
               {user.email}
             </dd>
           </div>
-          <div className="rounded-xl bg-slate-50 p-4">
-            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <div className="rounded-md bg-surface-muted p-4">
+            <dt className="uppercase text-neutral-600 text-caption font-semibold tracking-eyebrow">
               Role
             </dt>
-            <dd className="mt-2 font-semibold capitalize text-slate-950">
+            <dd className="mt-2 font-semibold capitalize text-brand-strong">
               {user.role}
             </dd>
           </div>
-          <div className="rounded-xl bg-slate-50 p-4 sm:col-span-2">
-            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <div className="rounded-md bg-surface-muted p-4 sm:col-span-2">
+            <dt className="uppercase text-neutral-600 text-caption font-semibold tracking-eyebrow">
               Account ID
             </dt>
-            <dd className="mt-2 font-semibold text-slate-950">{user.id}</dd>
+            <dd className="mt-2 font-semibold text-brand-strong">{user.id}</dd>
           </div>
         </dl>
 
         <nav
           aria-label="Account sections"
-          className="mt-8 grid gap-3 border-t border-slate-200 pt-6 sm:grid-cols-2"
+          className="mt-8 grid gap-3 border-t border-line pt-6 sm:grid-cols-2"
         >
           <Link
             href="/account/orders"
-            className="rounded-xl border border-slate-200 p-4 font-semibold text-slate-900 hover:border-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className="rounded-md border border-line p-4 font-semibold text-brand hover:border-brand hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
-            <span className="block text-lg">Your Orders</span>
-            <span className="mt-1 block text-sm font-normal text-slate-600">
+            <span className="block text-title">Your Orders</span>
+            <span className="mt-1 block text-body-sm font-normal text-neutral-600">
               Review purchases and Order status
             </span>
           </Link>
           <Link
             href="/account/addresses"
-            className="rounded-xl border border-slate-200 p-4 font-semibold text-slate-900 hover:border-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className="rounded-md border border-line p-4 font-semibold text-brand hover:border-brand hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
-            <span className="block text-lg">Saved addresses</span>
-            <span className="mt-1 block text-sm font-normal text-slate-600">
+            <span className="block text-title">Saved addresses</span>
+            <span className="mt-1 block text-body-sm font-normal text-neutral-600">
               Manage checkout destinations
             </span>
           </Link>
           <Link
             href="/wishlist"
-            className="rounded-xl border border-slate-200 p-4 font-semibold text-slate-900 hover:border-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 sm:col-span-2"
+            className="rounded-md border border-line p-4 font-semibold text-brand hover:border-brand hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:col-span-2"
           >
-            <span className="block text-lg">Your wishlist</span>
-            <span className="mt-1 block text-sm font-normal text-slate-600">
+            <span className="block text-title">Your wishlist</span>
+            <span className="mt-1 block text-body-sm font-normal text-neutral-600">
               Revisit products you saved
             </span>
           </Link>

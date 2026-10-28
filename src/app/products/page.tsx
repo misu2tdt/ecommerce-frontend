@@ -17,6 +17,7 @@ import {
 } from "@/features/catalog/search-params";
 import type { CatalogFilterOptions, ProductSummary } from "@/types/catalog";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
 export const metadata: Metadata = {
   title: "Shop All Products | Everyday Essentials & Activewear",
   description:
@@ -55,14 +56,14 @@ export default async function ProductsPage({
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Page Header */}
-      <div className="border-b border-slate-200 pb-6">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-800">
+      <div className="border-b border-line pb-6">
+        <Eyebrow>
           Curated Wardrobe
-        </p>
-        <h1 className="mt-1 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+        </Eyebrow>
+        <h1 className="mt-1 font-bold tracking-tight text-brand text-display">
           Everyday Performance & Essentials
         </h1>
-        <p className="mt-2 max-w-3xl text-sm text-slate-600">
+        <p className="mt-2 max-w-3xl text-body-sm text-neutral-600">
           Explore versatile fabrics, breathable activewear, and timeless wardrobe
           staples designed for all-day comfort.
         </p>
@@ -71,7 +72,7 @@ export default async function ProductsPage({
       {/* Main Catalog Layout */}
       <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
         {/* Desktop Filter Sidebar */}
-        <div className="hidden w-64 shrink-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs lg:block">
+        <div className="hidden w-64 shrink-0 rounded-md border border-line bg-surface p-6 lg:block">
           <CatalogSidebar
             filters={filters}
             options={filterOptions}
@@ -82,11 +83,11 @@ export default async function ProductsPage({
         {/* Product Grid & Controls */}
         <div className="flex-1 min-w-0">
           {/* Top Control Bar */}
-          <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border-b border-line pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <MobileFilterDrawer filters={filters} options={filterOptions} />
               <p
-                className="text-xs font-semibold text-slate-600"
+                className="text-body-sm font-semibold text-neutral-600"
                 role="status"
                 aria-live="polite"
               >

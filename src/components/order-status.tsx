@@ -1,3 +1,4 @@
+import { badgeStyles, type BadgeVariant } from "@/components/ui/badge";
 import type { OrderStatus } from "@/types/order";
 
 const statusLabels: Record<OrderStatus, string> = {
@@ -9,13 +10,14 @@ const statusLabels: Record<OrderStatus, string> = {
   cancelled: "Cancelled",
 };
 
-const statusClasses: Record<OrderStatus, string> = {
-  pending: "bg-amber-100 text-amber-900",
-  confirmed: "bg-blue-100 text-blue-900",
-  processing: "bg-violet-100 text-violet-900",
-  shipped: "bg-cyan-100 text-cyan-900",
-  delivered: "bg-emerald-100 text-emerald-900",
-  cancelled: "bg-red-100 text-red-800",
+// Status colours carry meaning only: amber waiting, green done, red cancelled.
+const statusVariants: Record<OrderStatus, BadgeVariant> = {
+  pending: "warning",
+  confirmed: "success",
+  processing: "neutral",
+  shipped: "neutral",
+  delivered: "success",
+  cancelled: "error",
 };
 
 const lifecycle: Exclude<OrderStatus, "cancelled">[] = [
@@ -30,7 +32,7 @@ export function OrderStatusBadge({ status }: { status: OrderStatus }) {
   return (
     <span
       aria-label={`Order status: ${statusLabels[status]}`}
-      className={`inline-flex rounded-full px-3 py-1.5 text-sm font-semibold ${statusClasses[status]}`}
+      className={badgeStyles(statusVariants[status], undefined, "md")}
     >
       {statusLabels[status]}
     </span>
@@ -40,9 +42,9 @@ export function OrderStatusBadge({ status }: { status: OrderStatus }) {
 export function OrderStatusProgress({ status }: { status: OrderStatus }) {
   if (status === "cancelled") {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-4">
+      <div className="rounded-md border border-red-200 bg-red-50 px-4 py-4">
         <OrderStatusBadge status="cancelled" />
-        <p className="mt-2 text-sm text-red-800">
+        <p className="mt-2 text-body-sm text-red-800">
           This Order was cancelled. No later lifecycle state is implied.
         </p>
       </div>
@@ -59,11 +61,11 @@ export function OrderStatusProgress({ status }: { status: OrderStatus }) {
           <li
             key={step}
             aria-current={current ? "step" : undefined}
-            className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${
-              current
-                ? statusClasses[step]
-                : "border-slate-200 bg-slate-50 text-slate-600"
-            }`}
+            className={badgeStyles(
+              current ? statusVariants[step] : "neutral",
+              undefined,
+              "md",
+            )}
           >
             {statusLabels[step]}
             <span className="sr-only"> {current ? "current" : "completed"}</span>

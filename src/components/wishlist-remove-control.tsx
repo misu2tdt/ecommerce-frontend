@@ -21,12 +21,12 @@ export function WishlistRemoveControl({ productId }: { productId: number }) {
       <button
         type="submit"
         disabled={pending}
-        className="min-h-11 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-wait disabled:opacity-60"
+        className="min-h-11 rounded-md border border-red-300 px-4 py-2 text-body-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-wait disabled:opacity-60"
       >
         {pending ? "Removing..." : "Remove"}
       </button>
       {state.status === "error" && (
-        <p role="alert" className="mt-2 text-sm text-red-700">
+        <p role="alert" className="mt-2 text-body-sm text-red-700">
           {state.message}
         </p>
       )}

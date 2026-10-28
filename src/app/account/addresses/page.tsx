@@ -11,9 +11,13 @@ import { buildLoginHref, safeInternalPath } from "@/features/auth/redirects";
 import { ApiError, apiErrorMessage } from "@/lib/api";
 import type { Address } from "@/types/address";
 
+import { buttonStyles } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { Badge } from "@/components/ui/badge";
+import { SITE_NAME } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Saved addresses",
-  description: "Manage your Evergreen Store shipping addresses.",
+  description: `Manage your ${SITE_NAME} shipping addresses.`,
 };
 
 type AddressSearchParams = Record<string, string | string[] | undefined>;
@@ -48,20 +52,20 @@ export default async function AddressesPage({
       <AccountNav />
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+          <Eyebrow>
             Your account
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+          </Eyebrow>
+          <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
             Saved addresses
           </h1>
-          <p className="mt-3 text-slate-600">
+          <p className="mt-3 text-neutral-600">
             These addresses can be selected during authenticated checkout.
           </p>
         </div>
         {returnPath !== "/account/addresses" && (
           <Link
             href={returnPath}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-800 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className={buttonStyles({ variant: "secondary", size: "md" })}
           >
             Return to checkout
           </Link>
@@ -72,26 +76,24 @@ export default async function AddressesPage({
         {addresses.map((address) => (
           <article
             key={address.id}
-            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+            className="rounded-md border border-line bg-surface p-5 sm:p-6"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-950">
+              <h2 className="text-title font-bold text-brand-strong">
                 {address.label ?? "Saved address"}
               </h2>
               {address.isDefault && (
-                <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-                  Default
-                </span>
+                <Badge>Default</Badge>
               )}
             </div>
             <div className="mt-3">
               <AddressSummary address={address} />
             </div>
-            <details className="mt-5 rounded-xl border border-slate-200 p-4">
-              <summary className="cursor-pointer font-semibold text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800">
+            <details className="mt-5 rounded-md border border-line p-4">
+              <summary className="cursor-pointer font-semibold text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
                 Edit address
               </summary>
-              <div className="mt-5 border-t border-slate-200 pt-5">
+              <div className="mt-5 border-t border-line pt-5">
                 <AddressForm
                   mode="edit"
                   address={address}
@@ -108,15 +110,15 @@ export default async function AddressesPage({
       </div>
 
       {addresses.length === 0 && (
-        <p className="mt-8 rounded-xl border border-slate-200 bg-slate-50 px-5 py-6 text-slate-600">
+        <p className="mt-8 rounded-md border border-line bg-surface-muted px-5 py-6 text-neutral-600">
           You do not have a saved address yet. Add one below to prepare for
           checkout.
         </p>
       )}
 
-      <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-        <h2 className="text-2xl font-bold text-slate-950">Add an address</h2>
-        <p className="mt-2 text-sm text-slate-600">
+      <section className="mt-10 rounded-md border border-line bg-surface p-5 sm:p-7">
+        <h2 className="text-heading font-bold text-brand-strong">Add an address</h2>
+        <p className="mt-2 text-body-sm text-neutral-600">
           Optional fields may be left blank. Country uses a two-letter code.
         </p>
         <div className="mt-6">
@@ -124,7 +126,7 @@ export default async function AddressesPage({
         </div>
       </section>
 
-      <p className="mt-6 text-sm text-slate-500">
+      <p className="mt-6 text-body-sm text-neutral-600">
         Deleting or editing a saved address does not change the immutable
         shipping snapshot on an existing Order. Deleting a default address
         does not automatically promote another address.

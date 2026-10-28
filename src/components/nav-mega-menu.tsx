@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
 // Only a few direct links fit beside the search and account controls; every
 // other category stays reachable through "Shop All" and the mobile drawer.
 const navigationItems = [
@@ -96,14 +97,14 @@ export function NavMegaMenu() {
               setDropdownOpen(true);
             }
           }}
-          className="group inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+          className="group inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-700 transition hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
           aria-expanded={dropdownOpen}
           aria-controls="desktop-mega-menu-content"
         >
           <span>Shop All</span>
           <svg
-            className={`h-3.5 w-3.5 text-slate-500 transition group-hover:text-slate-700 ${
-              dropdownOpen ? "rotate-180 text-slate-700" : ""
+            className={`h-3.5 w-3.5 text-neutral-600 transition group-hover:text-neutral-700 ${
+              dropdownOpen ? "rotate-180 text-neutral-700" : ""
             }`}
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -123,21 +124,21 @@ export function NavMegaMenu() {
             id="desktop-mega-menu-content"
             role="region"
             aria-label="Shop categories and collections"
-            className="absolute left-0 top-full z-50 mt-1 w-full min-w-[700px] rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xl ring-1 ring-slate-950/5 animate-in fade-in slide-in-from-top-1 duration-150"
+            className="absolute left-0 top-full z-50 mt-1 w-full min-w-[700px] rounded-md border border-neutral-200/80 bg-surface p-6 shadow-xl ring-1 ring-neutral-950/5 animate-in fade-in slide-in-from-top-1 duration-150"
           >
             <div className="grid grid-cols-3 gap-8">
               {categoryColumns.map((col) => (
                 <div key={col.title}>
-                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <Eyebrow className="mb-3 text-neutral-600">
                     {col.title}
-                  </p>
+                  </Eyebrow>
                   <ul className="space-y-2">
                     {col.links.map((link) => (
                       <li key={link.href}>
                         <Link
                           href={link.href}
                           onClick={() => setDropdownOpen(false)}
-                          className="text-sm font-medium text-slate-700 transition hover:text-slate-950 hover:underline focus-visible:outline-2 focus-visible:outline-slate-900"
+                          className="text-body-sm font-semibold text-neutral-700 transition hover:text-brand-strong hover:underline focus-visible:outline-2 focus-visible:outline-neutral-900"
                         >
                           {link.label}
                         </Link>
@@ -148,12 +149,12 @@ export function NavMegaMenu() {
               ))}
             </div>
 
-            <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-medium text-slate-500">
+            <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4 text-body-sm font-normal text-neutral-600">
               <span>Live inventory by variant with integer VND pricing</span>
               <Link
                 href="/products"
                 onClick={() => setDropdownOpen(false)}
-                className="font-semibold text-slate-900 hover:underline focus-visible:outline-2 focus-visible:outline-slate-900"
+                className="font-semibold text-brand hover:underline focus-visible:outline-2 focus-visible:outline-neutral-900"
               >
                 Browse all products &rarr;
               </Link>
@@ -167,7 +168,7 @@ export function NavMegaMenu() {
         <Link
           key={item.href}
           href={item.href}
-          className="shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+          className="shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-700 transition hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
         >
           {item.name}
         </Link>

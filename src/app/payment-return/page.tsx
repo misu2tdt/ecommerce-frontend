@@ -15,6 +15,8 @@ import { ApiError, apiErrorMessage } from "@/lib/api";
 import type { CustomerOrder } from "@/types/order";
 import type { Payment } from "@/types/payment";
 
+import { buttonStyles } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
 export const metadata: Metadata = {
   title: "Payment return",
   description:
@@ -95,32 +97,32 @@ export default async function PaymentReturnPage({
 
   return (
     <ReturnShell>
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+      <div className="rounded-md border border-line bg-surface p-6 sm:p-8">
+        <Eyebrow>
           Returned from MoMo
-        </p>
+        </Eyebrow>
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-950">
+          <h1 className="font-bold tracking-tight text-brand-strong text-display">
             {heading}
           </h1>
           {latest && <PaymentStatusBadge status={latest.status} />}
         </div>
-        <p className="mt-3 max-w-2xl leading-7 text-slate-600">{description}</p>
-        <div className="mt-6 flex flex-wrap items-center gap-3 rounded-xl bg-slate-50 p-4">
-          <span className="font-bold text-slate-950">Order #{order.id}</span>
+        <p className="mt-3 max-w-2xl text-body text-neutral-600">{description}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-3 rounded-md bg-surface-muted p-4">
+          <span className="font-bold text-brand-strong">Order #{order.id}</span>
           <OrderStatusBadge status={order.status} />
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href={returnPath}
             prefetch={false}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-800 px-4 py-2 font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className={buttonStyles({ variant: "primary", size: "md" })}
           >
             Recheck status
           </Link>
           <Link
             href={`/account/orders/${order.id}`}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-800 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            className={buttonStyles({ variant: "secondary", size: "md" })}
           >
             View Order
           </Link>

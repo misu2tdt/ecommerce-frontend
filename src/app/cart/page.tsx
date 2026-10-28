@@ -13,9 +13,11 @@ import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatVnd } from "@/lib/money";
 import type { Cart } from "@/types/cart";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { SITE_NAME } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Cart",
-  description: "Review and update your Evergreen Store cart.",
+  description: `Review and update your ${SITE_NAME} cart.`,
 };
 
 export default async function CartPage() {
@@ -39,10 +41,10 @@ export default async function CartPage() {
     return (
       <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+          <Eyebrow>
             Your cart
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+          </Eyebrow>
+          <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
             Shopping cart
           </h1>
         </div>
@@ -60,20 +62,20 @@ export default async function CartPage() {
     <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+          <Eyebrow>
             Your cart
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+          </Eyebrow>
+          <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
             Shopping cart
           </h1>
-          <p className="mt-3 text-slate-600">
+          <p className="mt-3 text-neutral-600">
             Review current prices and availability before checkout.
           </p>
         </div>
         <ClearCartControl />
       </div>
 
-      <p className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      <p className="mt-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-body-sm text-amber-900">
         Cart contents do not reserve inventory. Availability is checked against
         current catalog data.
       </p>
@@ -87,13 +89,13 @@ export default async function CartPage() {
             return (
               <article
                 key={item.id}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+                className="rounded-md border border-line bg-surface p-5 sm:p-6"
               >
                 <div className="grid gap-5 sm:grid-cols-[8rem_minmax(0,1fr)]">
                   <Link
                     href={`/products/${encodeURIComponent(product.slug)}`}
                     aria-label={`View ${product.name}`}
-                    className="relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+                    className="relative aspect-square overflow-hidden rounded-md border border-line bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                   >
                     <CartProductMedia
                       imageUrl={product.primaryImage}
@@ -106,20 +108,20 @@ export default async function CartPage() {
                       <div>
                         <Link
                           href={`/products/${encodeURIComponent(product.slug)}`}
-                          className="text-lg font-bold text-slate-950 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+                          className="text-title font-bold text-brand-strong hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
                         >
                           {product.name}
                         </Link>
-                        <p className="mt-1 font-semibold text-slate-700">
+                        <p className="mt-1 font-semibold text-neutral-700">
                           {item.variant.name}
                         </p>
-                        <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <Eyebrow className="mt-1 text-neutral-600">
                           SKU {item.variant.sku}
-                        </p>
+                        </Eyebrow>
                       </div>
                       <div className="sm:text-right">
-                        <p className="text-sm text-slate-500">Line total</p>
-                        <p className="mt-1 text-lg font-bold text-emerald-900">
+                        <p className="text-body-sm text-neutral-600">Line total</p>
+                        <p className="mt-1 text-title font-bold text-brand-strong">
                           {formatVnd(item.lineTotal)}
                         </p>
                       </div>
@@ -130,30 +132,30 @@ export default async function CartPage() {
                         {attributes.map(([key, value]) => (
                           <div
                             key={key}
-                            className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs"
+                            className="rounded-md bg-brand-soft px-3 py-1.5 text-body-sm"
                           >
-                            <dt className="inline font-semibold text-slate-500">
+                            <dt className="inline font-semibold text-neutral-600">
                               {formatAttributeLabel(key)}:{" "}
                             </dt>
-                            <dd className="inline text-slate-800">{value}</dd>
+                            <dd className="inline text-neutral-800">{value}</dd>
                           </div>
                         ))}
                       </dl>
                     )}
 
-                    <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
+                    <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-body-sm text-neutral-600">
                       <p>Current price: {formatVnd(item.variant.price)}</p>
                       <p>Current stock: {item.variant.stock}</p>
                     </div>
 
                     {item.available ? (
-                      <p className="mt-3 text-sm font-semibold text-emerald-700">
+                      <p className="mt-3 text-body-sm font-semibold text-success">
                         Available at the requested quantity
                       </p>
                     ) : (
                       <p
                         role="status"
-                        className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900"
+                        className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-body-sm font-semibold text-amber-900"
                       >
                         This item is currently unavailable at quantity {item.quantity}.
                         It remains in your cart and will be validated at checkout.

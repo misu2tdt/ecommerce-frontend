@@ -6,6 +6,7 @@ import { CouponEntryBox } from "./coupon-entry-box";
 import type { Cart } from "@/types/cart";
 import type { CartQuoteResponse } from "@/types/promotions";
 
+import { buttonStyles } from "@/components/ui/button";
 export function CartSummary({ cart }: { cart: Cart }) {
   const [quote, setQuote] = useState<CartQuoteResponse | null>(null);
 
@@ -14,9 +15,9 @@ export function CartSummary({ cart }: { cart: Cart }) {
     : "/checkout";
 
   return (
-    <aside className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-6">
-      <h2 className="text-xl font-bold text-slate-950">Cart summary</h2>
-      <div className="mt-4 flex items-center justify-between border-b border-slate-200 pb-4 text-sm text-slate-600">
+    <aside className="rounded-md border border-line bg-surface p-6 lg:sticky lg:top-6">
+      <h2 className="text-title font-bold text-brand-strong">Cart summary</h2>
+      <div className="mt-4 flex items-center justify-between border-b border-line pb-4 text-body-sm text-neutral-600">
         <span>
           {cart.items.length} {cart.items.length === 1 ? "item" : "items"}
         </span>
@@ -31,20 +32,20 @@ export function CartSummary({ cart }: { cart: Cart }) {
         />
       </div>
 
-      <p className="mt-4 text-xs leading-5 text-slate-500">
+      <p className="mt-4 text-body-sm text-neutral-600">
         Inventory and coupon eligibility are validated server-side when placing
         the order.
       </p>
 
       <Link
         href={checkoutHref}
-        className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-800 px-4 py-3 text-sm font-bold text-white shadow-xs transition hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+        className={buttonStyles({ variant: "primary", size: "lg", className: "mt-6 w-full" })}
       >
         Continue to checkout
       </Link>
       <Link
         href="/products"
-        className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+        className={buttonStyles({ variant: "secondary", size: "md", className: "mt-3 w-full" })}
       >
         Continue shopping
       </Link>

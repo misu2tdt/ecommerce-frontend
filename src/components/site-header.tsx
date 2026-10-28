@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { logoutAction } from "@/features/auth/actions";
 import { getCurrentUser } from "@/features/auth/current-user";
 import { HeaderSearch } from "./header-search";
+import { buttonStyles } from "./ui/button";
 import { MobileNav } from "./mobile-nav";
 import { NavMegaMenu } from "./nav-mega-menu";
 
@@ -17,28 +18,29 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
       {/* Announcement Bar */}
-      <div className="bg-slate-950 px-4 py-2 text-center text-xs font-medium text-slate-200">
+      <div className="bg-brand-strong px-4 py-2 text-center text-body-sm text-neutral-200">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 sm:gap-3">
+          {/* One message on phones, two from sm, all three from md: never wraps */}
           <span>Curated everyday essentials</span>
-          <span className="hidden text-slate-600 sm:inline">•</span>
-          <span className="hidden sm:inline">Transparent integer VND pricing</span>
-          <span className="hidden text-slate-600 sm:inline">•</span>
-          <span>Verified customer reviews</span>
+          <span className="hidden text-neutral-600 md:inline">•</span>
+          <span className="hidden md:inline">Transparent integer VND pricing</span>
+          <span className="hidden text-neutral-600 sm:inline">•</span>
+          <span className="hidden sm:inline">Verified customer reviews</span>
         </div>
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="border-b border-slate-200/80">
+      <div className="border-b border-line">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
           {/* Left: Mobile trigger & Brand Logo */}
           <div className="flex min-w-0 items-center gap-1 sm:gap-3">
             <MobileNav user={user} />
             <Link
               href="/"
-              className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-lg font-black tracking-tight text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+              className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-title font-bold tracking-tight text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
             >
               <span className="tracking-widest">VERVE</span>
-              <span className="text-xs font-semibold tracking-widest text-slate-500">STUDIO</span>
+              <span className="text-body-sm font-semibold tracking-widest text-neutral-600">STUDIO</span>
             </Link>
           </div>
 
@@ -58,7 +60,7 @@ export async function SiteHeader() {
             <Link
               href="/wishlist"
               aria-label="View saved wishlist items"
-              className="inline-flex h-11 w-11 items-center justify-center xl:h-9 xl:w-9 rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-neutral-700 transition hover:bg-brand-soft hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
             >
               <svg
                 className="h-5 w-5"
@@ -80,7 +82,7 @@ export async function SiteHeader() {
             <Link
               href="/cart"
               aria-label="View shopping cart"
-              className="inline-flex h-11 w-11 items-center justify-center xl:h-9 xl:w-9 rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-neutral-700 transition hover:bg-brand-soft hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
             >
               <svg
                 className="h-5 w-5"
@@ -123,7 +125,11 @@ function UserAuthSection({
       {user.role === "admin" && (
         <Link
           href="/admin"
-          className="hidden min-h-11 items-center rounded-full bg-amber-100 px-2.5 text-xs font-bold text-amber-900 transition hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-amber-900 sm:inline-flex xl:min-h-0 xl:py-1"
+          className={buttonStyles({
+            variant: "secondary",
+            size: "sm",
+            className: "max-sm:hidden",
+          })}
         >
           Admin
         </Link>
@@ -131,7 +137,7 @@ function UserAuthSection({
       <Link
         href="/account"
         aria-label="View account profile"
-        className="inline-flex h-11 w-11 items-center justify-center xl:h-9 xl:w-9 rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-950"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md text-neutral-700 transition hover:bg-brand-soft hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
       >
         <svg
           className="h-5 w-5"
@@ -151,7 +157,7 @@ function UserAuthSection({
       <form action={logoutAction} className="hidden sm:inline-block">
         <button
           type="submit"
-          className="min-h-11 min-w-11 rounded-full px-2.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-slate-900 xl:min-h-0 xl:min-w-0 xl:py-1"
+          className={buttonStyles({ variant: "ghost", size: "sm" })}
         >
           Sign Out
         </button>
@@ -165,13 +171,17 @@ function GuestAuthButtons() {
     <div className="flex items-center gap-0.5 sm:gap-1.5">
       <Link
         href="/login"
-        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900 xl:min-h-0 xl:min-w-0 xl:px-3 xl:py-1.5"
+        className={buttonStyles({ variant: "ghost", size: "sm" })}
       >
         Sign In
       </Link>
       <Link
         href="/register"
-        className="hidden min-h-11 items-center justify-center rounded-full bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-slate-900 sm:inline-flex xl:min-h-0 xl:py-1.5"
+        className={buttonStyles({
+          variant: "primary",
+          size: "sm",
+          className: "max-sm:hidden",
+        })}
       >
         Register
       </Link>

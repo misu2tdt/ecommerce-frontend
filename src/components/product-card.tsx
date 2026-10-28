@@ -6,6 +6,7 @@ import type { ProductSummary } from "@/types/catalog";
 import { ProductMedia } from "./product-media";
 import { WishlistSaveControl } from "./wishlist-save-control";
 
+import { Badge } from "@/components/ui/badge";
 interface ProductCardProps {
   product: ProductSummary;
   filters?: ProductFilters;
@@ -14,7 +15,7 @@ interface ProductCardProps {
 export function ProductCard({ product, filters = {} }: ProductCardProps) {
   const productHref = buildProductDetailHref(product.slug, filters);
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="group relative overflow-hidden rounded-md border border-line bg-surface transition hover:-translate-y-0.5">
       <div className="absolute right-3 top-3 z-10">
         <WishlistSaveControl
           productId={product.id}
@@ -25,7 +26,7 @@ export function ProductCard({ product, filters = {} }: ProductCardProps) {
       </div>
       <Link
         href={productHref}
-        className="block focus-visible:outline-2 focus-visible:outline-emerald-800"
+        className="block focus-visible:outline-2 focus-visible:outline-brand"
         aria-label={`View ${product.name}`}
       >
         <div className="relative aspect-[4/3] overflow-hidden">
@@ -33,40 +34,32 @@ export function ProductCard({ product, filters = {} }: ProductCardProps) {
         </div>
       </Link>
       <div className="p-5">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <p className="mb-2 text-body-sm text-neutral-600">
           {product.category.name}
           {product.brand ? ` / ${product.brand.name}` : ""}
         </p>
         <div className="flex min-w-0 items-start justify-between gap-3">
-          <h2 className="min-w-0 break-words font-semibold text-slate-900 group-hover:text-emerald-800">
+          <h2 className="min-w-0 break-words font-semibold text-brand">
             <Link
               href={productHref}
-              className="focus-visible:outline-2 focus-visible:outline-emerald-800"
+              className="focus-visible:outline-2 focus-visible:outline-brand"
             >
               {product.name}
             </Link>
           </h2>
-          <span
-            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-              product.inStock
-                ? "bg-emerald-100 text-emerald-800"
-                : "bg-slate-100 text-slate-600"
-            }`}
-          >
+          <Badge variant={product.inStock ? "success" : "neutral"} size="md" className="shrink-0">
             {product.inStock ? "In stock" : "Out of stock"}
-          </span>
+          </Badge>
         </div>
         <div className="mt-3 flex flex-wrap items-baseline gap-2">
-          <span className="font-bold text-emerald-900">
+          <span
+            className={`font-bold ${product.hasDiscount ? "text-sale" : "text-brand-strong"}`}
+          >
             {formatPriceRange(product.minPrice, product.maxPrice)}
           </span>
-          {product.hasDiscount && (
-            <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700">
-              Sale options
-            </span>
-          )}
+          {product.hasDiscount && <Badge variant="sale" size="md">Sale options</Badge>}
         </div>
-        <p className="mt-3 text-sm text-slate-500">
+        <p className="mt-3 text-body-sm text-neutral-600">
           {product.averageRating === null
             ? "No reviews yet"
             : `Rating ${product.averageRating.toFixed(1)} / 5 - ${product.reviewCount} ${

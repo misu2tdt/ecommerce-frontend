@@ -19,6 +19,8 @@ import { ApiError, apiErrorMessage } from "@/lib/api";
 import type { ProductDetail } from "@/types/catalog";
 import type { MyReview, PublicReview } from "@/types/reviews";
 
+import { buttonStyles } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
@@ -78,11 +80,11 @@ export default async function ProductDetailPage({
     <div className="mx-auto max-w-7xl px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-12">
       {/* Breadcrumb Navigation */}
       <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
+        <ol className="flex flex-wrap items-center gap-2 text-body-sm font-normal text-neutral-600">
           <li>
             <Link
               href={backHref}
-              className="transition hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+              className="transition hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
             >
               All Products
             </Link>
@@ -91,14 +93,14 @@ export default async function ProductDetailPage({
           <li>
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="transition hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+              className="transition hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
             >
               {product.category.name}
             </Link>
           </li>
           <li aria-hidden="true">/</li>
           <li
-            className="max-w-[200px] truncate font-semibold text-slate-800 sm:max-w-none"
+            className="max-w-[200px] truncate font-semibold text-neutral-800 sm:max-w-none"
             aria-current="page"
           >
             {product.name}
@@ -117,13 +119,13 @@ export default async function ProductDetailPage({
         <div className="flex flex-col">
           {/* Brand & Category Header */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">
+            <span className="text-body-sm font-bold text-brand">
               {product.brand?.name || product.category.name}
             </span>
             {product.brand && (
               <>
-                <span className="text-slate-300">•</span>
-                <span className="text-xs font-semibold text-slate-500">
+                <span className="text-neutral-300">•</span>
+                <span className="text-body-sm font-semibold text-neutral-600">
                   {product.category.name}
                 </span>
               </>
@@ -131,7 +133,7 @@ export default async function ProductDetailPage({
           </div>
 
           {/* Product Name (H1) */}
-          <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl lg:text-4xl">
+          <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
             {product.name}
           </h1>
 
@@ -140,31 +142,32 @@ export default async function ProductDetailPage({
             {hasReviews ? (
               <>
                 <div
-                  className="flex items-center text-sm text-amber-600"
+                  role="img"
+                  className="flex items-center text-body-sm text-amber-700"
                   aria-label={`Rating ${product.averageRating?.toFixed(1)} out of 5`}
                 >
                   {"★".repeat(Math.round(product.averageRating!))}
-                  <span className="text-slate-200">
+                  <span className="text-neutral-300">
                     {"★".repeat(5 - Math.round(product.averageRating!))}
                   </span>
                 </div>
-                <span className="text-xs font-medium text-slate-600">
+                <span className="text-body-sm font-normal text-neutral-600">
                   {product.averageRating?.toFixed(1)} / 5 ({product.reviewCount}{" "}
                   {product.reviewCount === 1 ? "review" : "reviews"})
                 </span>
               </>
             ) : (
-              <span className="text-xs text-slate-500">No reviews yet</span>
+              <span className="text-body-sm text-neutral-600">No reviews yet</span>
             )}
           </div>
 
           {/* Product Description */}
           {product.description ? (
-            <p className="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
+            <p className="mt-4 text-body text-neutral-600">
               {product.description}
             </p>
           ) : (
-            <p className="mt-4 text-sm italic leading-relaxed text-slate-500">
+            <p className="mt-4 text-body italic text-neutral-600">
               No description is available for this product.
             </p>
           )}
@@ -189,21 +192,21 @@ export default async function ProductDetailPage({
       {/* Customer Reviews Section */}
       <section
         aria-labelledby="reviews-heading"
-        className="mt-16 border-t border-slate-200 pt-12"
+        className="mt-16 border-t border-line pt-12"
       >
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-800">
+            <Eyebrow>
               Customer Feedback
-            </p>
+            </Eyebrow>
             <h2
               id="reviews-heading"
-              className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl"
+              className="mt-1 text-heading font-bold tracking-tight text-brand-strong"
             >
               Product Reviews
             </h2>
           </div>
-          <p className="text-sm text-slate-600">
+          <p className="text-body-sm text-neutral-600">
             {hasReviews
               ? `Overall ${product.averageRating?.toFixed(1)} / 5 based on ${product.reviewCount} ${
                   product.reviewCount === 1
@@ -264,40 +267,41 @@ function PublicReviewList({ data }: { data: ReviewData }) {
       {data.reviews.map((review) => (
         <article
           key={review.id}
-          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6"
+          className="rounded-md border border-line bg-surface p-5 sm:p-6"
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p
-              className="font-bold text-amber-600"
+              role="img"
+              className="font-bold text-amber-700"
               aria-label={`${review.rating} out of 5 stars`}
             >
               {"★".repeat(review.rating)}
-              <span className="text-slate-200">
+              <span className="text-neutral-300">
                 {"★".repeat(5 - review.rating)}
               </span>
             </p>
             <time
               dateTime={review.createdAt}
-              className="text-xs font-medium text-slate-400"
+              className="text-body-sm font-normal text-neutral-500"
             >
               {formatReviewDate(review.createdAt)}
             </time>
           </div>
           {review.title && (
-            <h3 className="mt-3 text-base font-bold text-slate-950 sm:text-lg">
+            <h3 className="mt-3 text-body font-bold text-brand-strong sm:text-title">
               {review.title}
             </h3>
           )}
           {review.body && (
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
+            <p className="mt-2 whitespace-pre-wrap text-body text-neutral-600">
               {review.body}
             </p>
           )}
           {!review.title && !review.body && (
-            <p className="mt-2 text-sm italic text-slate-400">Rating only</p>
+            <p className="mt-2 text-body-sm italic text-neutral-500">Rating only</p>
           )}
           {review.updatedAt !== review.createdAt && (
-            <p className="mt-3 text-xs text-slate-400">
+            <p className="mt-3 text-body-sm text-neutral-500">
               Updated {formatReviewDate(review.updatedAt)}
             </p>
           )}
@@ -326,17 +330,17 @@ function ReviewManagement({
   }
   if (!data.authenticated) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-        <h3 className="text-base font-bold text-slate-950">
+      <div className="rounded-md border border-line bg-surface-muted p-6">
+        <h3 className="text-body font-bold text-brand-strong">
           Share Your Experience
         </h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+        <p className="mt-2 text-body text-neutral-600">
           Sign in to submit a verified product review after receiving your
           delivery.
         </p>
         <Link
           href={buildLoginHref(returnPath)}
-          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+          className={buttonStyles({ variant: "primary", size: "md", className: "mt-5" })}
         >
           Sign in to review
         </Link>

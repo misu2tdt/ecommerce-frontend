@@ -4,6 +4,7 @@ import { Suspense, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ProductSort } from "@/types/catalog";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
 interface CatalogSortSelectProps {
   currentSort?: ProductSort;
 }
@@ -19,10 +20,10 @@ export function CatalogSortSelect(props: CatalogSortSelectProps) {
 function CatalogSortSelectFallback({ currentSort = "featured" }: CatalogSortSelectProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
+      <Eyebrow as="span" className="whitespace-nowrap text-neutral-600">
         Sort by:
-      </span>
-      <div className="rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-8 text-xs font-medium text-slate-800 opacity-60">
+      </Eyebrow>
+      <div className="rounded-md border border-field-border bg-surface py-2 pl-3 pr-8 text-body-sm font-semibold text-neutral-800 opacity-60">
         {currentSort === "price_asc"
           ? "Price: Low to High"
           : currentSort === "price_desc"
@@ -61,7 +62,7 @@ function CatalogSortSelectContent({ currentSort = "featured" }: CatalogSortSelec
     <div className="flex items-center gap-2">
       <label
         htmlFor="catalog-sort-select"
-        className="text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap"
+        className="uppercase text-neutral-600 whitespace-nowrap text-caption font-semibold tracking-eyebrow"
       >
         Sort by:
       </label>
@@ -72,7 +73,7 @@ function CatalogSortSelectContent({ currentSort = "featured" }: CatalogSortSelec
           disabled={isPending}
           value={currentSort}
           onChange={(e) => handleSortChange(e.target.value)}
-          className="appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-8 text-xs font-medium text-slate-800 shadow-sm transition hover:border-slate-400 focus:border-emerald-700 focus:outline-none focus:ring-1 focus:ring-emerald-700 disabled:opacity-50"
+          className="appearance-none rounded-md border border-field-border bg-surface py-2 pl-3 pr-8 text-body-sm font-semibold text-neutral-800 transition hover:border-neutral-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-50"
         >
           <option value="featured">Default</option>
           <option value="price_asc">Price: Low to High</option>
@@ -81,7 +82,7 @@ function CatalogSortSelectContent({ currentSort = "featured" }: CatalogSortSelec
           <option value="name_desc">Name: Z to A</option>
           <option value="newest">Newest Arrivals</option>
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-slate-400">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-neutral-500">
           <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"

@@ -17,6 +17,9 @@ import { ProductAccordions } from "./product-accordions";
 import { SizeGuideModal } from "./size-guide-modal";
 import { WishlistSaveControl } from "./wishlist-save-control";
 
+import { buttonStyles } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { Badge } from "@/components/ui/badge";
 interface ProductPurchasePanelProps {
   productId: number;
   productName: string;
@@ -174,29 +177,29 @@ export function ProductPurchasePanel({
   return (
     <section aria-labelledby="purchase-heading" className="flex flex-col">
       {/* Price & Stock Overview */}
-      <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-line pb-5">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <span className="text-body-sm font-semibold text-neutral-600">
             {selectedVariant ? "Selected Price" : "Price Range"}
           </span>
           <div className="mt-1 flex flex-wrap items-baseline gap-3">
-            <p className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+            <p
+              className={`text-heading font-bold tracking-tight ${
+                compareAtInfo?.type === "exact" ? "text-sale" : "text-brand-strong"
+              }`}
+            >
               {priceDisplay}
             </p>
             {compareAtInfo?.type === "exact" && (
               <>
-                <span className="text-base text-slate-400 line-through">
+                <span className="text-body text-neutral-500 line-through">
                   {compareAtInfo.compareAtDisplay}
                 </span>
-                <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-700">
-                  -{compareAtInfo.percent}%
-                </span>
+                <Badge variant="sale" size="md">-{compareAtInfo.percent}%</Badge>
               </>
             )}
             {compareAtInfo?.type === "options" && (
-              <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-700">
-                Sale options
-              </span>
+              <Badge variant="sale" size="md">Sale options</Badge>
             )}
           </div>
         </div>
@@ -204,51 +207,46 @@ export function ProductPurchasePanel({
         <div className="flex items-center gap-2">
           {selectedVariant ? (
             <>
-              <span
-                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${
-                  selectedVariant.stock > 0
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-rose-100 text-rose-800"
-                }`}
+              <Badge
+                variant={selectedVariant.stock > 0 ? "success" : "error"}
+                size="md"
                 role="status"
               >
                 <span
                   className={`mr-1.5 h-2 w-2 rounded-full ${
-                    selectedVariant.stock > 0 ? "bg-emerald-600" : "bg-rose-600"
+                    selectedVariant.stock > 0 ? "bg-success" : "bg-red-600"
                   }`}
                 />
                 {selectedVariant.stock > 0
                   ? `${selectedVariant.stock} in stock`
                   : "Out of stock"}
-              </span>
-              <span className="font-mono text-xs text-slate-400">
+              </Badge>
+              <span className="font-mono text-body-sm text-neutral-500">
                 SKU: {selectedVariant.sku}
               </span>
             </>
           ) : (
-            <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600" role="status">
+            <Badge variant="neutral" size="md" role="status">
               {options.hasMultipleSizes && !selectedSize
                 ? "Select a size for availability"
                 : "Select an option"}
-            </span>
+            </Badge>
           )}
         </div>
       </div>
 
       {/* Variant Selection Header */}
-      <h2
-        id="purchase-heading"
-        className="mt-5 text-sm font-bold uppercase tracking-[0.12em] text-slate-900"
-      >
+      <Eyebrow as="h2"
+        id="purchase-heading" className="mt-5">
         Choose a variant
-      </h2>
+      </Eyebrow>
 
       {/* 1. Color Selector (Regular Mode) */}
       {(options.mode === "color_size" || options.mode === "color_only") && options.colors.length > 0 && (
         <div className="mt-6">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-bold text-slate-900">
-              Color: <span className="font-semibold text-emerald-800">{selectedColor ?? "Choose a color"}</span>
+            <label className="text-body-sm font-bold text-brand">
+              Color: <span className="font-semibold text-brand">{selectedColor ?? "Choose a color"}</span>
             </label>
           </div>
 
@@ -265,17 +263,17 @@ export function ProductPurchasePanel({
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => handleColorChange(color)}
-                  className={`relative flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 ${
+                  className={`relative flex items-center gap-2 rounded-md border-2 px-4 py-2.5 text-body-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
                     isSelected
-                      ? "border-emerald-800 bg-emerald-50/80 text-emerald-950 shadow-xs"
-                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+                      ? "border-brand bg-brand-soft text-brand-strong"
+                      : "border-line bg-surface text-neutral-700 hover:border-neutral-400 hover:bg-surface-muted"
                   } ${!hasInStock ? "opacity-60" : ""}`}
                 >
                   <span>{color}</span>
                   {!hasInStock && (
-                    <span className="text-[10px] uppercase font-medium tracking-wide text-slate-500">
+                    <Eyebrow as="span" className="text-neutral-600">
                       (Sold out)
-                    </span>
+                    </Eyebrow>
                   )}
                 </button>
               );
@@ -288,10 +286,10 @@ export function ProductPurchasePanel({
       {(options.mode === "color_size" || options.mode === "size_only") && options.sizes.length > 0 && (
         <div className="mt-6">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-bold text-slate-900">
+            <label className="text-body-sm font-bold text-brand">
               Size:{" "}
               {selectedSize ? (
-                <span className="font-semibold text-emerald-800">{selectedSize}</span>
+                <span className="font-semibold text-brand">{selectedSize}</span>
               ) : (
                 <span className="font-normal text-amber-700">Please select</span>
               )}
@@ -301,7 +299,7 @@ export function ProductPurchasePanel({
               <button
                 type="button"
                 onClick={() => setShowSizeGuide(true)}
-                className="text-xs font-semibold text-emerald-800 underline underline-offset-4 hover:text-emerald-950 focus-visible:outline-2 focus-visible:outline-emerald-800"
+                className="text-body-sm font-semibold text-brand underline underline-offset-4 hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
               >
                 Size & fit guide
               </button>
@@ -330,21 +328,21 @@ export function ProductPurchasePanel({
                   aria-pressed={isSelected}
                   disabled={!exists}
                   onClick={() => exists && setSelectedSize(size)}
-                  className={`relative flex min-h-12 flex-col items-center justify-center rounded-xl border-2 px-3 py-2 text-center text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 ${
+                  className={`relative flex min-h-12 flex-col items-center justify-center rounded-md border-2 px-3 py-2 text-center text-body-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
                     !exists
-                      ? "cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300 line-through"
+                      ? "cursor-not-allowed border-neutral-100 bg-surface-muted text-neutral-300 line-through"
                       : isSelected
-                        ? "border-emerald-800 bg-emerald-50/90 text-emerald-950 shadow-xs"
+                        ? "border-brand bg-brand-soft text-brand-strong"
                         : inStock
-                          ? "border-slate-200 bg-white text-slate-800 hover:border-slate-400 hover:bg-slate-50"
-                          : "border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300"
+                          ? "border-line bg-surface text-neutral-800 hover:border-neutral-400 hover:bg-surface-muted"
+                          : "border-line bg-surface-muted text-neutral-600 hover:border-field-border"
                   }`}
                 >
                   <span>{size}</span>
                   {exists && !inStock && (
-                    <span className="text-[9px] uppercase font-bold tracking-tight text-slate-400">
+                    <Eyebrow as="span" className="text-neutral-600">
                       Out of stock
-                    </span>
+                    </Eyebrow>
                   )}
                 </button>
               );
@@ -356,10 +354,10 @@ export function ProductPurchasePanel({
       {/* 3. Generic / Concrete Variant Selector (When attributes are irregular/mixed) */}
       {options.mode === "generic" && variants.length > 1 && (
         <div className="mt-6">
-          <label className="text-sm font-bold text-slate-900">
+          <label className="text-body-sm font-bold text-brand">
             Select Option:{" "}
             {selectedVariant ? (
-              <span className="font-semibold text-emerald-800">{selectedVariant.name}</span>
+              <span className="font-semibold text-brand">{selectedVariant.name}</span>
             ) : (
               <span className="font-normal text-amber-700">Please select</span>
             )}
@@ -376,17 +374,17 @@ export function ProductPurchasePanel({
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => setSelectedVariantId(v.id)}
-                  className={`rounded-xl border-2 p-3 text-left transition focus-visible:outline-2 focus-visible:outline-emerald-800 ${
+                  className={`rounded-md border-2 p-3 text-left transition focus-visible:outline-2 focus-visible:outline-brand ${
                     isSelected
-                      ? "border-emerald-800 bg-emerald-50 text-emerald-950 shadow-xs"
-                      : "border-slate-200 bg-white text-slate-800 hover:border-slate-300"
+                      ? "border-brand bg-brand-soft text-brand-strong"
+                      : "border-line bg-surface text-neutral-800 hover:border-field-border"
                   }`}
                 >
-                  <p className="font-semibold text-slate-950">{v.name}</p>
-                  <p className="mt-0.5 text-xs font-medium text-slate-600">
+                  <p className="font-semibold text-brand-strong">{v.name}</p>
+                  <p className="mt-0.5 text-body-sm font-normal text-neutral-600">
                     {secondaryLabel}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-body-sm text-neutral-600">
                     {formatVnd(v.price)} — {inStock ? `${v.stock} in stock` : "Out of stock"}
                   </p>
                 </button>
@@ -398,7 +396,7 @@ export function ProductPurchasePanel({
 
       {/* 4. Single Variant Confirmation (when only 1 option exists) */}
       {options.mode === "single" && variants.length === 1 && (
-        <div className="mt-4 text-xs text-slate-500">
+        <div className="mt-4 text-body-sm text-neutral-600">
           Standard single size configuration.
         </div>
       )}
@@ -420,16 +418,16 @@ export function ProductPurchasePanel({
 
         <div className="flex items-center gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="quantity-input" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+            <label htmlFor="quantity-input" className="uppercase text-neutral-700 text-caption font-semibold tracking-eyebrow">
               Quantity
             </label>
-            <div className="flex items-center rounded-xl border border-slate-300 bg-white shadow-2xs">
+            <div className="flex items-center rounded-md border border-field-border bg-surface">
               <button
                 type="button"
                 onClick={() => handleQuantityChange(-1)}
                 disabled={!isPurchasable || currentQuantity <= 1 || pending}
                 aria-label="Decrease quantity"
-                className="flex h-11 w-11 items-center justify-center rounded-l-xl text-lg font-bold text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-11 w-11 items-center justify-center rounded-l-md text-title font-bold text-neutral-700 hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40"
               >
                 −
               </button>
@@ -447,14 +445,14 @@ export function ProductPurchasePanel({
                   }
                 }}
                 disabled={!isPurchasable || pending}
-                className="h-11 w-14 text-center font-bold text-slate-900 focus:outline-none disabled:bg-slate-50"
+                className="h-11 w-14 text-center font-bold text-brand focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand disabled:bg-surface-muted"
               />
               <button
                 type="button"
                 onClick={() => handleQuantityChange(1)}
                 disabled={!isPurchasable || currentQuantity >= maxStock || pending}
                 aria-label="Increase quantity"
-                className="flex h-11 w-11 items-center justify-center rounded-r-xl text-lg font-bold text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-11 w-11 items-center justify-center rounded-r-md text-title font-bold text-neutral-700 hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40"
               >
                 +
               </button>
@@ -465,7 +463,7 @@ export function ProductPurchasePanel({
             <button
               type="submit"
               disabled={!isPurchasable || pending}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-800 px-6 py-3 text-base font-bold text-white shadow-sm transition hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+              className={buttonStyles({ variant: "primary", size: "lg", className: "w-full" })}
             >
               <svg
                 className="h-5 w-5"
@@ -489,17 +487,17 @@ export function ProductPurchasePanel({
         {state.message && (
           <div
             role={state.status === "error" ? "alert" : "status"}
-            className={`mt-4 flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium ${
+            className={`mt-4 flex items-center justify-between rounded-md border px-4 py-3 text-body-sm font-semibold ${
               state.status === "error"
                 ? "border-red-200 bg-red-50 text-red-800"
-                : "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-success/30 bg-success-soft text-success"
             }`}
           >
             <span>{state.message}</span>
             {state.status === "success" && (
               <Link
                 href="/cart"
-                className="font-bold underline underline-offset-2 hover:text-emerald-950 focus-visible:outline-2 focus-visible:outline-emerald-800"
+                className="font-bold underline underline-offset-2 hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
               >
                 View Bag →
               </Link>
@@ -534,13 +532,13 @@ export function ProductPurchasePanel({
       )}
 
       {/* 6. Mobile Sticky Purchase Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-lg backdrop-blur-md lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-white/95 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-lg backdrop-blur-md lg:hidden">
         <div className="mx-auto flex max-w-md items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="truncate text-xs font-semibold text-slate-500">
+            <p className="truncate text-body-sm font-semibold text-neutral-600">
               {selectedVariant ? selectedVariant.name : productName}
             </p>
-            <p className="text-lg font-black text-emerald-950">
+            <p className="text-title font-bold text-brand-strong">
               {priceDisplay}
             </p>
           </div>
@@ -549,7 +547,7 @@ export function ProductPurchasePanel({
             type="button"
             disabled={!isPurchasable || pending}
             onClick={() => formRef.current?.requestSubmit()}
-            className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white shadow-xs transition hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+            className={buttonStyles({ variant: "primary", size: "md" })}
           >
             <svg
               className="h-4 w-4"

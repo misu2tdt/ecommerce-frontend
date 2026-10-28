@@ -7,6 +7,8 @@ import {
 } from "@/features/addresses/actions";
 import type { Address, AddressInput } from "@/types/address";
 
+import { buttonStyles } from "@/components/ui/button";
+import { fieldStyles } from "@/components/ui/field";
 const INITIAL_STATE: AddressActionState = {};
 
 export function AddressForm({
@@ -145,14 +147,14 @@ export function AddressForm({
         error={state.fieldErrors?.countryCode}
       />
 
-      <label className="flex min-h-11 items-center gap-3 rounded-lg border border-slate-200 px-4 py-3 sm:col-span-2">
+      <label className="flex min-h-11 items-center gap-3 rounded-md border border-line px-4 py-3 sm:col-span-2">
         <input
           type="checkbox"
           name="isDefault"
           defaultChecked={address?.isDefault ?? false}
-          className="h-5 w-5 accent-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+          className="h-5 w-5 accent-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         />
-        <span className="text-sm font-semibold text-slate-800">
+        <span className="text-body-sm font-semibold text-neutral-800">
           Use as my default shipping address
         </span>
       </label>
@@ -161,10 +163,10 @@ export function AddressForm({
         {state.message && (
           <p
             role={state.status === "error" ? "alert" : "status"}
-            className={`mb-4 rounded-lg border px-4 py-3 text-sm ${
+            className={`mb-4 rounded-md border px-4 py-3 text-body-sm ${
               state.status === "error"
                 ? "border-red-200 bg-red-50 text-red-800"
-                : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : "border-success/30 bg-success-soft text-success"
             }`}
           >
             {state.message}
@@ -173,7 +175,7 @@ export function AddressForm({
         <button
           type="submit"
           disabled={pending}
-          className="min-h-11 rounded-lg bg-emerald-800 px-5 py-2.5 font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait disabled:opacity-60"
+          className={buttonStyles({ variant: "primary", size: "md" })}
         >
           {pending
             ? "Saving..."
@@ -205,7 +207,7 @@ function AddressInputField({
   const errorId = `${id}-error`;
   return (
     <div className={className}>
-      <label htmlFor={id} className="text-sm font-semibold text-slate-800">
+      <label htmlFor={id} className="text-body-sm font-semibold text-neutral-800">
         {label}
       </label>
       <input
@@ -215,10 +217,10 @@ function AddressInputField({
         defaultValue={defaultValue ?? ""}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-slate-950 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
+        className={fieldStyles("mt-2")}
       />
       {error && (
-        <p id={errorId} className="mt-2 text-sm text-red-700">
+        <p id={errorId} className="mt-2 text-body-sm text-red-700">
           {error}
         </p>
       )}

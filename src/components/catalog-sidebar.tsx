@@ -6,6 +6,9 @@ import type { CatalogFilterOptions } from "@/types/catalog";
 import type { ProductFilters } from "@/features/catalog/api";
 import { formatVnd } from "@/lib/money";
 
+import { buttonStyles } from "@/components/ui/button";
+import { fieldStyles } from "@/components/ui/field";
+import { Eyebrow } from "@/components/ui/eyebrow";
 interface CatalogSidebarProps {
   filters: ProductFilters;
   options: CatalogFilterOptions;
@@ -24,12 +27,12 @@ function CatalogSidebarFallback({ options }: { options: CatalogFilterOptions }) 
   return (
     <aside className="w-full space-y-8 opacity-60" aria-label="Catalog filters">
       <div>
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 mb-3">
+        <Eyebrow as="h3" className="mb-3">
           Category
-        </h3>
-        <ul className="space-y-1.5 text-sm">
+        </Eyebrow>
+        <ul className="space-y-1.5 text-body-sm">
           {options.categories.map((cat) => (
-            <li key={cat.id} className="px-2.5 py-1.5 text-slate-600">
+            <li key={cat.id} className="px-2.5 py-1.5 text-neutral-600">
               {cat.name}
             </li>
           ))}
@@ -193,10 +196,10 @@ function CatalogSidebarContent({
     <aside className="w-full space-y-8" aria-label="Catalog filters">
       {/* Categories Facet */}
       <div>
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 mb-3">
+        <Eyebrow as="h3" className="mb-3">
           Category
-        </h3>
-        <ul className="space-y-1.5 text-sm">
+        </Eyebrow>
+        <ul className="space-y-1.5 text-body-sm">
           <li>
             <button
               type="button"
@@ -204,8 +207,8 @@ function CatalogSidebarContent({
               onClick={() => handleCategorySelect(undefined)}
               className={`block w-full text-left rounded-md px-2.5 py-1.5 transition ${
                 !filters.category
-                  ? "bg-emerald-50 font-semibold text-emerald-900"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-brand-soft font-semibold text-brand-strong"
+                  : "text-neutral-600 hover:bg-surface-muted hover:text-brand"
               }`}
             >
               All Categories
@@ -219,8 +222,8 @@ function CatalogSidebarContent({
                 onClick={() => handleCategorySelect(cat.slug)}
                 className={`block w-full text-left rounded-md px-2.5 py-1.5 transition ${
                   filters.category === cat.slug
-                    ? "bg-emerald-50 font-semibold text-emerald-900"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-brand-soft font-semibold text-brand-strong"
+                    : "text-neutral-600 hover:bg-surface-muted hover:text-brand"
                 }`}
               >
                 {cat.name}
@@ -231,11 +234,11 @@ function CatalogSidebarContent({
       </div>
 
       {/* Brands Facet */}
-      <div className="border-t border-slate-200 pt-6">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 mb-3">
+      <div className="border-t border-line pt-6">
+        <Eyebrow as="h3" className="mb-3">
           Brand
-        </h3>
-        <ul className="space-y-1.5 text-sm">
+        </Eyebrow>
+        <ul className="space-y-1.5 text-body-sm">
           <li>
             <button
               type="button"
@@ -243,8 +246,8 @@ function CatalogSidebarContent({
               onClick={() => handleBrandSelect(undefined)}
               className={`block w-full text-left rounded-md px-2.5 py-1.5 transition ${
                 !filters.brand
-                  ? "bg-emerald-50 font-semibold text-emerald-900"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-brand-soft font-semibold text-brand-strong"
+                  : "text-neutral-600 hover:bg-surface-muted hover:text-brand"
               }`}
             >
               All Brands
@@ -258,8 +261,8 @@ function CatalogSidebarContent({
                 onClick={() => handleBrandSelect(brand.slug)}
                 className={`block w-full text-left rounded-md px-2.5 py-1.5 transition ${
                   filters.brand === brand.slug
-                    ? "bg-emerald-50 font-semibold text-emerald-900"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-brand-soft font-semibold text-brand-strong"
+                    : "text-neutral-600 hover:bg-surface-muted hover:text-brand"
                 }`}
               >
                 {brand.name}
@@ -271,16 +274,16 @@ function CatalogSidebarContent({
 
       {/* Sizes Facet */}
       {options.sizes.length > 0 && (
-        <div className="border-t border-slate-200 pt-6">
+        <div className="border-t border-line pt-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+            <Eyebrow as="h3">
               Size
-            </h3>
+            </Eyebrow>
             {selectedSizes.length > 0 && (
               <button
                 type="button"
                 onClick={() => updateUrl((p) => p.delete("size"))}
-                className="text-xs text-slate-500 hover:text-emerald-700 underline"
+                className="text-body-sm text-neutral-600 hover:text-brand underline"
               >
                 Reset
               </button>
@@ -296,10 +299,10 @@ function CatalogSidebarContent({
                   disabled={isPending}
                   onClick={() => handleSizeToggle(size)}
                   aria-pressed={isSelected}
-                  className={`flex h-10 items-center justify-center rounded-lg border text-xs font-semibold uppercase transition focus:outline-none focus:ring-2 focus:ring-emerald-700 ${
+                  className={`flex h-10 items-center justify-center rounded-md border text-body-sm font-semibold uppercase transition focus:outline-none focus:ring-2 focus:ring-brand ${
                     isSelected
-                      ? "border-emerald-700 bg-emerald-700 text-white shadow-sm"
-                      : "border-slate-300 bg-white text-slate-800 hover:border-slate-400 hover:bg-slate-50"
+                      ? "border-brand bg-brand text-white"
+                      : "border-field-border bg-surface text-neutral-800 hover:border-neutral-400 hover:bg-surface-muted"
                   }`}
                 >
                   {size}
@@ -312,16 +315,16 @@ function CatalogSidebarContent({
 
       {/* Colors Facet */}
       {options.colors.length > 0 && (
-        <div className="border-t border-slate-200 pt-6">
+        <div className="border-t border-line pt-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+            <Eyebrow as="h3">
               Color
-            </h3>
+            </Eyebrow>
             {selectedColors.length > 0 && (
               <button
                 type="button"
                 onClick={() => updateUrl((p) => p.delete("color"))}
-                className="text-xs text-slate-500 hover:text-emerald-700 underline"
+                className="text-body-sm text-neutral-600 hover:text-brand underline"
               >
                 Reset
               </button>
@@ -337,10 +340,10 @@ function CatalogSidebarContent({
                   disabled={isPending}
                   onClick={() => handleColorToggle(color)}
                   aria-pressed={isSelected}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-emerald-700 ${
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-body-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand ${
                     isSelected
-                      ? "border-emerald-800 bg-emerald-800 text-white shadow-sm"
-                      : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+                      ? "border-brand bg-brand text-white"
+                      : "border-field-border bg-surface text-neutral-700 hover:border-neutral-400 hover:bg-surface-muted"
                   }`}
                 >
                   <span>{color}</span>
@@ -352,30 +355,30 @@ function CatalogSidebarContent({
       )}
 
       {/* Price Range Facet */}
-      <div className="border-t border-slate-200 pt-6">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 mb-3">
+      <div className="border-t border-line pt-6">
+        <Eyebrow as="h3" className="mb-3">
           Price Range (VND)
-        </h3>
+        </Eyebrow>
         <div className="space-y-2 mb-3">
           <div className="flex flex-wrap gap-1.5">
             <button
               type="button"
               onClick={() => handlePricePreset(undefined, 250000)}
-              className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              className="rounded-md border border-line bg-surface-muted px-2 py-1 text-body-sm text-neutral-700 hover:bg-brand-soft hover:text-brand"
             >
               Under {formatVnd(250000)}
             </button>
             <button
               type="button"
               onClick={() => handlePricePreset(250000, 500000)}
-              className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              className="rounded-md border border-line bg-surface-muted px-2 py-1 text-body-sm text-neutral-700 hover:bg-brand-soft hover:text-brand"
             >
               250k – 500k
             </button>
             <button
               type="button"
               onClick={() => handlePricePreset(500000, undefined)}
-              className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              className="rounded-md border border-line bg-surface-muted px-2 py-1 text-body-sm text-neutral-700 hover:bg-brand-soft hover:text-brand"
             >
               Over {formatVnd(500000)}
             </button>
@@ -395,7 +398,7 @@ function CatalogSidebarContent({
                 placeholder="Min ₫"
                 value={displayedMinPrice}
                 onChange={(e) => setMinPriceDraft(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:border-emerald-700 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+                className={fieldStyles()}
               />
             </div>
             <div>
@@ -410,14 +413,14 @@ function CatalogSidebarContent({
                 placeholder="Max ₫"
                 value={displayedMaxPrice}
                 onChange={(e) => setMaxPriceDraft(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:border-emerald-700 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+                className={fieldStyles()}
               />
             </div>
           </div>
           <button
             type="submit"
             disabled={isPending}
-            className="w-full rounded-lg bg-slate-900 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:opacity-50"
+            className={buttonStyles({ variant: "primary", size: "md", className: "w-full" })}
           >
             Apply Price
           </button>
@@ -425,7 +428,7 @@ function CatalogSidebarContent({
       </div>
 
       {/* In-Stock Filter */}
-      <div className="border-t border-slate-200 pt-6">
+      <div className="border-t border-line pt-6">
         <label
           htmlFor={inStockCheckboxId}
           className="flex items-center gap-3 cursor-pointer select-none"
@@ -435,9 +438,9 @@ function CatalogSidebarContent({
             type="checkbox"
             checked={Boolean(filters.inStock)}
             onChange={(e) => handleInStockToggle(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-700"
+            className="h-4 w-4 rounded border-field-border text-brand focus:ring-brand"
           />
-          <span className="text-sm font-semibold text-slate-800">
+          <span className="text-body-sm font-semibold text-neutral-800">
             In stock only
           </span>
         </label>

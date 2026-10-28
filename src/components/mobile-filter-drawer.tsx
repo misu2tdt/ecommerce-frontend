@@ -7,6 +7,8 @@ import type { ProductFilters } from "@/features/catalog/api";
 import { countActiveFilters } from "@/features/catalog/search-params";
 import { CatalogSidebar } from "./catalog-sidebar";
 
+import { buttonStyles } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 interface MobileFilterDrawerProps {
   filters: ProductFilters;
   options: CatalogFilterOptions;
@@ -28,10 +30,10 @@ function MobileFilterTriggerFallback({ filters }: { filters: ProductFilters }) {
         type="button"
         disabled
         aria-label="Open filter drawer"
-        className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm opacity-60"
+        className="flex items-center gap-2 rounded-md border border-field-border bg-surface px-3 py-2 text-body-sm font-semibold text-neutral-800 opacity-60"
       >
         <svg
-          className="h-4 w-4 text-slate-600"
+          className="h-4 w-4 text-neutral-600"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -45,7 +47,7 @@ function MobileFilterTriggerFallback({ filters }: { filters: ProductFilters }) {
         </svg>
         <span>Filters</span>
         {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-700 text-[10px] font-bold text-white">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand text-caption font-bold text-white">
             {activeCount}
           </span>
         )}
@@ -152,10 +154,10 @@ function MobileFilterDrawerContent({ filters, options }: MobileFilterDrawerProps
         onClick={() => setIsOpen(true)}
         aria-expanded={isOpen}
         aria-controls="mobile-filter-dialog"
-        className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-700"
+        className={buttonStyles({ variant: "secondary", size: "md" })}
       >
         <svg
-          className="h-4 w-4 text-slate-600"
+          className="h-4 w-4 text-neutral-600"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -169,7 +171,7 @@ function MobileFilterDrawerContent({ filters, options }: MobileFilterDrawerProps
         </svg>
         <span>Filters</span>
         {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-700 text-[10px] font-bold text-white">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand text-caption font-bold text-white">
             {activeCount}
           </span>
         )}
@@ -185,7 +187,7 @@ function MobileFilterDrawerContent({ filters, options }: MobileFilterDrawerProps
         >
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-neutral-900/50 backdrop-blur-xs transition-opacity"
             onClick={handleClose}
             aria-hidden="true"
           />
@@ -193,21 +195,19 @@ function MobileFilterDrawerContent({ filters, options }: MobileFilterDrawerProps
           {/* Drawer content */}
           <div
             ref={drawerRef}
-            className="relative ml-auto flex h-full w-full max-w-xs flex-col bg-white shadow-2xl overflow-hidden"
+            className="relative ml-auto flex h-full w-full max-w-xs flex-col bg-surface shadow-2xl overflow-hidden"
           >
             {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div className="flex items-center gap-2">
                 <h2
                   id="mobile-filter-drawer-title"
-                  className="text-base font-bold text-slate-900"
+                  className="text-body font-bold text-brand"
                 >
                   Filters
                 </h2>
                 {activeCount > 0 && (
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
-                    {activeCount} active
-                  </span>
+                  <Badge>{activeCount} active</Badge>
                 )}
               </div>
               <button
@@ -215,7 +215,7 @@ function MobileFilterDrawerContent({ filters, options }: MobileFilterDrawerProps
                 type="button"
                 onClick={handleClose}
                 aria-label="Close filters"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-700"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-neutral-600 hover:bg-brand-soft hover:text-brand focus:outline-none focus:ring-2 focus:ring-brand"
               >
                 <svg
                   className="h-5 w-5"
@@ -243,11 +243,11 @@ function MobileFilterDrawerContent({ filters, options }: MobileFilterDrawerProps
             </div>
 
             {/* Drawer Footer */}
-            <div className="border-t border-slate-200 p-4 bg-slate-50">
+            <div className="border-t border-line p-4 bg-surface-muted">
               <button
                 type="button"
                 onClick={handleClose}
-                className="w-full rounded-lg bg-emerald-700 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-700"
+                className="w-full rounded-md bg-brand py-2.5 text-body-sm font-semibold text-white transition hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               >
                 View Results
               </button>

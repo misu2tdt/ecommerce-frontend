@@ -6,6 +6,8 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { logoutAction } from "@/features/auth/actions";
 import { HeaderSearch } from "./header-search";
 
+import { buttonStyles } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
 interface MobileNavProps {
   user: { email: string; role: string } | null;
 }
@@ -41,7 +43,7 @@ function MobileNavTriggerFallback() {
         type="button"
         disabled
         aria-label="Open mobile navigation menu"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-lg p-2 text-slate-400"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md p-2 text-neutral-500"
       >
         <svg
           className="h-6 w-6"
@@ -150,7 +152,7 @@ function MobileNavContent({ user }: MobileNavProps) {
         aria-label="Open mobile navigation menu"
         aria-expanded={isOpen}
         aria-controls="mobile-navigation-drawer"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-slate-900"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md p-2 text-neutral-700 hover:bg-brand-soft hover:text-brand focus-visible:outline-2 focus-visible:outline-neutral-900"
       >
         <svg
           className="h-6 w-6"
@@ -172,7 +174,7 @@ function MobileNavContent({ user }: MobileNavProps) {
         <div className="fixed inset-0 z-50 flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-neutral-950/60 backdrop-blur-sm transition-opacity"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
@@ -184,15 +186,15 @@ function MobileNavContent({ user }: MobileNavProps) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="mobile-nav-title"
-            className="relative flex w-full max-w-xs flex-1 flex-col bg-white shadow-2xl"
+            className="relative flex w-full max-w-xs flex-1 flex-col bg-surface shadow-2xl"
           >
             {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
               <Link
                 id="mobile-nav-title"
                 href="/"
                 onClick={() => setIsOpen(false)}
-                className="text-base font-extrabold tracking-wider text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+                className="text-body font-bold tracking-wider text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
               >
                 VERVE STUDIO
               </Link>
@@ -201,7 +203,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Close navigation menu"
-                className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-slate-900"
+                className="rounded-md p-1.5 text-neutral-600 hover:bg-brand-soft hover:text-brand focus-visible:outline-2 focus-visible:outline-neutral-900"
               >
                 <svg
                   className="h-5 w-5"
@@ -220,7 +222,7 @@ function MobileNavContent({ user }: MobileNavProps) {
             </div>
 
             {/* Search within Drawer */}
-            <div className="border-b border-slate-100 p-4">
+            <div className="border-b border-neutral-100 p-4">
               <HeaderSearch
                 id="mobile-header-search-input"
                 onSearchSubmitted={() => setIsOpen(false)}
@@ -231,16 +233,16 @@ function MobileNavContent({ user }: MobileNavProps) {
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {/* Category section */}
               <div className="mb-6">
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+                <Eyebrow className="mb-2 text-neutral-600">
                   Catalog
-                </p>
+                </Eyebrow>
                 <nav className="space-y-1">
                   {categories.map((cat) => (
                     <Link
                       key={cat.href}
                       href={cat.href}
                       onClick={() => setIsOpen(false)}
-                      className="block rounded-lg px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+                      className="block rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-800 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                     >
                       {cat.name}
                     </Link>
@@ -249,46 +251,46 @@ function MobileNavContent({ user }: MobileNavProps) {
               </div>
 
               {/* Brands section */}
-              <div className="mb-6 border-t border-slate-100 pt-5">
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+              <div className="mb-6 border-t border-neutral-100 pt-5">
+                <Eyebrow className="mb-2 text-neutral-600">
                   Featured Brands
-                </p>
+                </Eyebrow>
                 <nav className="space-y-1">
                   {brands.map((b) => (
                     <Link
                       key={b.href}
                       href={b.href}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+                      className="flex items-center justify-between rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                     >
                       <span>{b.name}</span>
-                      <span className="text-xs text-slate-500">{b.tag}</span>
+                      <span className="text-body-sm text-neutral-600">{b.tag}</span>
                     </Link>
                   ))}
                 </nav>
               </div>
 
               {/* Account / Quick Links */}
-              <div className="border-t border-slate-100 pt-5">
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+              <div className="border-t border-neutral-100 pt-5">
+                <Eyebrow className="mb-2 text-neutral-600">
                   Customer
-                </p>
-                <div className="space-y-1 text-sm">
+                </Eyebrow>
+                <div className="space-y-1 text-body-sm">
                   <Link
                     href="/cart"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-between rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+                    className="flex items-center justify-between rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                   >
                     <span>Shopping Cart</span>
-                    <span className="text-xs font-bold text-slate-500">Bag</span>
+                    <span className="text-body-sm font-bold text-neutral-600">Bag</span>
                   </Link>
                   <Link
                     href="/wishlist"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-between rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+                    className="flex items-center justify-between rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                   >
                     <span>Saved Wishlist</span>
-                    <span className="text-xs font-bold text-slate-500">Saved</span>
+                    <span className="text-body-sm font-bold text-neutral-600">Saved</span>
                   </Link>
 
                   {user ? (
@@ -296,14 +298,14 @@ function MobileNavContent({ user }: MobileNavProps) {
                       <Link
                         href="/account"
                         onClick={() => setIsOpen(false)}
-                        className="block rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+                        className="block rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                       >
                         Account Profile
                       </Link>
                       <Link
                         href="/account/orders"
                         onClick={() => setIsOpen(false)}
-                        className="block rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-slate-900"
+                        className="block rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                       >
                         Order History
                       </Link>
@@ -311,7 +313,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                         <Link
                           href="/admin"
                           onClick={() => setIsOpen(false)}
-                          className="block rounded-lg bg-amber-50 px-3 py-2 font-semibold text-amber-900 hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-amber-900"
+                          className="block rounded-md bg-amber-50 px-3 py-2 font-semibold text-amber-900 hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-amber-900"
                         >
                           Catalog Administration
                         </Link>
@@ -325,7 +327,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                       >
                         <button
                           type="submit"
-                          className="w-full rounded-lg px-3 py-2 text-left font-medium text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-600"
+                          className="w-full rounded-md px-3 py-2 text-left font-semibold text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-600"
                         >
                           Sign Out ({user.email})
                         </button>
@@ -336,14 +338,14 @@ function MobileNavContent({ user }: MobileNavProps) {
                       <Link
                         href="/login"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-center rounded-lg border border-slate-200 py-2.5 text-center font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-slate-900"
+                        className="flex items-center justify-center rounded-md border border-line py-2.5 text-center font-semibold text-neutral-800 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-neutral-900"
                       >
                         Sign In
                       </Link>
                       <Link
                         href="/register"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-center rounded-lg bg-slate-900 py-2.5 text-center font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-slate-900"
+                        className={buttonStyles({ variant: "primary", size: "md" })}
                       >
                         Register
                       </Link>

@@ -36,7 +36,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   return (
     <section aria-label={`${productName} gallery`} className="flex flex-col gap-4">
       {/* Primary Hero Image */}
-      <div className="group relative aspect-[4/4] sm:aspect-[4/5] w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition duration-200 hover:shadow-md">
+      <div className="group relative aspect-[4/4] sm:aspect-[4/5] w-full overflow-hidden rounded-md border border-line bg-surface transition duration-200">
         <ProductMedia
           image={activeImage}
           productName={productName}
@@ -44,7 +44,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         />
 
         {images.length > 1 && (
-          <div className="absolute bottom-3 right-3 rounded-full bg-slate-900/70 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-xs">
+          <div className="absolute bottom-3 right-3 rounded-full bg-neutral-900/70 px-2.5 py-1 text-caption font-semibold text-white backdrop-blur-xs">
             {safeIndex + 1} / {images.length}
           </div>
         )}
@@ -68,10 +68,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 aria-label={`View ${image.altText || `${productName} photo ${index + 1}`}`}
                 aria-pressed={isSelected}
-                className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 bg-white transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 ${
+                className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-md border-2 bg-surface transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
                   isSelected
-                    ? "border-emerald-700 ring-2 ring-emerald-700/20 shadow-xs"
-                    : "border-slate-200 opacity-75 hover:border-slate-400 hover:opacity-100"
+                    ? "border-brand ring-2 ring-brand"
+                    : "border-line opacity-75 hover:border-neutral-400 hover:opacity-100"
                 }`}
               >
                 <ProductMedia image={image} productName={productName} />

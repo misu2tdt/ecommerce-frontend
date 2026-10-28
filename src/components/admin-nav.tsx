@@ -29,17 +29,17 @@ export function AdminNav() {
             key={href}
             href={href}
             aria-current={isCurrent ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-lg border px-4 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-emerald-200 ${
+            className={`inline-flex min-h-11 items-center rounded-md border px-4 py-2 text-body-sm font-semibold focus-visible:outline-2 focus-visible:outline-white ${
               isCurrent
-                ? "border-emerald-200 bg-emerald-100 text-emerald-950"
-                : "border-emerald-800 bg-white text-emerald-950 hover:border-emerald-500 hover:bg-emerald-50"
+                ? "border-white bg-white text-brand-strong"
+                : "border-neutral-600 text-neutral-200 hover:border-white hover:bg-white/10 hover:text-white"
             }`}
           >
             {label}
           </Link>
         );
       })}
-      <Link href="/products" className="inline-flex min-h-11 items-center rounded-lg px-4 py-2 text-sm font-semibold text-emerald-100 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-emerald-200">
+      <Link href="/products" className="inline-flex min-h-11 items-center rounded-md px-4 py-2 text-body-sm font-semibold text-neutral-300 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-white">
         Back to storefront
       </Link>
     </nav>

@@ -100,6 +100,19 @@ test("header height does not change with width inside each mode", async ({
   }
 });
 
+test("phone header hides Register and never clips the logo", async ({ page }) => {
+  await openHome(page, 390);
+  const header = page.locator("header");
+
+  await expect(header.getByRole("link", { name: "Register" })).toBeHidden();
+  await expect(header.getByRole("link", { name: "Sign In" })).toBeVisible();
+
+  const logo = header.getByRole("link", { name: /VERVE\s*STUDIO/ });
+  const clipped = await logo.evaluate(
+    (element) => element.scrollWidth > element.clientWidth,
+  );
+  expect(clipped, "logo text is cut off").toBe(false);
+});
 test("header controls are at least 44x44 on mobile and tablet", async ({
   page,
 }) => {

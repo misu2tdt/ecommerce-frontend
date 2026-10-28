@@ -10,9 +10,12 @@ import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatPriceRange } from "@/lib/money";
 import type { WishlistItem } from "@/types/wishlist";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { SITE_NAME } from "@/lib/site";
+import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Wishlist",
-  description: "Products saved to your Evergreen Store wishlist.",
+  description: `Products saved to your ${SITE_NAME} wishlist.`,
 };
 
 export default async function WishlistPage() {
@@ -33,13 +36,13 @@ export default async function WishlistPage() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
       <div className="mb-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+        <Eyebrow>
           Saved products
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+        </Eyebrow>
+        <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
           Your wishlist
         </h1>
-        <p className="mt-3 text-slate-600">
+        <p className="mt-3 text-neutral-600">
           Prices, ratings, and availability reflect the current catalog.
         </p>
       </div>
@@ -67,10 +70,10 @@ function WishlistCard({ item }: { item: WishlistItem }) {
   const href = `/products/${encodeURIComponent(product.slug)}`;
   const purchasable = product.available && product.inStock;
   return (
-    <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <article className="overflow-hidden rounded-md border border-line bg-surface">
       <Link
         href={href}
-        className="relative block aspect-[4/3] overflow-hidden bg-slate-100 focus-visible:outline-2 focus-visible:outline-emerald-800"
+        className="relative block aspect-[4/3] overflow-hidden bg-brand-soft focus-visible:outline-2 focus-visible:outline-brand"
         aria-label={`View ${product.name}`}
       >
         {product.primaryImage ? (
@@ -82,45 +85,47 @@ function WishlistCard({ item }: { item: WishlistItem }) {
             className="object-cover"
           />
         ) : (
-          <span className="flex h-full items-center justify-center text-sm text-slate-500">
+          <span className="flex h-full items-center justify-center text-body-sm text-neutral-600">
             No image available
           </span>
         )}
       </Link>
       <div className="p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <Eyebrow>
           {product.category.name}
           {product.brand ? ` / ${product.brand.name}` : ""}
-        </p>
+        </Eyebrow>
         <div className="mt-2 flex min-w-0 items-start justify-between gap-3">
           <Link
             href={href}
-            className="min-w-0 break-words font-bold text-slate-950 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+            className="min-w-0 break-words font-bold text-brand-strong hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
           >
             {product.name}
           </Link>
-          <span
-            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${purchasable ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-600"}`}
+          <Badge
+            variant={purchasable ? "success" : "neutral"}
+            size="md"
+            className="shrink-0"
           >
             {purchasable
               ? "In stock"
               : product.available
                 ? "Out of stock"
                 : "Unavailable"}
-          </span>
+          </Badge>
         </div>
-        <p className="mt-3 font-bold text-emerald-900">
+        <p className="mt-3 font-bold text-brand-strong">
           {formatPriceRange(product.minPrice, product.maxPrice)}
         </p>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-body-sm text-neutral-600">
           {product.averageRating === null
             ? "No reviews yet"
             : `${product.averageRating.toFixed(1)} / 5 · ${product.reviewCount} ${product.reviewCount === 1 ? "review" : "reviews"}`}
         </p>
-        <div className="mt-5 flex items-start justify-between gap-3 border-t border-slate-200 pt-4">
+        <div className="mt-5 flex items-start justify-between gap-3 border-t border-line pt-4">
           <Link
             href={href}
-            className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-emerald-800 hover:text-emerald-950 focus-visible:outline-2 focus-visible:outline-emerald-800"
+            className="inline-flex min-h-11 items-center rounded-md px-2 text-body-sm font-semibold text-brand hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
           >
             View product
           </Link>

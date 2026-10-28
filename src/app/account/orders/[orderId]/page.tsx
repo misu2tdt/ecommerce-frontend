@@ -22,9 +22,11 @@ import { formatVnd } from "@/lib/money";
 import type { CustomerOrder } from "@/types/order";
 import type { Payment } from "@/types/payment";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { SITE_NAME } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Order details",
-  description: "Review an owned Evergreen Store Order.",
+  description: `Review an owned ${SITE_NAME} Order.`,
 };
 
 export default async function OrderDetailPage({
@@ -80,7 +82,7 @@ export default async function OrderDetailPage({
       <AccountNav />
       <Link
         href="/account/orders"
-        className="mt-8 inline-block text-sm font-semibold text-emerald-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+        className="mt-8 inline-block text-body-sm font-semibold text-brand underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
       >
         Back to all Orders
       </Link>
@@ -88,16 +90,16 @@ export default async function OrderDetailPage({
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            <h1 className="font-bold tracking-tight text-brand-strong text-display">
               Order #{order.id}
             </h1>
             <OrderStatusBadge status={order.status} />
           </div>
-          <p className="mt-3 text-slate-600">
+          <p className="mt-3 text-neutral-600">
             Placed {formatDateTime(order.createdAt)}
           </p>
         </div>
-        <p className="text-3xl font-bold text-emerald-900">
+        <p className="text-heading font-bold text-brand-strong">
           {formatVnd(order.totalPrice)}
         </p>
       </div>
@@ -105,7 +107,7 @@ export default async function OrderDetailPage({
       <section aria-labelledby="lifecycle-heading" className="mt-8">
         <h2
           id="lifecycle-heading"
-          className="mb-4 text-xl font-bold text-slate-950"
+          className="mb-4 text-title font-bold text-brand-strong"
         >
           Order status
         </h2>
@@ -145,7 +147,7 @@ export default async function OrderDetailPage({
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
         <section aria-labelledby="items-heading">
-          <h2 id="items-heading" className="text-2xl font-bold text-slate-950">
+          <h2 id="items-heading" className="text-heading font-bold text-brand-strong">
             Purchased items
           </h2>
           <div className="mt-4 space-y-4">
@@ -154,24 +156,24 @@ export default async function OrderDetailPage({
               return (
                 <article
                   key={item.id}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                  className="rounded-md border border-line bg-surface p-5"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <Link
                         href={`/products/${encodeURIComponent(item.variant.product.slug)}`}
-                        className="text-lg font-bold text-slate-950 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-800"
+                        className="text-title font-bold text-brand-strong hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
                       >
                         {item.variant.product.name}
                       </Link>
-                      <p className="mt-1 font-semibold text-slate-700">
+                      <p className="mt-1 font-semibold text-neutral-700">
                         {item.variant.name}
                       </p>
-                      <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <Eyebrow className="mt-1 text-neutral-600">
                         SKU {item.variant.sku}
-                      </p>
+                      </Eyebrow>
                     </div>
-                    <p className="text-lg font-bold text-emerald-900">
+                    <p className="text-title font-bold text-brand-strong">
                       {formatVnd(item.lineTotal)}
                     </p>
                   </div>
@@ -181,33 +183,33 @@ export default async function OrderDetailPage({
                       {attributes.map(([key, value]) => (
                         <div
                           key={key}
-                          className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs"
+                          className="rounded-md bg-brand-soft px-3 py-1.5 text-body-sm"
                         >
-                          <dt className="inline font-semibold text-slate-500">
+                          <dt className="inline font-semibold text-neutral-600">
                             {formatAttributeLabel(key)}:{" "}
                           </dt>
-                          <dd className="inline text-slate-800">{value}</dd>
+                          <dd className="inline text-neutral-800">{value}</dd>
                         </div>
                       ))}
                     </dl>
                   )}
 
-                  <dl className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
+                  <dl className="mt-4 grid grid-cols-2 gap-3 text-body-sm sm:grid-cols-3">
                     <div>
-                      <dt className="text-slate-500">Purchase-time price</dt>
-                      <dd className="mt-1 font-semibold text-slate-900">
+                      <dt className="text-neutral-600">Purchase-time price</dt>
+                      <dd className="mt-1 font-semibold text-brand">
                         {formatVnd(item.price)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Quantity</dt>
-                      <dd className="mt-1 font-semibold text-slate-900">
+                      <dt className="text-neutral-600">Quantity</dt>
+                      <dd className="mt-1 font-semibold text-brand">
                         {item.quantity}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Line total</dt>
-                      <dd className="mt-1 font-semibold text-slate-900">
+                      <dt className="text-neutral-600">Line total</dt>
+                      <dd className="mt-1 font-semibold text-brand">
                         {formatVnd(item.lineTotal)}
                       </dd>
                     </div>
@@ -219,21 +221,21 @@ export default async function OrderDetailPage({
         </section>
 
         <aside className="space-y-5 lg:sticky lg:top-6">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-950">
+          <section className="rounded-md border border-line bg-surface p-5">
+            <h2 className="text-title font-bold text-brand-strong">
               Payment breakdown
             </h2>
-            <div className="mt-4 space-y-2.5 text-sm">
-              <div className="flex justify-between text-slate-600">
+            <div className="mt-4 space-y-2.5 text-body-sm">
+              <div className="flex justify-between text-neutral-600">
                 <span>Subtotal</span>
                 <span>{formatVnd(order.subtotalPrice ?? order.totalPrice)}</span>
               </div>
               {order.discountPrice > 0 && (
-                <div className="flex items-center justify-between font-semibold text-emerald-700">
+                <div className="flex items-center justify-between font-semibold text-brand">
                   <span className="flex items-center gap-1.5">
                     <span>Promotion</span>
                     {order.couponCode && (
-                      <span className="rounded bg-emerald-100 px-1.5 py-0.5 font-mono text-xs font-bold text-emerald-800">
+                      <span className="rounded-md bg-brand-soft px-1.5 py-0.5 font-mono text-body-sm font-bold text-brand">
                         {order.couponCode}
                       </span>
                     )}
@@ -241,25 +243,25 @@ export default async function OrderDetailPage({
                   <span>-{formatVnd(order.discountPrice)}</span>
                 </div>
               )}
-              <div className="flex items-end justify-between border-t border-slate-200 pt-3">
-                <span className="font-bold text-slate-950">Total</span>
-                <span className="text-xl font-black text-emerald-950">
+              <div className="flex items-end justify-between border-t border-line pt-3">
+                <span className="font-bold text-brand-strong">Total</span>
+                <span className="text-title font-bold text-brand-strong">
                   {formatVnd(order.totalPrice)}
                 </span>
               </div>
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-950">
+          <section className="rounded-md border border-line bg-surface p-5">
+            <h2 className="text-title font-bold text-brand-strong">
               Shipping address used
             </h2>
-            <p className="mt-2 text-xs leading-5 text-slate-500">
+            <p className="mt-2 text-body-sm text-neutral-600">
               Immutable snapshot captured when this Order was created—not your
               current saved address.
             </p>
-            <div className="mt-4 text-sm leading-6 text-slate-600">
-              <p className="font-semibold text-slate-950">
+            <div className="mt-4 text-body text-neutral-600">
+              <p className="font-semibold text-brand-strong">
                 {shipping.recipientName} · {shipping.phone}
               </p>
               <p>{shipping.addressLine1}</p>
@@ -294,18 +296,18 @@ function PaymentNotice({
   orderId: number;
 }) {
   const styles = {
-    success: "border-emerald-200 bg-emerald-50 text-emerald-950",
-    processing: "border-sky-200 bg-sky-50 text-sky-950",
-    neutral: "border-slate-200 bg-slate-50 text-slate-900",
+    success: "border-success/30 bg-success-soft text-success",
+    processing: "border-line bg-brand-soft text-brand-strong",
+    neutral: "border-line bg-surface-muted text-brand",
   } as const;
   return (
-    <aside className={`rounded-2xl border p-5 ${styles[tone]}`}>
-      <h2 className="text-lg font-bold">{title}</h2>
-      <p className="mt-2 text-sm leading-6 opacity-80">{description}</p>
+    <aside className={`rounded-md border p-5 ${styles[tone]}`}>
+      <h2 className="text-title font-bold">{title}</h2>
+      <p className="mt-2 text-body opacity-80">{description}</p>
       <Link
         href={`/account/orders/${orderId}`}
         prefetch={false}
-        className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-current bg-white px-4 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-current bg-surface px-4 py-2 text-body-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         Recheck status
       </Link>

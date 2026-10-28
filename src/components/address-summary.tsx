@@ -9,8 +9,8 @@ export function AddressSummary({ address }: { address: Address }) {
   ].filter(Boolean);
 
   return (
-    <div className="text-sm leading-6 text-slate-600">
-      <p className="font-semibold text-slate-950">
+    <div className="text-body text-neutral-600">
+      <p className="font-semibold text-brand-strong">
         {address.recipientName} · {address.phone}
       </p>
       <p>{address.addressLine1}</p>

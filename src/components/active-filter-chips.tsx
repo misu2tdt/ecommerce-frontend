@@ -155,11 +155,11 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
 
   return (
     <div className="flex flex-wrap items-center gap-2 pt-2">
-      <span className="text-xs font-semibold text-slate-500">Active filters:</span>
+      <span className="text-body-sm font-semibold text-neutral-600">Active filters:</span>
       {chips.map((chip) => (
         <span
           key={chip.id}
-          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 py-1 pl-3 pr-2 text-xs font-medium text-emerald-900 shadow-sm transition hover:bg-emerald-100"
+          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-brand-soft py-1 pl-3 pr-2 text-caption font-semibold text-brand"
         >
           <span>{chip.label}</span>
           <button
@@ -167,7 +167,7 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
             disabled={isPending}
             onClick={chip.onRemove}
             aria-label={`Remove filter ${chip.label}`}
-            className="flex h-4 w-4 items-center justify-center rounded-full text-emerald-700 hover:bg-emerald-200 hover:text-emerald-950 focus:outline-none focus:ring-1 focus:ring-emerald-700"
+            className="flex h-4 w-4 items-center justify-center rounded-full text-brand hover:bg-neutral-200 hover:text-brand-strong focus:outline-none focus:ring-1 focus:ring-brand"
           >
             <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
               <path
@@ -183,7 +183,7 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
         type="button"
         disabled={isPending}
         onClick={handleClearAll}
-        className="text-xs font-semibold text-emerald-700 underline underline-offset-2 transition hover:text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-700 rounded px-1 disabled:opacity-50"
+        className="text-body-sm font-semibold text-brand underline underline-offset-2 transition hover:text-brand-strong focus:outline-none focus:ring-2 focus:ring-brand rounded px-1 disabled:opacity-50"
       >
         Clear all
       </button>

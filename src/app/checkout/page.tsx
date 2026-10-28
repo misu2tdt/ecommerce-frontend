@@ -12,6 +12,7 @@ import { ApiError, apiErrorMessage } from "@/lib/api";
 import type { Address } from "@/types/address";
 import type { Cart } from "@/types/cart";
 
+import { Eyebrow } from "@/components/ui/eyebrow";
 export const metadata: Metadata = {
   title: "Checkout",
   description: "Choose a saved shipping address and place your Order.",
@@ -48,10 +49,10 @@ export default async function CheckoutPage({
     return (
       <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+          <Eyebrow>
             Checkout
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+          </Eyebrow>
+          <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
             Your cart is empty
           </h1>
         </div>
@@ -67,19 +68,19 @@ export default async function CheckoutPage({
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+      <Eyebrow>
         Secure checkout
-      </p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+      </Eyebrow>
+      <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
         Shipping and Order review
       </h1>
-      <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-body-sm text-amber-900">
         Cart items do not reserve inventory. The backend validates current
         product activity, price, and stock atomically when you place the Order.
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <div className="rounded-md border border-line bg-surface p-5 sm:p-7">
           {addresses.length > 0 ? (
             <CheckoutForm
               addresses={addresses}
@@ -88,10 +89,10 @@ export default async function CheckoutPage({
             />
           ) : (
             <div>
-              <h2 className="text-xl font-bold text-slate-950">
+              <h2 className="text-title font-bold text-brand-strong">
                 Add a shipping address
               </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <p className="mt-2 text-body text-neutral-600">
                 Checkout requires an owned saved address. Save one here and it
                 will become available without losing this checkout.
               </p>
@@ -100,7 +101,7 @@ export default async function CheckoutPage({
               </div>
               <Link
                 href="/account/addresses?returnTo=%2Fcheckout"
-                className="mt-5 inline-block text-sm font-semibold text-emerald-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-800"
+                className="mt-5 inline-block text-body-sm font-semibold text-brand underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-brand"
               >
                 Open full address management
               </Link>

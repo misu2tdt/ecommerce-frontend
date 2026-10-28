@@ -29,7 +29,7 @@ export function ProductMedia({
     <div
       role="img"
       aria-label={`No image available for ${productName}`}
-      className="flex h-full min-h-52 items-center justify-center bg-gradient-to-br from-emerald-50 to-slate-100 text-emerald-900/45"
+      className="flex h-full min-h-52 items-center justify-center bg-gradient-to-br from-neutral-50 to-neutral-100 text-brand-strong/45"
     >
       <svg
         aria-hidden="true"
