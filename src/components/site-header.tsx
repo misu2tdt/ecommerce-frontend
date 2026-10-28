@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { logoutAction } from "@/features/auth/actions";
 import { getCurrentUser } from "@/features/auth/current-user";
+import { SITE_NAME } from "@/lib/site";
 import { HeaderSearch } from "./header-search";
 import { buttonStyles } from "./ui/button";
 import { MobileNav } from "./mobile-nav";
@@ -37,10 +38,11 @@ export async function SiteHeader() {
             <MobileNav user={user} />
             <Link
               href="/"
+              aria-label={SITE_NAME}
               className="flex min-w-0 items-center gap-1 sm:gap-1.5 overflow-hidden whitespace-nowrap text-title font-bold tracking-tight text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
             >
               <span className="tracking-wide sm:tracking-widest">VERVE</span>
-              <span className="text-body-sm font-semibold tracking-wide sm:tracking-widest text-neutral-600">STUDIO</span>
+              <span className="hidden text-body-sm font-semibold tracking-wide text-neutral-600 min-[400px]:inline sm:tracking-widest">STUDIO</span>
             </Link>
           </div>
 

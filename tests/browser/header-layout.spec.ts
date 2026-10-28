@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const WIDTHS = [390, 768, 1024, 1100, 1280, 1440, 1920];
 // The inline desktop navigation needs about 1280px; below that the compact
@@ -103,19 +103,48 @@ test("header height does not change with width inside each mode", async ({
 test("phone header hides Register and never clips the logo", async ({ page }) => {
   const header = page.locator("header");
 
-  // 375px guards a safety margin: 390px alone passes with zero slack.
-  for (const width of [390, 375]) {
+  const isClipped = (logo: Locator) =>
+    logo.evaluate((element) => element.scrollWidth > element.clientWidth);
+
+  // Below 400px only "VERVE" is shown, so there is always real slack.
+  for (const width of [390, 375, 360]) {
     await openHome(page, width);
 
     await expect(header.getByRole("link", { name: "Register" })).toBeHidden();
     await expect(header.getByRole("link", { name: "Sign In" })).toBeVisible();
 
     const logo = header.getByRole("link", { name: /VERVE\s*STUDIO/ });
-    const clipped = await logo.evaluate(
-      (element) => element.scrollWidth > element.clientWidth,
-    );
-    expect(clipped, `logo text is cut off at ${width}px`).toBe(false);
+    expect(
+      await isClipped(logo),
+      `logo text is cut off at ${width}px`,
+    ).toBe(false);
   }
+});
+
+test("logo shows the full VERVE STUDIO from 400px and is not clipped", async ({
+  page,
+}) => {
+  await openHome(page, 420);
+  const logo = page
+    .locator("header")
+    .getByRole("link", { name: /VERVE\s*STUDIO/ });
+
+  await expect(logo.getByText("STUDIO")).toBeVisible();
+  const clipped = await logo.evaluate(
+    (element) => element.scrollWidth > element.clientWidth,
+  );
+  expect(clipped, "logo text is cut off at 420px").toBe(false);
+});
+
+test("logo keeps its accessible name while STUDIO is hidden on small phones", async ({
+  page,
+}) => {
+  await openHome(page, 375);
+  const logo = page.locator("header").getByRole("link", { name: /VERVE\s*STUDIO/ });
+
+  await expect(logo).toBeVisible();
+  await expect(logo.getByText("STUDIO")).toBeHidden();
+  await expect(logo).toHaveAttribute("aria-label", /VERVE\s*STUDIO/);
 });
 test("header controls are at least 44x44 on mobile and tablet", async ({
   page,
