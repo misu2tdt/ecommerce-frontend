@@ -5,6 +5,7 @@ import { CatalogSortSelect } from "@/components/catalog-sort-select";
 import { FeedbackState } from "@/components/feedback-state";
 import { MobileFilterDrawer } from "@/components/mobile-filter-drawer";
 import { ProductCard } from "@/components/product-card";
+import { ProductGrid } from "@/components/product-grid";
 import {
   getCatalogFilterOptions,
   getProducts,
@@ -126,15 +127,17 @@ export default async function ProductsPage({
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
+            <ProductGrid>
+              {products.map((product, index) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                   filters={filters}
+                  headingLevel="h2"
+                  priority={index < 4}
                 />
               ))}
-            </div>
+            </ProductGrid>
           )}
         </div>
       </div>

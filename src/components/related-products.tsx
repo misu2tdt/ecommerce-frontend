@@ -1,4 +1,5 @@
 import { ProductCard } from "@/components/product-card";
+import { ProductGrid } from "@/components/product-grid";
 import { getProducts } from "@/features/catalog/api";
 import type { ProductSummary } from "@/types/catalog";
 
@@ -46,11 +47,11 @@ export async function RelatedProducts({
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <ProductGrid className="mt-8">
         {related.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
-      </div>
+      </ProductGrid>
     </section>
   );
 }

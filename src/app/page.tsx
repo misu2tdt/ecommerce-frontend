@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
+import { ProductGrid } from "@/components/product-grid";
 import { getProducts } from "@/features/catalog/api";
 import type { ProductSummary } from "@/types/catalog";
 
@@ -347,11 +348,15 @@ export default async function Home() {
               <p className="mt-1 text-body-sm">Please try again shortly.</p>
             </div>
           ) : (
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredCollection.map((product) => (
-                <ProductCard key={product.id} product={product} />
+            <ProductGrid className="mt-8">
+              {featuredCollection.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  priority={index < 4}
+                />
               ))}
-            </div>
+            </ProductGrid>
           )}
         </div>
       </section>
@@ -427,11 +432,11 @@ export default async function Home() {
               </Link>
             </div>
 
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <ProductGrid className="mt-8">
               {everydayEssentials.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
-            </div>
+            </ProductGrid>
           </div>
         </section>
       )}

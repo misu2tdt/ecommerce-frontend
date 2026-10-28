@@ -1,16 +1,25 @@
 import Image from "next/image";
 import type { ProductImage } from "@/types/catalog";
+import { cx } from "./ui/cx";
 
 interface ProductMediaProps {
-  image?: ProductImage;
+  image?: ProductImage | { url: string; altText: string | null };
   productName: string;
   priority?: boolean;
+  sizes?: string;
+  // The picture sits next to a link that already names the product, so the
+  // "no image" placeholder is hidden from assistive technology.
+  decorative?: boolean;
+  imageClassName?: string;
 }
 
 export function ProductMedia({
   image,
   productName,
   priority,
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  decorative = false,
+  imageClassName,
 }: ProductMediaProps) {
   if (image) {
     return (
@@ -19,17 +28,21 @@ export function ProductMedia({
         alt={image.altText || productName}
         fill
         priority={priority}
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-cover"
+        sizes={sizes}
+        className={cx("object-cover", imageClassName)}
       />
     );
   }
 
   return (
     <div
-      role="img"
-      aria-label={`No image available for ${productName}`}
-      className="flex h-full min-h-52 items-center justify-center bg-gradient-to-br from-neutral-50 to-neutral-100 text-brand-strong/45"
+      {...(decorative
+        ? { "aria-hidden": true }
+        : { role: "img", "aria-label": `No image available for ${productName}` })}
+      className={cx(
+        "flex h-full items-center justify-center bg-gradient-to-br from-neutral-50 to-neutral-100 text-brand-strong/45",
+        !decorative && "min-h-52",
+      )}
     >
       <svg
         aria-hidden="true"

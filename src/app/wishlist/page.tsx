@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FeedbackState } from "@/components/feedback-state";
+import { ProductCard } from "@/components/product-card";
+import { ProductGrid } from "@/components/product-grid";
 import { WishlistRemoveControl } from "@/components/wishlist-remove-control";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { getWishlist } from "@/features/wishlist/api";
 import { ApiError, apiErrorMessage } from "@/lib/api";
-import { formatPriceRange } from "@/lib/money";
 import type { WishlistItem } from "@/types/wishlist";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { SITE_NAME } from "@/lib/site";
-import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Wishlist",
   description: `Products saved to your ${SITE_NAME} wishlist.`,
@@ -55,84 +53,19 @@ export default async function WishlistPage() {
           actionLabel="Browse products"
         />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ProductGrid>
           {items.map((item) => (
-            <WishlistCard key={item.id} item={item} />
+            <ProductCard
+              key={item.id}
+              product={item.product}
+              headingLevel="h2"
+              action={null}
+              footer={<WishlistRemoveControl productId={item.product.id} />}
+            />
           ))}
-        </div>
+        </ProductGrid>
       )}
     </section>
-  );
-}
-
-function WishlistCard({ item }: { item: WishlistItem }) {
-  const { product } = item;
-  const href = `/products/${encodeURIComponent(product.slug)}`;
-  const purchasable = product.available && product.inStock;
-  return (
-    <article className="overflow-hidden rounded-md border border-line bg-surface">
-      <Link
-        href={href}
-        className="relative block aspect-[4/3] overflow-hidden bg-brand-soft focus-visible:outline-2 focus-visible:outline-brand"
-        aria-label={`View ${product.name}`}
-      >
-        {product.primaryImage ? (
-          <Image
-            src={product.primaryImage.url}
-            alt={product.primaryImage.altText || product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-          />
-        ) : (
-          <span className="flex h-full items-center justify-center text-body-sm text-neutral-600">
-            No image available
-          </span>
-        )}
-      </Link>
-      <div className="p-5">
-        <Eyebrow>
-          {product.category.name}
-          {product.brand ? ` / ${product.brand.name}` : ""}
-        </Eyebrow>
-        <div className="mt-2 flex min-w-0 items-start justify-between gap-3">
-          <Link
-            href={href}
-            className="min-w-0 break-words font-bold text-brand-strong hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
-          >
-            {product.name}
-          </Link>
-          <Badge
-            variant={purchasable ? "success" : "neutral"}
-            size="md"
-            className="shrink-0"
-          >
-            {purchasable
-              ? "In stock"
-              : product.available
-                ? "Out of stock"
-                : "Unavailable"}
-          </Badge>
-        </div>
-        <p className="mt-3 font-bold text-brand-strong">
-          {formatPriceRange(product.minPrice, product.maxPrice)}
-        </p>
-        <p className="mt-2 text-body-sm text-neutral-600">
-          {product.averageRating === null
-            ? "No reviews yet"
-            : `${product.averageRating.toFixed(1)} / 5 · ${product.reviewCount} ${product.reviewCount === 1 ? "review" : "reviews"}`}
-        </p>
-        <div className="mt-5 flex items-start justify-between gap-3 border-t border-line pt-4">
-          <Link
-            href={href}
-            className="inline-flex min-h-11 items-center rounded-md px-2 text-body-sm font-semibold text-brand hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
-          >
-            View product
-          </Link>
-          <WishlistRemoveControl productId={product.id} />
-        </div>
-      </div>
-    </article>
   );
 }
 
