@@ -10,7 +10,7 @@ export default function ProductsError({ reset }: { reset: () => void }) {
           Catalog unavailable
         </h2>
         <p className="mt-3 text-body-sm text-neutral-600">
-          We could not load the catalog. Check the backend and try again.
+          We could not load the products right now. Please try again in a moment.
         </p>
         <button
           type="button"

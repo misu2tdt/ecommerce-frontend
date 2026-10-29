@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { Eyebrow } from "@/components/ui/eyebrow";
 import { FOOTER_BRANDS, FOOTER_CATEGORIES } from "@/lib/catalog-nav";
 import { SITE_NAME } from "@/lib/site";
+
+// 14px, not the 12px eyebrow: these name the link columns and must stay readable.
+const columnTitle =
+  "text-body-sm font-semibold uppercase tracking-eyebrow text-neutral-200";
 
 const customerLinks = [
   { label: "My Account", href: "/account" },
@@ -25,20 +28,13 @@ export function SiteFooter() {
               <span className="text-body-sm font-semibold tracking-widest text-neutral-400">STUDIO</span>
             </Link>
             <p className="mt-3 text-body-sm text-neutral-400">
-              Modern commercial fashion storefront engineered for comfort,
-              movement, and everyday utility. Powered by Next.js and NestJS.
+              Modern everyday fashion, made for comfort and movement.
             </p>
-            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-brand px-3 py-1 text-body-sm font-semibold text-neutral-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-neutral-400" />
-              <span>Live Fashion Catalog</span>
-            </div>
           </div>
 
           {/* Col 2: Categories */}
           <div>
-            <Eyebrow className="text-neutral-200">
-              Categories
-            </Eyebrow>
+            <p className={columnTitle}>Categories</p>
             <ul className="mt-4 space-y-2.5 text-body-sm">
               {FOOTER_CATEGORIES.map((item) => (
                 <li key={item.href}>
@@ -55,9 +51,7 @@ export function SiteFooter() {
 
           {/* Col 3: Brands */}
           <div>
-            <Eyebrow className="text-neutral-200">
-              Brands
-            </Eyebrow>
+            <p className={columnTitle}>Brands</p>
             <ul className="mt-4 space-y-2.5 text-body-sm">
               {FOOTER_BRANDS.map((item) => (
                 <li key={item.href}>
@@ -75,9 +69,7 @@ export function SiteFooter() {
 
           {/* Col 4: Customer Care */}
           <div>
-            <Eyebrow className="text-neutral-200">
-              Customer Care
-            </Eyebrow>
+            <p className={columnTitle}>Customer Care</p>
             <ul className="mt-4 space-y-2.5 text-body-sm">
               {customerLinks.map((item) => (
                 <li key={item.href}>
@@ -92,17 +84,22 @@ export function SiteFooter() {
             </ul>
             <div className="mt-6 rounded-md border border-neutral-800 bg-neutral-900/60 p-3 text-body-sm text-neutral-400">
               <p className="font-semibold text-neutral-300">Need help with an order?</p>
-              <p className="mt-1">Check order status anytime in your account dashboard.</p>
+              <p className="mt-1">Check your order status anytime in your account.</p>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-neutral-800/80 pt-8 text-body-sm text-neutral-400 sm:flex-row">
-          <p>&copy; {new Date().getFullYear()} {SITE_NAME}. Fictional portfolio fashion store.</p>
-          <div className="flex items-center gap-6">
+          <p>&copy; {new Date().getFullYear()} {SITE_NAME}.</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-6">
             <span>Currency: VND (₫)</span>
-            <span>Deterministic Demo Data</span>
+            <Link
+              href="/about-demo"
+              className="inline-flex min-h-11 items-center transition hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-white"
+            >
+              Portfolio demo store, not a real shop
+            </Link>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
+import { toShopperMessage } from "@/lib/shopper-messages";
 import type { Payment } from "@/types/payment";
 import { createOrderPayment } from "./api";
 
@@ -21,12 +22,12 @@ export async function createPaymentAction(
   const orderId = readPositiveInteger(formData, "orderId");
   const idempotencyKey = readString(formData, "idempotencyKey").trim();
   if (!orderId) {
-    return { status: "error", message: "The Order identifier is invalid." };
+    return { status: "error", message: "We could not find that order." };
   }
   if (!isSafeIdempotencyKey(idempotencyKey)) {
     return {
       status: "error",
-      message: "The payment attempt identifier is invalid.",
+      message: "We could not start the payment. Please try again.",
     };
   }
 
@@ -48,7 +49,7 @@ export async function createPaymentAction(
     return { status: "error", message: paymentErrorMessage(failure) };
   }
   if (!payment) {
-    return { status: "error", message: "The backend returned no Payment." };
+    return { status: "error", message: "We could not start the payment. Please try again." };
   }
 
   const checkoutUrl = safeCheckoutUrl(payment.checkoutUrl);
@@ -56,7 +57,7 @@ export async function createPaymentAction(
     return {
       status: "error",
       message:
-        "The provider checkout link was invalid. Recheck payment status before retrying.",
+        "We could not open the MoMo payment page. Check your payment status before trying again.",
       payment,
     };
   }
@@ -66,10 +67,10 @@ export async function createPaymentAction(
     payment,
     checkoutUrl: checkoutUrl ?? undefined,
     message: checkoutUrl
-      ? "Payment attempt created. Continue to MoMo to complete checkout."
+      ? "Payment started. Continue to MoMo to complete it."
       : payment.status === "succeeded"
-        ? "Payment is already confirmed by the backend."
-        : "Payment attempt created, but no provider checkout link was returned. Recheck status before retrying.",
+        ? "This payment is already confirmed."
+        : "We started your payment but could not open the MoMo page. Check your payment status before trying again.",
   };
 }
 
@@ -103,18 +104,18 @@ function readString(formData: FormData, key: string): string {
 
 function paymentErrorMessage(error: unknown): string {
   if (!(error instanceof ApiError)) {
-    return "Unable to create a Payment. Please try again.";
+    return "We could not start the payment. Please try again.";
   }
-  if (error.status === 400) return error.message;
+  if (error.status === 400) return toShopperMessage(error.message);
   if (error.status === 404) {
-    return "Order not found or unavailable for this account.";
+    return "We could not find this order in your account.";
   }
-  if (error.status === 409) return error.message;
+  if (error.status === 409) return toShopperMessage(error.message);
   if (error.status === 502) {
-    return "MoMo checkout is currently unavailable. The Payment history below remains authoritative; recheck it before trying again.";
+    return "MoMo is not available right now. Check your payment history below before trying again.";
   }
   if (error.status === 0) {
-    return "The Payment service is unavailable. Please try again.";
+    return "Payments are unavailable right now. Please try again.";
   }
-  return "Unable to create a Payment. Please try again.";
+  return "We could not start the payment. Please try again.";
 }

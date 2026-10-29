@@ -20,7 +20,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 export const metadata: Metadata = {
   title: "Payment return",
   description:
-    "Check backend-confirmed Payment status after returning from MoMo.",
+    "Check your payment status after returning from MoMo.",
 };
 
 type ReturnSearchParams = Record<string, string | string[] | undefined>;
@@ -37,7 +37,7 @@ export default async function PaymentReturnPage({
       <ReturnShell>
         <FeedbackState
           title="Payment return could not be identified"
-          description="No valid provider Payment identifier was supplied. Check your Order history for the authoritative status."
+          description="We could not tell which payment you came back from. Check your order history for the latest status."
           actionHref="/account/orders"
           actionLabel="View Orders"
         />
@@ -53,7 +53,7 @@ export default async function PaymentReturnPage({
       <ReturnShell>
         <FeedbackState
           title="Payment return unavailable"
-          description="This Payment could not be found for your account. Redirect result fields were not used as proof of payment."
+          description="We could not find this payment in your account. Check your order history for the latest status."
           actionHref="/account/orders"
           actionLabel="View Orders"
         />
@@ -83,17 +83,17 @@ export default async function PaymentReturnPage({
   const heading = succeeded
     ? "Payment confirmed"
     : active
-      ? "Awaiting provider confirmation"
+      ? "Waiting for MoMo to confirm"
       : latest?.status === "failed"
         ? "Payment was not completed"
         : latest?.status === "cancelled"
           ? "Payment attempt cancelled"
           : "Payment status unavailable";
   const description = succeeded
-    ? "The backend received and verified a final provider IPN."
+    ? "MoMo has confirmed your payment."
     : active
-      ? "Returning from MoMo is not proof of success. The backend is still waiting for a verified final IPN."
-      : "The backend has not confirmed a successful Payment. The Order remains authoritative.";
+      ? "Coming back from MoMo does not confirm the payment yet. We are still waiting for MoMo to confirm it, so check again in a moment."
+      : "We have not received a confirmed payment for this order.";
 
   return (
     <ReturnShell>

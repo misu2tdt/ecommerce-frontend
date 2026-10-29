@@ -24,7 +24,7 @@ export async function SiteHeader() {
           {/* One message on phones, two from sm, all three from md: never wraps */}
           <span>Curated everyday essentials</span>
           <span className="hidden text-neutral-600 md:inline">•</span>
-          <span className="hidden md:inline">Transparent integer VND pricing</span>
+          <span className="hidden md:inline">Prices shown in VND</span>
           <span className="hidden text-neutral-600 sm:inline">•</span>
           <span className="hidden sm:inline">Verified customer reviews</span>
         </div>

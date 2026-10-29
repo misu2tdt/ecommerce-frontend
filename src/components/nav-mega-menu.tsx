@@ -130,7 +130,7 @@ export function NavMegaMenu() {
             </div>
 
             <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4 text-body-sm font-normal text-neutral-600">
-              <span>Live inventory by variant with integer VND pricing</span>
+              <span>Prices shown in VND</span>
               <Link
                 href="/products"
                 onClick={() => setDropdownOpen(false)}

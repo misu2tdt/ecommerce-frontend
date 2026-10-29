@@ -51,8 +51,7 @@ export function CancelOrderControl({ orderId }: { orderId: number }) {
         Cancel Order #{orderId}?
       </h2>
       <p id="cancel-order-description" className="mt-2 text-body-sm text-red-800">
-        The backend will validate status and payment state, then restore stock
-        transactionally if cancellation is allowed.
+        If this order can still be cancelled, its items go back into stock.
       </p>
       <div className="mt-4 flex flex-wrap gap-3">
         <form action={formAction}>

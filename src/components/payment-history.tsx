@@ -18,7 +18,7 @@ export function PaymentHistory({ payments }: { payments: Payment[] }) {
             Payment history
           </h2>
           <p className="mt-2 text-body-sm text-neutral-600">
-            Provider confirmation received by the backend is authoritative.
+            A payment counts as paid once MoMo confirms it.
           </p>
         </div>
         <span className="text-body-sm text-neutral-600">
@@ -28,7 +28,7 @@ export function PaymentHistory({ payments }: { payments: Payment[] }) {
 
       {payments.length === 0 ? (
         <p className="mt-5 rounded-md bg-surface-muted px-4 py-3 text-body-sm text-neutral-600">
-          No Payment attempts have been created for this Order.
+          No payment attempts yet for this order.
         </p>
       ) : (
         <ol className="mt-5 space-y-3">
@@ -43,7 +43,7 @@ export function PaymentHistory({ payments }: { payments: Payment[] }) {
                     Payment #{payment.id}
                   </p>
                   <p className="mt-1 text-body-sm capitalize text-neutral-600">
-                    Provider: {payment.provider}
+                    Paid with: {payment.provider}
                   </p>
                 </div>
                 <PaymentStatusBadge status={payment.status} />
@@ -64,7 +64,7 @@ export function PaymentHistory({ payments }: { payments: Payment[] }) {
                 {payment.succeededAt && (
                   <div className="sm:col-span-2">
                     <dt className="text-neutral-600">
-                      Backend-confirmed success
+                      Payment confirmed
                     </dt>
                     <dd className="mt-1 font-semibold text-brand">
                       {formatDateTime(payment.succeededAt)}

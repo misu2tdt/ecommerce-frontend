@@ -45,7 +45,7 @@ export function Hero() {
       <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:flex lg:h-full lg:items-center lg:px-8 lg:py-0">
         <div className="lg:max-w-sm xl:max-w-xl">
           <Eyebrow className="text-neutral-600 lg:text-white">
-            Curated Fashion Catalog • Live Inventory
+            Everyday fashion
           </Eyebrow>
           <h1 className="mt-4 font-bold tracking-tight text-brand-strong text-display lg:text-white">
             Built for Every Day.

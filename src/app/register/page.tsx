@@ -30,7 +30,7 @@ export default async function RegisterPage({
           Create your account
         </h1>
         <p className="mt-3 text-neutral-600">
-          Register with the email and password fields supported by the backend.
+          Create an account to check out, track your orders and save a wishlist.
         </p>
 
         <RegisterForm nextPath={nextPath} />

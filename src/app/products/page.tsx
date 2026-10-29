@@ -59,7 +59,7 @@ export default async function ProductsPage({
       {/* Page Header */}
       <div className="border-b border-line pb-6">
         <Eyebrow>
-          Curated Wardrobe
+          Shop
         </Eyebrow>
         <h1 className="mt-1 font-bold tracking-tight text-brand text-display">
           Everyday Performance & Essentials

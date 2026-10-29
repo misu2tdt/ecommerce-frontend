@@ -125,21 +125,21 @@ export default async function OrderDetailPage({
           <PaymentNotice
             tone="success"
             title="Payment confirmed"
-            description="The backend received verified provider confirmation and updated this Order."
+            description="MoMo confirmed your payment and this order has been updated."
             orderId={order.id}
           />
         ) : hasActivePayment ? (
           <PaymentNotice
             tone="processing"
-            title="Awaiting provider confirmation"
-            description="A Payment is pending or processing. Returning from MoMo does not prove success; recheck until the backend receives a verified final IPN."
+            title="Waiting for MoMo to confirm"
+            description="Your payment is still being processed. Coming back from MoMo does not confirm it yet, so check again in a moment."
             orderId={order.id}
           />
         ) : (
           <PaymentNotice
             tone="neutral"
             title="Payment unavailable"
-            description="This Order is not currently eligible for a new Payment attempt."
+            description="You cannot start a new payment for this order right now."
             orderId={order.id}
           />
         )}

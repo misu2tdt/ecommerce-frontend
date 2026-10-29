@@ -26,7 +26,7 @@ export async function loginAction(
   try {
     const response = await login(email, password);
     if (!response.access_token) {
-      return { message: "The backend returned an invalid login response." };
+      return { message: "We could not sign you in. Please try again." };
     }
     await setSessionToken(response.access_token);
   } catch (error) {

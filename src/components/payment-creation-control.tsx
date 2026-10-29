@@ -25,10 +25,10 @@ export function PaymentCreationControl({
 
   return (
     <section className="rounded-md border border-line bg-surface-muted p-5">
-      <h2 className="text-title font-bold text-brand-strong">Pay this Order</h2>
+      <h2 className="text-title font-bold text-brand-strong">Pay for this order</h2>
       <p className="mt-2 text-body text-brand-strong/80">
-        The backend determines ownership, amount, currency, and eligibility.
-        MoMo confirmation may arrive after you return to the store.
+        You will continue to MoMo to pay. Confirmation can arrive a little after
+        you return to the store.
       </p>
 
       <form action={action} className="mt-5">
@@ -40,9 +40,9 @@ export function PaymentCreationControl({
           className={buttonStyles({ variant: "primary", size: "lg", className: "w-full" })}
         >
           {pending
-            ? "Creating Payment..."
+            ? "Starting payment..."
             : attemptCreated
-              ? "Payment attempt created"
+              ? "Payment started"
               : "Pay now"}
         </button>
       </form>
@@ -75,7 +75,7 @@ export function PaymentCreationControl({
           prefetch={false}
           className={buttonStyles({ variant: "secondary", size: "md", className: "mt-4 w-full" })}
         >
-          Recheck Payment status
+          Check payment status
         </Link>
       )}
     </section>

@@ -36,7 +36,7 @@ export function CheckoutSummary({ cart }: { cart: Cart }) {
             </div>
             {!item.available && (
               <p className="mt-2 text-body-sm font-semibold text-amber-800">
-                Availability changed; backend validation is required.
+                Availability has changed. We will check stock again when you place your order.
               </p>
             )}
           </li>
@@ -49,8 +49,7 @@ export function CheckoutSummary({ cart }: { cart: Cart }) {
         </span>
       </div>
       <p className="mt-4 text-body-sm text-neutral-600">
-        Prices, promotions, and inventory are recalculated atomically by the
-        backend when the Order is placed.
+        Prices, promotions and stock are checked again when you place your order.
       </p>
     </aside>
   );

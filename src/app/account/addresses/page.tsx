@@ -59,7 +59,7 @@ export default async function AddressesPage({
             Saved addresses
           </h1>
           <p className="mt-3 text-neutral-600">
-            These addresses can be selected during authenticated checkout.
+            You can choose one of these addresses when you check out.
           </p>
         </div>
         {returnPath !== "/account/addresses" && (

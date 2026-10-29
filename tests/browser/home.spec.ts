@@ -491,17 +491,17 @@ test("the value points appear once, in one strip, and the old pillars section is
   await expect(main.getByText("Why Shop With Us")).toHaveCount(0);
   await expect(main.getByText("Practical Fashion, Built on Trust")).toHaveCount(0);
   for (const title of [
-    "Live Inventory",
-    "Integer VND",
-    "Verified Reviews",
-    "Secure Checkout",
+    "Current stock",
+    "Prices in VND",
+    "Verified reviews",
+    "Secure sign-in",
   ]) {
     await expect(main.getByText(title, { exact: true })).toHaveCount(1);
   }
 
   const strip = main
     .locator("section")
-    .filter({ has: page.getByText("Live Inventory", { exact: true }) });
+    .filter({ has: page.getByText("Current stock", { exact: true }) });
   await expect(strip).toHaveCount(1);
   expect(await strip.locator("li").count()).toBe(4);
 });

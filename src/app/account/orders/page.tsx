@@ -48,7 +48,7 @@ export default async function OrdersPage() {
         Order history
       </h1>
       <p className="mt-3 text-neutral-600">
-        Orders are shown newest first using the backend response order.
+        Your orders are listed newest first.
       </p>
 
       {orders.length === 0 ? (

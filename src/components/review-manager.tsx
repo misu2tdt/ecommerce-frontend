@@ -39,8 +39,7 @@ export function ReviewManager({
         {review ? "Your review" : "Write a review"}
       </h3>
       <p className="mt-2 text-body text-neutral-600">
-        Reviews can be submitted after the backend confirms a delivered purchase
-        of this product.
+        You can review a product after your order for it has been delivered.
       </p>
       {review && !review.isVisible && (
         <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-body-sm text-amber-900">

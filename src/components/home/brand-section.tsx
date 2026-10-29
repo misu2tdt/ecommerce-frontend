@@ -36,7 +36,7 @@ export function BrandSection() {
     <section className="py-14 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <Eyebrow className="text-neutral-600">Editorial Spotlight</Eyebrow>
+          <Eyebrow className="text-neutral-600">Our brands</Eyebrow>
           <h2 className="mt-1 text-heading font-bold tracking-tight text-brand-strong">
             Brand Collections
           </h2>

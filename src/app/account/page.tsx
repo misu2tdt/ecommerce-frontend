@@ -10,7 +10,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { SITE_NAME } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Account",
-  description: `Your authenticated ${SITE_NAME} account.`,
+  description: `Your ${SITE_NAME} account.`,
 };
 
 export default async function AccountPage() {
@@ -33,13 +33,13 @@ export default async function AccountPage() {
     <section className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
       <div className="rounded-md border border-line bg-surface p-6 sm:p-8">
         <Eyebrow>
-          Authenticated account
+          Signed in
         </Eyebrow>
         <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
           Your account
         </h1>
         <p className="mt-3 text-neutral-600">
-          This identity was verified by the NestJS backend for this request.
+          You are signed in with this account.
         </p>
 
         <dl className="mt-8 grid gap-4 sm:grid-cols-2">

@@ -45,7 +45,7 @@ export function OrderStatusProgress({ status }: { status: OrderStatus }) {
       <div className="rounded-md border border-red-200 bg-red-50 px-4 py-4">
         <OrderStatusBadge status="cancelled" />
         <p className="mt-2 text-body-sm text-red-800">
-          This Order was cancelled. No later lifecycle state is implied.
+          This order was cancelled.
         </p>
       </div>
     );
@@ -54,7 +54,7 @@ export function OrderStatusProgress({ status }: { status: OrderStatus }) {
   const currentIndex = lifecycle.indexOf(status);
   const reached = lifecycle.slice(0, currentIndex + 1);
   return (
-    <ol className="flex flex-wrap gap-2" aria-label="Order lifecycle reached">
+    <ol className="flex flex-wrap gap-2" aria-label="Order progress">
       {reached.map((step, index) => {
         const current = index === reached.length - 1;
         return (

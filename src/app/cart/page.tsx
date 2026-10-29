@@ -50,7 +50,7 @@ export default async function CartPage() {
         </div>
         <FeedbackState
           title="Your cart is empty"
-          description="Browse the catalog and choose a product variant to get started."
+          description="Browse our products and add something you like."
           actionHref="/products"
           actionLabel="Browse products"
         />
@@ -76,8 +76,8 @@ export default async function CartPage() {
       </div>
 
       <p className="mt-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-body-sm text-amber-900">
-        Cart contents do not reserve inventory. Availability is checked against
-        current catalog data.
+        Items in your cart are not reserved. Stock is checked again when you
+        place your order.
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">

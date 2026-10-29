@@ -58,7 +58,7 @@ export default async function CheckoutPage({
         </div>
         <FeedbackState
           title="Add something before checkout"
-          description="Checkout creates an Order from the current authenticated cart."
+          description="Add a product to your cart, then come back to check out."
           actionHref="/products"
           actionLabel="Browse products"
         />
@@ -72,11 +72,11 @@ export default async function CheckoutPage({
         Secure checkout
       </Eyebrow>
       <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
-        Shipping and Order review
+        Shipping and order review
       </h1>
       <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-body-sm text-amber-900">
-        Cart items do not reserve inventory. The backend validates current
-        product activity, price, and stock atomically when you place the Order.
+        Items in your cart are not reserved. Prices and stock are checked again
+        when you place your order.
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">

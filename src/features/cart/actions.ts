@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildLoginHref, safeInternalPath } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
+import { toShopperMessage } from "@/lib/shopper-messages";
 import {
   addCartItem,
   clearCart,
@@ -23,7 +24,7 @@ export async function addToCartAction(
   const variantId = readPositiveInteger(formData, "variantId");
   const quantity = readPositiveInteger(formData, "quantity");
   if (!variantId || !quantity) {
-    return { status: "error", message: "Choose a valid variant and quantity." };
+    return { status: "error", message: "Choose an option and a quantity." };
   }
 
   const returnPath = safeInternalPath(readString(formData, "returnPath"), "/products");
@@ -57,7 +58,7 @@ export async function removeCartItemAction(
 ): Promise<CartActionState> {
   const itemId = readPositiveInteger(formData, "itemId");
   if (!itemId) {
-    return { status: "error", message: "The cart item is invalid." };
+    return { status: "error", message: "That item is not in your cart." };
   }
 
   return runCartMutation(
@@ -116,10 +117,10 @@ function cartErrorMessage(error: unknown): string {
     return "Unable to update your cart. Please try again.";
   }
   if (error.status === 400 || error.status === 404 || error.status === 409) {
-    return error.message;
+    return toShopperMessage(error.message);
   }
   if (error.status === 0) {
-    return "The cart service is unavailable. Please try again.";
+    return "Your cart is unavailable right now. Please try again.";
   }
   return "Unable to update your cart. Please try again.";
 }

@@ -52,14 +52,14 @@ export default async function CheckoutSuccessPage({
           ✓
         </div>
         <Eyebrow className="mt-6">
-          Order created
+          Order placed
         </Eyebrow>
         <h1 className="mt-2 font-bold tracking-tight text-brand-strong text-display">
           Thank you for your order
         </h1>
         <p className="mt-3 text-neutral-600">
-          This confirmation was loaded from the authenticated backend Order,
-          so it remains trustworthy after refresh.
+          Your order is saved in your account, so you can find it any time under
+          Order history.
         </p>
 
         <dl className="mt-8 grid gap-4 sm:grid-cols-3">

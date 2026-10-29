@@ -17,7 +17,7 @@ export async function cancelOrderAction(
 ): Promise<CancelOrderState> {
   const orderId = readPositiveInteger(formData, "orderId");
   if (!orderId) {
-    return { status: "error", message: "The Order identifier is invalid." };
+    return { status: "error", message: "We could not find that order." };
   }
 
   let failure: unknown;

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
+import { toShopperMessage } from "@/lib/shopper-messages";
 import { checkoutCart } from "./api";
 
 export interface CheckoutActionState {
@@ -47,7 +48,7 @@ export async function checkoutAction(
   if (!orderId || !Number.isSafeInteger(orderId)) {
     return {
       status: "error",
-      message: "The backend returned an invalid Order response.",
+      message: "Your order may have been placed, but we could not load it. Please check your order history before trying again.",
     };
   }
 
@@ -69,12 +70,16 @@ function checkoutFailure(error: unknown): CheckoutActionState {
     normalized.includes("does not exist");
 
   if ([400, 404, 409].includes(error.status)) {
-    return { status: "error", message: error.message, inventoryIssue };
+    return {
+      status: "error",
+      message: toShopperMessage(error.message),
+      inventoryIssue,
+    };
   }
   if (error.status === 0) {
     return {
       status: "error",
-      message: "The checkout service is unavailable. Your cart was not changed.",
+      message: "Checkout is unavailable right now. Your cart was not changed.",
     };
   }
   return {

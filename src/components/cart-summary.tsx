@@ -33,8 +33,7 @@ export function CartSummary({ cart }: { cart: Cart }) {
       </div>
 
       <p className="mt-4 text-body-sm text-neutral-600">
-        Inventory and coupon eligibility are validated server-side when placing
-        the order.
+        Stock and coupon codes are checked again when you place your order.
       </p>
 
       <Link
