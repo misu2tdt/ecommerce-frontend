@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetch, type ApiQuery } from "@/lib/api";
 import type {
   Brand,
   Category,
@@ -20,21 +20,41 @@ export interface ProductFilters {
   sort?: ProductSort;
 }
 
+// The query parameters the backend's product list accepts (ProductQueryDto in
+// the backend repo). The backend answers anything else with a 400, for example
+// `limit` or `page`: the list has no pagination yet, so take the first N
+// products on the frontend instead of asking for N.
+export const PRODUCT_QUERY_PARAMS = [
+  "q",
+  "category",
+  "brand",
+  "size",
+  "color",
+  "minPrice",
+  "maxPrice",
+  "inStock",
+  "sort",
+] as const;
+
+export function buildProductsQuery(filters: ProductFilters): ApiQuery {
+  return {
+    q: filters.q,
+    category: filters.category,
+    brand: filters.brand,
+    size: filters.size,
+    color: filters.color,
+    minPrice: filters.minPrice,
+    maxPrice: filters.maxPrice,
+    inStock: filters.inStock ? "true" : undefined,
+    sort: filters.sort,
+  } satisfies Record<(typeof PRODUCT_QUERY_PARAMS)[number], unknown>;
+}
+
 export function getProducts(
   filters: ProductFilters = {},
 ): Promise<ProductSummary[]> {
   return apiFetch<ProductSummary[]>("/products", {
-    query: {
-      q: filters.q,
-      category: filters.category,
-      brand: filters.brand,
-      size: filters.size,
-      color: filters.color,
-      minPrice: filters.minPrice,
-      maxPrice: filters.maxPrice,
-      inStock: filters.inStock ? "true" : undefined,
-      sort: filters.sort,
-    },
+    query: buildProductsQuery(filters),
   });
 }
 

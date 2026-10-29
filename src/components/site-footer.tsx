@@ -1,21 +1,7 @@
 import Link from "next/link";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { FOOTER_BRANDS, FOOTER_CATEGORIES } from "@/lib/catalog-nav";
 import { SITE_NAME } from "@/lib/site";
-const categories = [
-  { label: "All Products", href: "/products" },
-  { label: "T-Shirts & Tops", href: "/products?category=t-shirts-tops" },
-  { label: "Shirts & Polos", href: "/products?category=shirts-polos" },
-  { label: "Hoodies & Outerwear", href: "/products?category=hoodies-outerwear" },
-  { label: "Pants & Shorts", href: "/products?category=pants-shorts" },
-  { label: "Basics & Accessories", href: "/products?category=basics-accessories" },
-];
-
-const brands = [
-  { label: "AeroThread", href: "/products?brand=aerothread", desc: "Everyday Minimal" },
-  { label: "Kanso Basics", href: "/products?brand=kanso-basics", desc: "Comfort Essentials" },
-  { label: "Veloce Active", href: "/products?brand=veloce-active", desc: "Performance Apparel" },
-  { label: "Monolith Studio", href: "/products?brand=monolith-studio", desc: "Structured Tailoring" },
-];
 
 const customerLinks = [
   { label: "My Account", href: "/account" },
@@ -54,7 +40,7 @@ export function SiteFooter() {
               Categories
             </Eyebrow>
             <ul className="mt-4 space-y-2.5 text-body-sm">
-              {categories.map((item) => (
+              {FOOTER_CATEGORIES.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -73,7 +59,7 @@ export function SiteFooter() {
               Brands
             </Eyebrow>
             <ul className="mt-4 space-y-2.5 text-body-sm">
-              {brands.map((item) => (
+              {FOOTER_BRANDS.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

@@ -6,7 +6,8 @@ export type CatalogSearchParams = Record<
   string | string[] | undefined
 >;
 
-const VALID_SORTS: ProductSort[] = [
+// The sort values the backend's ProductSort enum accepts.
+export const VALID_SORTS: ProductSort[] = [
   "featured",
   "price_asc",
   "price_desc",

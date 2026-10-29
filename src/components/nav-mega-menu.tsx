@@ -4,22 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
-// Only a few direct links fit beside the search and account controls; every
-// other category stays reachable through "Shop All" and the mobile drawer.
-const navigationItems = [
-  {
-    name: "T-Shirts & Tops",
-    href: "/products?category=t-shirts-tops",
-  },
-  {
-    name: "Shirts & Polos",
-    href: "/products?category=shirts-polos",
-  },
-  {
-    name: "Outerwear",
-    href: "/products?category=hoodies-outerwear",
-  },
-];
+import { MENU_BRAND_LINKS, PRIMARY_NAV_ITEMS } from "@/lib/catalog-nav";
 
 const categoryColumns = [
   {
@@ -45,12 +30,7 @@ const categoryColumns = [
   },
   {
     title: "Brand Edits",
-    links: [
-      { label: "AeroThread — Everyday Minimal", href: "/products?brand=aerothread" },
-      { label: "Kanso Basics — Comfort Essentials", href: "/products?brand=kanso-basics" },
-      { label: "Veloce Active — Athletic Performance", href: "/products?brand=veloce-active" },
-      { label: "Monolith Studio — Structured Tailoring", href: "/products?brand=monolith-studio" },
-    ],
+    links: MENU_BRAND_LINKS,
   },
 ];
 
@@ -164,7 +144,7 @@ export function NavMegaMenu() {
       </div>
 
       {/* Top-level direct category navigation links */}
-      {navigationItems.map((item) => (
+      {PRIMARY_NAV_ITEMS.map((item) => (
         <Link
           key={item.href}
           href={item.href}
