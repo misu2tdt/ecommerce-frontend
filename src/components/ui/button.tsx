@@ -1,7 +1,13 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cx } from "./cx";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "danger"
+  | "heroPrimary"
+  | "heroSecondary";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
@@ -16,6 +22,13 @@ const variants: Record<ButtonVariant, string> = {
     "text-brand hover:bg-brand-soft focus-visible:outline-brand disabled:text-neutral-600",
   danger:
     "bg-red-700 text-white hover:bg-red-800 focus-visible:outline-red-700 disabled:bg-neutral-200 disabled:text-neutral-600",
+  // The home hero's buttons. They look like primary and secondary on the white
+  // page, and turn light (white fill / white outline) from lg, where the hero
+  // text sits on the dark photo.
+  heroPrimary:
+    "bg-brand text-white hover:bg-brand-strong focus-visible:outline-brand lg:bg-white lg:text-brand-strong lg:hover:bg-neutral-100 lg:focus-visible:outline-white",
+  heroSecondary:
+    "border border-brand bg-surface text-brand hover:bg-brand-soft focus-visible:outline-brand lg:border-white lg:bg-transparent lg:text-white lg:hover:bg-white/10 lg:focus-visible:outline-white",
 };
 
 // Every size is at least 44px tall, the minimum comfortable touch target.

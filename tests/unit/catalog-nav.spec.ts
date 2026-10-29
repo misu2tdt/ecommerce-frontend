@@ -127,9 +127,10 @@ test.describe("shared catalog navigation lists", () => {
 });
 
 test.describe("banner constants", () => {
-  test("hold the eight banners as Cloudinary https urls with 3:2 sizes", () => {
+  test("hold the nine banners as Cloudinary https urls: 3:2, and the hero-wide one 16:9", () => {
     expect(Object.keys(BANNERS).sort()).toEqual([
       "banner-hero",
+      "banner-hero-wide",
       "brand-monolith-studio",
       "brand-veloce-active",
       "category-basics-accessories",
@@ -140,7 +141,8 @@ test.describe("banner constants", () => {
     ]);
     for (const [key, banner] of Object.entries(BANNERS)) {
       expect(banner.url, key).toMatch(/^https:\/\/res\.cloudinary\.com\//);
-      expect(banner.width / banner.height, key).toBeCloseTo(1.5, 2);
+      const expectedRatio = key === "banner-hero-wide" ? 16 / 9 : 1.5;
+      expect(banner.width / banner.height, key).toBeCloseTo(expectedRatio, 1);
     }
   });
 });
