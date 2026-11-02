@@ -62,6 +62,11 @@ test.describe("toShopperMessage", () => {
     }
   });
 
+  test("a missing payment reads as not found in the shopper's account", () => {
+    expect(toShopperMessage("Payment not found")).toBe(
+      "We could not find this payment in your account.",
+    );
+  });
   test("a message that is already readable is left alone", () => {
     expect(toShopperMessage("Order total must be at least 1,000 VND")).toBe(
       "Order total must be at least 1,000 VND",

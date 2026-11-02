@@ -28,6 +28,9 @@ jobs:
       CLOUDINARY_API_KEY: browser-disabled
       CLOUDINARY_API_SECRET: browser-disabled
       PAYMENT_CURRENCY: VND
+      # Demo payments: the browser tests finish orders on the demo payment page.
+      # The backend checkout below must be a revision that has this provider.
+      PAYMENT_PROVIDER: demo
       MOMO_PARTNER_CODE: browser-disabled
       MOMO_ACCESS_KEY: browser-disabled
       MOMO_SECRET_KEY: browser-disabled

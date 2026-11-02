@@ -1,5 +1,6 @@
 import { formatDateTime } from "@/lib/dates";
 import { formatVnd } from "@/lib/money";
+import { paymentProviderLabel } from "@/lib/payment-provider";
 import type { Payment } from "@/types/payment";
 import { PaymentStatusBadge } from "./payment-status";
 
@@ -18,7 +19,7 @@ export function PaymentHistory({ payments }: { payments: Payment[] }) {
             Payment history
           </h2>
           <p className="mt-2 text-body-sm text-neutral-600">
-            A payment counts as paid once MoMo confirms it.
+            A payment counts as paid once it is confirmed.
           </p>
         </div>
         <span className="text-body-sm text-neutral-600">
@@ -42,8 +43,8 @@ export function PaymentHistory({ payments }: { payments: Payment[] }) {
                   <p className="font-bold text-brand-strong">
                     Payment #{payment.id}
                   </p>
-                  <p className="mt-1 text-body-sm capitalize text-neutral-600">
-                    Paid with: {payment.provider}
+                  <p className="mt-1 text-body-sm text-neutral-600">
+                    Paid with: {paymentProviderLabel(payment.provider)}
                   </p>
                 </div>
                 <PaymentStatusBadge status={payment.status} />

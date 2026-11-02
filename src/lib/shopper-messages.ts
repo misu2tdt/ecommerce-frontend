@@ -27,6 +27,10 @@ const RULES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/^Cannot (checkout|quote) an empty cart$/i, () => "Your cart is empty."],
   [/^Cart item not found$/i, () => "That item is no longer in your cart."],
   [
+    /^Payment not found$/i,
+    () => "We could not find this payment in your account.",
+  ],
+  [
     /^Only a pending Order can be paid$/i,
     () => "Only an order that is waiting for payment can be paid.",
   ],

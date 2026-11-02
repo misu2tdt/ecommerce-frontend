@@ -1,65 +1,17 @@
 import { expect, test, type Page } from "@playwright/test";
+import { findBannedTerms, pageText } from "./support/banned-terms";
 
 // Customer-facing copy must read like a shop, not like a code base. This scans
 // what a shopper (or a screen reader) gets on the customer pages: the visible
 // text, every aria-label, image alt, the page title and its description.
 // The About page is exempt: it exists to talk about how the demo is built.
 
-const BANNED: Array<[string, RegExp]> = [
-  ["integer", /\binteger\b/i],
-  ["deterministic", /\bdeterministic\b/i],
-  ["variant-level", /\bvariant-level\b/i],
-  ["idempotent", /\bidempoten(t|cy)\b/i],
-  ["NestJS", /\bNest\.?js\b/i],
-  ["Next.js", /\bNext\.js\b/i],
-  ["Postgres", /\bPostgres(QL)?\b/i],
-  ["API", /\bAPI\b/],
-  ["seed", /\bseed(s|ed|ing)?\b/i],
-  ["endpoint", /\bendpoints?\b/i],
-  ["payload", /\bpayloads?\b/i],
-  ["session", /\bsessions?\b/i],
-  ["token", /\btokens?\b/i],
-  ["demo data", /\bdemo data\b/i],
-  ["backend", /\bback-?end\b/i],
-  ["server-side", /\bserver-?side\b/i],
-  ["provider", /\bprovider\b/i],
-  ["IPN", /\bIPN\b/],
-  ["authoritative", /\bauthoritative\b/i],
-  ["authenticated", /\bauthenticated\b/i],
-  ["lifecycle", /\blifecycle\b/i],
-];
-
 const DEMO_PASSWORD = "DemoOnly!2026";
-
-async function pageText(page: Page) {
-  return page.evaluate(() => {
-    const labels = Array.from(document.querySelectorAll("[aria-label]")).map(
-      (node) => node.getAttribute("aria-label") ?? "",
-    );
-    const alts = Array.from(document.querySelectorAll("img")).map(
-      (node) => node.getAttribute("alt") ?? "",
-    );
-    const description =
-      document.querySelector('meta[name="description"]')?.getAttribute("content") ??
-      "";
-    return [document.body.innerText, ...labels, ...alts, document.title, description].join(
-      "\n",
-    );
-  });
-}
 
 async function expectNoBannedTerms(page: Page, path: string) {
   await page.goto(path);
   await page.waitForLoadState("networkidle");
-  const text = await pageText(page);
-  const found = BANNED.filter(([, pattern]) => pattern.test(text)).map(
-    ([name]) => {
-      const match = text.match(BANNED.find(([n]) => n === name)![1]);
-      const at = match?.index ?? 0;
-      return `"${name}" in ...${text.slice(Math.max(0, at - 30), at + 40).replace(/\s+/g, " ")}...`;
-    },
-  );
-  expect(found, `${path}`).toEqual([]);
+  expect(findBannedTerms(await pageText(page)), ``).toEqual([]);
 }
 
 test("public pages use shopper language", async ({ page }) => {

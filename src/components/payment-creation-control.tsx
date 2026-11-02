@@ -27,8 +27,8 @@ export function PaymentCreationControl({
     <section className="rounded-md border border-line bg-surface-muted p-5">
       <h2 className="text-title font-bold text-brand-strong">Pay for this order</h2>
       <p className="mt-2 text-body text-brand-strong/80">
-        You will continue to MoMo to pay. Confirmation can arrive a little after
-        you return to the store.
+        You will continue to the payment page. Confirmation can arrive a little
+        after you return to the store.
       </p>
 
       <form action={action} className="mt-5">

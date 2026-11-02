@@ -1,12 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
+import {
+  MIN_READABLE_SHARE,
+  READABLE_PX,
+  measureReadableShare,
+} from "./support/readable-share";
 
 // Browser checks for the design system: one loaded font, readable text sizes,
 // a working skip link and field borders that pass the 3:1 non-text contrast rule.
 
 const VIEWPORT = { width: 1440, height: 900 };
-const READABLE_PX = 14;
-const MIN_READABLE_SHARE = 0.95;
-
 async function firstProductPath(page: Page) {
   await page.goto("/products");
   const href = await page
@@ -21,27 +23,6 @@ async function settle(page: Page, path: string) {
   await page.goto(path);
   await page.waitForLoadState("networkidle");
   await page.evaluate(() => document.fonts.ready);
-}
-
-// Share of rendered, non-whitespace characters at or above READABLE_PX.
-async function measureReadableShare(page: Page) {
-  return page.evaluate((readablePx) => {
-    const skip = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"]);
-    let total = 0;
-    let readable = 0;
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      const element = node.parentElement;
-      if (!element || skip.has(element.tagName)) continue;
-      const characters = (node.textContent ?? "").replace(/\s+/g, "").length;
-      if (!characters || !element.checkVisibility({ visibilityProperty: true }))
-        continue;
-      total += characters;
-      if (parseFloat(getComputedStyle(element).fontSize) >= readablePx)
-        readable += characters;
-    }
-    return { total, readable };
-  }, READABLE_PX);
 }
 
 // Any CSS colour (oklch, color-mix, ...) -> sRGB, by letting a canvas parse it.

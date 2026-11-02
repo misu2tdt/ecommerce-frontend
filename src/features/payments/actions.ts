@@ -7,6 +7,7 @@ import { ApiError } from "@/lib/api";
 import { toShopperMessage } from "@/lib/shopper-messages";
 import type { Payment } from "@/types/payment";
 import { createOrderPayment } from "./api";
+import { demoPayHref } from "./demo-pay";
 
 export interface CreatePaymentState {
   status?: "success" | "error";
@@ -49,7 +50,17 @@ export async function createPaymentAction(
     return { status: "error", message: paymentErrorMessage(failure) };
   }
   if (!payment) {
-    return { status: "error", message: "We could not start the payment. Please try again." };
+    return {
+      status: "error",
+      message: "We could not start the payment. Please try again.",
+    };
+  }
+
+  // The demo store has no checkout link: the shopper finishes on its own
+  // practice payment page. MoMo payments carry on below, unchanged.
+  if (payment.provider === "demo") {
+    revalidatePath(`/account/orders/${orderId}`);
+    redirect(demoPayHref(payment.id, orderId));
   }
 
   const checkoutUrl = safeCheckoutUrl(payment.checkoutUrl);
@@ -112,7 +123,7 @@ function paymentErrorMessage(error: unknown): string {
   }
   if (error.status === 409) return toShopperMessage(error.message);
   if (error.status === 502) {
-    return "MoMo is not available right now. Check your payment history below before trying again.";
+    return "The payment service is not available right now. Check your payment history below before trying again.";
   }
   if (error.status === 0) {
     return "Payments are unavailable right now. Please try again.";

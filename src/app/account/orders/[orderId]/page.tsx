@@ -15,6 +15,7 @@ import {
 import { buildLoginHref } from "@/features/auth/redirects";
 import { getOrder } from "@/features/orders/api";
 import { getOrderPayments } from "@/features/payments/api";
+import { demoPayHref } from "@/features/payments/demo-pay";
 import { formatAttributeLabel } from "@/lib/attributes";
 import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatDateTime } from "@/lib/dates";
@@ -22,6 +23,7 @@ import { formatVnd } from "@/lib/money";
 import type { CustomerOrder } from "@/types/order";
 import type { Payment } from "@/types/payment";
 
+import { buttonStyles } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { SITE_NAME } from "@/lib/site";
 export const metadata: Metadata = {
@@ -68,6 +70,13 @@ export default async function OrderDetailPage({
     (payment) => payment.status === "succeeded",
   );
   const hasActivePayment = payments.some(
+    (payment) =>
+      payment.status === "pending" || payment.status === "processing",
+  );
+  const succeededPayment = payments.find(
+    (payment) => payment.status === "succeeded",
+  );
+  const activePayment = payments.find(
     (payment) =>
       payment.status === "pending" || payment.status === "processing",
   );
@@ -125,8 +134,23 @@ export default async function OrderDetailPage({
           <PaymentNotice
             tone="success"
             title="Payment confirmed"
-            description="MoMo confirmed your payment and this order has been updated."
+            description={
+              succeededPayment?.provider === "demo"
+                ? "Your demo payment went through and this order has been updated."
+                : "MoMo confirmed your payment and this order has been updated."
+            }
             orderId={order.id}
+          />
+        ) : hasActivePayment && activePayment?.provider === "demo" ? (
+          <PaymentNotice
+            tone="processing"
+            title="Finish your demo payment"
+            description="This practice payment is waiting for you. Open the demo payment page to choose what happens."
+            orderId={order.id}
+            action={{
+              href: demoPayHref(activePayment.id, order.id),
+              label: "Continue demo payment",
+            }}
           />
         ) : hasActivePayment ? (
           <PaymentNotice
@@ -289,11 +313,13 @@ function PaymentNotice({
   title,
   description,
   orderId,
+  action,
 }: {
   tone: "success" | "processing" | "neutral";
   title: string;
   description: string;
   orderId: number;
+  action?: { href: string; label: string };
 }) {
   const styles = {
     success: "border-success/30 bg-success-soft text-success",
@@ -304,13 +330,23 @@ function PaymentNotice({
     <aside className={`rounded-md border p-5 ${styles[tone]}`}>
       <h2 className="text-title font-bold">{title}</h2>
       <p className="mt-2 text-body opacity-80">{description}</p>
-      <Link
-        href={`/account/orders/${orderId}`}
-        prefetch={false}
-        className="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-current bg-surface px-4 py-2 text-body-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
-        Recheck status
-      </Link>
+      <div className="mt-4 flex flex-wrap gap-3">
+        {action && (
+          <Link
+            href={action.href}
+            className={buttonStyles({ variant: "primary", size: "md" })}
+          >
+            {action.label}
+          </Link>
+        )}
+        <Link
+          href={`/account/orders/${orderId}`}
+          prefetch={false}
+          className="inline-flex min-h-11 items-center justify-center rounded-md border border-current bg-surface px-4 py-2 text-body-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Recheck status
+        </Link>
+      </div>
     </aside>
   );
 }

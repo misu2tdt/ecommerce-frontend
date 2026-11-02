@@ -42,6 +42,9 @@ export default defineConfig({
         DB_NAME: process.env.DB_NAME ?? "ecommerce_test",
         FRONTEND_ORIGIN: "http://localhost:3001",
         SWAGGER_ENABLED: "false",
+        // The money-path tests finish orders on the demo payment page. This
+        // needs a backend that has the demo payment provider (backend main).
+        PAYMENT_PROVIDER: "demo",
       },
     },
     {
