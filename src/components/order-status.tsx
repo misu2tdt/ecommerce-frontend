@@ -1,14 +1,6 @@
 import { badgeStyles, type BadgeVariant } from "@/components/ui/badge";
+import { statusLabel, type StatusAudience } from "@/lib/order-status";
 import type { OrderStatus } from "@/types/order";
-
-const statusLabels: Record<OrderStatus, string> = {
-  pending: "Pending",
-  confirmed: "Confirmed",
-  processing: "Processing",
-  shipped: "Shipped",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
 
 // Status colours carry meaning only: amber waiting, green done, red cancelled.
 const statusVariants: Record<OrderStatus, BadgeVariant> = {
@@ -28,22 +20,37 @@ const lifecycle: Exclude<OrderStatus, "cancelled">[] = [
   "delivered",
 ];
 
-export function OrderStatusBadge({ status }: { status: OrderStatus }) {
+// Customers see plain wording ("Awaiting payment"); admin pages pass
+// audience="admin" to keep the backend's raw status.
+export function OrderStatusBadge({
+  status,
+  audience = "customer",
+}: {
+  status: OrderStatus;
+  audience?: StatusAudience;
+}) {
+  const label = statusLabel(status, audience);
   return (
     <span
-      aria-label={`Order status: ${statusLabels[status]}`}
+      aria-label={`Order status: ${label}`}
       className={badgeStyles(statusVariants[status], undefined, "md")}
     >
-      {statusLabels[status]}
+      {label}
     </span>
   );
 }
 
-export function OrderStatusProgress({ status }: { status: OrderStatus }) {
+export function OrderStatusProgress({
+  status,
+  audience = "customer",
+}: {
+  status: OrderStatus;
+  audience?: StatusAudience;
+}) {
   if (status === "cancelled") {
     return (
       <div className="rounded-md border border-red-200 bg-red-50 px-4 py-4">
-        <OrderStatusBadge status="cancelled" />
+        <OrderStatusBadge status="cancelled" audience={audience} />
         <p className="mt-2 text-body-sm text-red-800">
           This order was cancelled.
         </p>
@@ -67,7 +74,7 @@ export function OrderStatusProgress({ status }: { status: OrderStatus }) {
               "md",
             )}
           >
-            {statusLabels[step]}
+            {statusLabel(step, audience)}
             <span className="sr-only"> {current ? "current" : "completed"}</span>
           </li>
         );

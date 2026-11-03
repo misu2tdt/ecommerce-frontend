@@ -1,9 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useId, useMemo, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { addToCartAction, type CartActionState } from "@/features/cart/actions";
 import { formatVnd } from "@/lib/money";
+import { stockHint } from "@/lib/product-detail";
 import {
   clampQuantity,
   determineSelectorMode,
@@ -14,6 +22,7 @@ import {
 } from "@/lib/variant-selection";
 import type { ProductVariant } from "@/types/catalog";
 import { ProductAccordions } from "./product-accordions";
+import { useProductColor } from "./product-selection";
 import { SizeGuideModal } from "./size-guide-modal";
 import { WishlistSaveControl } from "./wishlist-save-control";
 
@@ -63,6 +72,42 @@ export function ProductPurchasePanel({
     () => getInitialSelection(variants, options).variantId,
   );
   const [quantity, setQuantity] = useState(1);
+  const { setColor: shareColor } = useProductColor();
+
+  // Pressing "Add to Bag" before choosing is answered here, not with an alert.
+  const [selectionError, setSelectionError] = useState<string | null>(null);
+  const sizeGroupRef = useRef<HTMLDivElement | null>(null);
+  const optionGroupRef = useRef<HTMLDivElement | null>(null);
+
+  // The sticky bar (phones) is shown once the main button has scrolled away, and
+  // is hidden again at the footer so it never covers it.
+  const mainButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [mainButtonVisible, setMainButtonVisible] = useState(true);
+  const [footerVisible, setFooterVisible] = useState(false);
+  const stickyVisible = !mainButtonVisible && !footerVisible;
+
+  useEffect(() => {
+    const button = mainButtonRef.current;
+    if (!button) return;
+    const footer = document.querySelector("footer");
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === button) setMainButtonVisible(entry.isIntersecting);
+        else setFooterVisible(entry.isIntersecting);
+      }
+    });
+    observer.observe(button);
+    if (footer) observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
+
+  // While the bar is up, anything focused or scrolled to stays above it.
+  useEffect(() => {
+    document.documentElement.style.scrollPaddingBottom = stickyVisible ? "6rem" : "";
+    return () => {
+      document.documentElement.style.scrollPaddingBottom = "";
+    };
+  }, [stickyVisible]);
 
   // Resolve active ProductVariant with ZERO unsafe fallbacks
   const selectedVariant = useMemo(() => {
@@ -83,6 +128,18 @@ export function ProductPurchasePanel({
     );
     setSelectedColor(newColor);
     setSelectedSize(reconciledSize);
+    shareColor(newColor);
+    setSelectionError(null);
+  };
+
+  const chooseSize = (size: string) => {
+    setSelectedSize(size);
+    setSelectionError(null);
+  };
+
+  const chooseVariant = (variantId: number) => {
+    setSelectedVariantId(variantId);
+    setSelectionError(null);
   };
 
   // Safe quantity calculation
@@ -151,15 +208,22 @@ export function ProductPurchasePanel({
   // Determine purchase button label
   const purchaseButtonLabel = useMemo(() => {
     if (pending) return "Adding to Bag...";
-    if (selectedVariant === null) {
-      if (options.mode === "color_size" && !selectedSize) return "Select a Size";
-      if (options.mode === "size_only" && !selectedSize) return "Select a Size";
-      if (options.mode === "generic" && selectedVariantId === null) return "Select an Option";
-      return "Unavailable";
-    }
+    // Nothing chosen yet: the button still reads "Add to Bag" and asks for the
+    // missing choice when pressed.
+    if (selectedVariant === null) return "Add to Bag";
     if (selectedVariant.stock === 0) return "Out of Stock";
     return "Add to Bag";
-  }, [pending, selectedVariant, options.mode, selectedSize, selectedVariantId]);
+  }, [pending, selectedVariant]);
+
+  const missingChoice =
+    options.mode === "generic" ? "Please choose an option." : "Please choose a size.";
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (selectedVariant !== null) return;
+    event.preventDefault();
+    setSelectionError(missingChoice);
+    (sizeGroupRef.current ?? optionGroupRef.current)?.focus();
+  }
 
   // Is size guide appropriate for this category?
   const isApparelCategory =
@@ -207,20 +271,16 @@ export function ProductPurchasePanel({
         <div className="flex items-center gap-2">
           {selectedVariant ? (
             <>
-              <Badge
-                variant={selectedVariant.stock > 0 ? "success" : "error"}
-                size="md"
-                role="status"
-              >
-                <span
-                  className={`mr-1.5 h-2 w-2 rounded-full ${
-                    selectedVariant.stock > 0 ? "bg-success" : "bg-red-600"
-                  }`}
-                />
-                {selectedVariant.stock > 0
-                  ? `${selectedVariant.stock} in stock`
-                  : "Out of stock"}
-              </Badge>
+              {/* Only when it matters: a few left, or none. */}
+              {stockHint(selectedVariant.stock) && (
+                <Badge
+                  variant={selectedVariant.stock > 0 ? "warning" : "error"}
+                  size="md"
+                  role="status"
+                >
+                  {stockHint(selectedVariant.stock)}
+                </Badge>
+              )}
               <span className="font-mono text-body-sm text-neutral-500">
                 SKU: {selectedVariant.sku}
               </span>
@@ -299,7 +359,7 @@ export function ProductPurchasePanel({
               <button
                 type="button"
                 onClick={() => setShowSizeGuide(true)}
-                className="text-body-sm font-semibold text-brand underline underline-offset-4 hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
+                className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand underline underline-offset-4 hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
               >
                 Size & fit guide
               </button>
@@ -307,8 +367,11 @@ export function ProductPurchasePanel({
           </div>
 
           <div
-            className="mt-3 grid grid-cols-3 gap-2.5 sm:grid-cols-4"
+            ref={sizeGroupRef}
+            tabIndex={-1}
+            className="mt-3 grid grid-cols-3 gap-2.5 focus:outline-none sm:grid-cols-4"
             aria-label="Available sizes"
+            aria-describedby={selectionError ? "selection-error" : undefined}
           >
             {options.sizes.map((size) => {
               const isSelected = size === selectedSize;
@@ -326,22 +389,27 @@ export function ProductPurchasePanel({
                   key={size}
                   type="button"
                   aria-pressed={isSelected}
-                  disabled={!exists}
-                  onClick={() => exists && setSelectedSize(size)}
+                  aria-disabled={!exists || !inStock}
+                  onClick={() => exists && inStock && chooseSize(size)}
                   className={`relative flex min-h-12 flex-col items-center justify-center rounded-md border-2 px-3 py-2 text-center text-body-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
                     !exists
-                      ? "cursor-not-allowed border-neutral-100 bg-surface-muted text-neutral-300 line-through"
+                      ? "cursor-not-allowed border-neutral-100 bg-surface-muted text-neutral-600 line-through"
                       : isSelected
                         ? "border-brand bg-brand-soft text-brand-strong"
                         : inStock
                           ? "border-line bg-surface text-neutral-800 hover:border-neutral-400 hover:bg-surface-muted"
-                          : "border-line bg-surface-muted text-neutral-600 hover:border-field-border"
+                          : "cursor-not-allowed border-line bg-surface-muted text-neutral-600 line-through"
                   }`}
                 >
                   <span>{size}</span>
                   {exists && !inStock && (
-                    <Eyebrow as="span" className="text-neutral-600">
-                      Out of stock
+                    <Eyebrow as="span" className="text-neutral-600 no-underline">
+                      Sold out
+                    </Eyebrow>
+                  )}
+                  {exists && inStock && stockHint(matchingVariant!.stock) && (
+                    <Eyebrow as="span" className="text-amber-700">
+                      {stockHint(matchingVariant!.stock)}
                     </Eyebrow>
                   )}
                 </button>
@@ -362,7 +430,13 @@ export function ProductPurchasePanel({
               <span className="font-normal text-amber-700">Please select</span>
             )}
           </label>
-          <div className="mt-3 grid gap-2.5 sm:grid-cols-2" aria-label="Available options">
+          <div
+            ref={optionGroupRef}
+            tabIndex={-1}
+            className="mt-3 grid gap-2.5 focus:outline-none sm:grid-cols-2"
+            aria-label="Available options"
+            aria-describedby={selectionError ? "selection-error" : undefined}
+          >
             {variants.map((v) => {
               const isSelected = v.id === selectedVariantId;
               const inStock = v.stock > 0;
@@ -373,7 +447,7 @@ export function ProductPurchasePanel({
                   key={v.id}
                   type="button"
                   aria-pressed={isSelected}
-                  onClick={() => setSelectedVariantId(v.id)}
+                  onClick={() => chooseVariant(v.id)}
                   className={`rounded-md border-2 p-3 text-left transition focus-visible:outline-2 focus-visible:outline-brand ${
                     isSelected
                       ? "border-brand bg-brand-soft text-brand-strong"
@@ -406,6 +480,7 @@ export function ProductPurchasePanel({
         id={formId}
         ref={formRef}
         action={formAction}
+        onSubmit={handleSubmit}
         className="mt-8 space-y-4"
       >
         {selectedVariant && (
@@ -461,8 +536,9 @@ export function ProductPurchasePanel({
 
           <div className="flex-1 pt-5">
             <button
+              ref={mainButtonRef}
               type="submit"
-              disabled={!isPurchasable || pending}
+              disabled={(selectedVariant !== null && !isPurchasable) || pending}
               className={buttonStyles({ variant: "primary", size: "lg", className: "w-full" })}
             >
               <svg
@@ -482,6 +558,16 @@ export function ProductPurchasePanel({
             </button>
           </div>
         </div>
+
+        {selectionError && (
+          <p
+            id="selection-error"
+            role="alert"
+            className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-body-sm font-semibold text-red-800"
+          >
+            {selectionError}
+          </p>
+        )}
 
         {/* Status Feedback Message */}
         {state.message && (
@@ -532,6 +618,7 @@ export function ProductPurchasePanel({
       )}
 
       {/* 6. Mobile Sticky Purchase Bar */}
+      {stickyVisible && (
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-white/95 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-lg backdrop-blur-md lg:hidden">
         <div className="mx-auto flex max-w-md items-center justify-between gap-4">
           <div className="min-w-0">
@@ -545,7 +632,7 @@ export function ProductPurchasePanel({
 
           <button
             type="button"
-            disabled={!isPurchasable || pending}
+            disabled={(selectedVariant !== null && !isPurchasable) || pending}
             onClick={() => formRef.current?.requestSubmit()}
             className={buttonStyles({ variant: "primary", size: "md" })}
           >
@@ -566,6 +653,7 @@ export function ProductPurchasePanel({
           </button>
         </div>
       </div>
+      )}
     </section>
   );
 }

@@ -17,12 +17,9 @@ export function CartSummary({ cart }: { cart: Cart }) {
   return (
     <aside className="rounded-md border border-line bg-surface p-6 lg:sticky lg:top-6">
       <h2 className="text-title font-bold text-brand-strong">Cart summary</h2>
-      <div className="mt-4 flex items-center justify-between border-b border-line pb-4 text-body-sm text-neutral-600">
-        <span>
-          {cart.items.length} {cart.items.length === 1 ? "item" : "items"}
-        </span>
-        <span>Eligible items</span>
-      </div>
+      <p className="mt-4 border-b border-line pb-4 text-body-sm text-neutral-600">
+        {cart.items.length} {cart.items.length === 1 ? "item" : "items"}
+      </p>
 
       <div className="mt-5">
         <CouponEntryBox

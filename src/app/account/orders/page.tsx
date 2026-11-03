@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ListPager } from "@/components/list-pager";
 import { AccountNav } from "@/components/account-nav";
 import { FeedbackState } from "@/components/feedback-state";
 import { OrderStatusBadge } from "@/components/order-status";
 import { buildLoginHref } from "@/features/auth/redirects";
-import { getOrders } from "@/features/orders/api";
+import type { CatalogSearchParams } from "@/features/catalog/search-params";
+import { getOrdersPage } from "@/features/orders/api";
 import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatDateTime } from "@/lib/dates";
 import { formatVnd } from "@/lib/money";
+import {
+  pageRedirectTarget,
+  parsePageParam,
+  withPage,
+  type PaginationInfo,
+} from "@/lib/pagination";
 import type { CustomerOrder } from "@/types/order";
 
 import { buttonStyles } from "@/components/ui/button";
@@ -19,15 +27,21 @@ export const metadata: Metadata = {
   description: `Review your ${SITE_NAME} Order history.`,
 };
 
-export default async function OrdersPage() {
-  const result = await loadOrders();
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<CatalogSearchParams>;
+}) {
+  const pageParam = parsePageParam((await searchParams).page);
+  const result = await loadOrders(pageParam.page);
   if ("unauthenticated" in result) {
     redirect(buildLoginHref("/account/orders"));
   }
   if ("error" in result) {
     return (
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16">
         <FeedbackState
+          as="h1"
           title="Orders unavailable"
           description={apiErrorMessage(result.error)}
           actionHref="/account/orders"
@@ -37,9 +51,14 @@ export default async function OrdersPage() {
     );
   }
 
-  const orders = result.data;
+  const { items: orders, ...pagination } = result.data;
+  // An unusable page (not a number, or past the last page) goes to a real one.
+  const redirectPage = pageRedirectTarget(pageParam, pagination.totalPages);
+  if (redirectPage !== null) {
+    redirect(withPage("/account/orders", "", redirectPage));
+  }
   return (
-    <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
+    <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <AccountNav />
       <Eyebrow className="mt-8">
         Your account
@@ -112,15 +131,25 @@ export default async function OrdersPage() {
           ))}
         </div>
       )}
+      <ListPager
+        path="/account/orders"
+        page={pageParam.page}
+        totalPages={pagination.totalPages}
+        total={pagination.total}
+        limit={pagination.limit}
+        label="Order history pages"
+      />
     </section>
   );
 }
 
-async function loadOrders(): Promise<
-  { data: CustomerOrder[] } | { unauthenticated: true } | { error: unknown }
+async function loadOrders(page: number): Promise<
+  | { data: { items: CustomerOrder[] } & PaginationInfo }
+  | { unauthenticated: true }
+  | { error: unknown }
 > {
   try {
-    return { data: await getOrders() };
+    return { data: await getOrdersPage(page) };
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       return { unauthenticated: true };

@@ -4,6 +4,8 @@ import { expect, test } from "@playwright/test";
 import {
   buildProductsQuery,
   getProducts,
+  getProductsPage,
+  PRODUCT_PAGE_PARAMS,
   PRODUCT_QUERY_PARAMS,
   type ProductFilters,
 } from "@/features/catalog/api";
@@ -12,7 +14,8 @@ import { VALID_SORTS } from "@/features/catalog/search-params";
 // The backend rejects any query parameter it does not know with a 400 (global
 // ValidationPipe, forbidNonWhitelisted). This is a second, independent copy of
 // what ProductQueryDto in the backend repo accepts: if the backend gains or
-// loses a parameter, both copies have to change on purpose.
+// loses a parameter, both copies have to change on purpose. The backend pages the
+// list when it gets `page` and/or `limit` (12 by default, at most 48).
 const BACKEND_ACCEPTS = [
   "category",
   "brand",
@@ -24,6 +27,7 @@ const BACKEND_ACCEPTS = [
   "inStock",
   "sort",
 ];
+const BACKEND_PAGE_PARAMS = ["page", "limit"];
 const BACKEND_SORTS = [
   "featured",
   "price_asc",
@@ -92,11 +96,52 @@ test.describe("the products request only uses parameters the backend accepts", (
     expect(url.searchParams.get("inStock")).toBe("true");
   });
 
-  test("the allow-list in the frontend matches the backend's", () => {
+  test("the allow-lists in the frontend match the backend's", () => {
     expect([...PRODUCT_QUERY_PARAMS].sort()).toEqual([...BACKEND_ACCEPTS].sort());
+    expect([...PRODUCT_PAGE_PARAMS].sort()).toEqual([...BACKEND_PAGE_PARAMS].sort());
   });
 
-  test("a pagination parameter can never be sent, even if one is passed in", async () => {
+  test("a page of the catalog sends the filters plus page and limit 12, and reads the totals", async () => {
+    const originalFetch = globalThis.fetch;
+    const originalBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+    process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:3000";
+    let url: URL | undefined;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      url = new URL(String(input));
+      return new Response("[]", {
+        status: 200,
+        headers: {
+          "content-type": "application/json",
+          "x-total-count": "30",
+          "x-total-pages": "3",
+          "x-page": "2",
+          "x-limit": "12",
+        },
+      });
+    }) as typeof fetch;
+    try {
+      const result = await getProductsPage(EVERY_FILTER, 2);
+
+      const sent = [...new Set(url!.searchParams.keys())].sort();
+      expect(sent).toEqual(
+        [...BACKEND_ACCEPTS, ...BACKEND_PAGE_PARAMS].sort(),
+      );
+      expect(url!.searchParams.get("page")).toBe("2");
+      expect(url!.searchParams.get("limit")).toBe("12");
+      expect(result).toMatchObject({
+        items: [],
+        total: 30,
+        totalPages: 3,
+        page: 2,
+        limit: 12,
+      });
+    } finally {
+      globalThis.fetch = originalFetch;
+      process.env.NEXT_PUBLIC_API_BASE_URL = originalBase;
+    }
+  });
+
+  test("an unpaged request never sends a pagination parameter, even if one is passed in", async () => {
     const sneaky = { ...EVERY_FILTER, limit: 8, page: 1, offset: 0 };
     const query = buildProductsQuery(sneaky as ProductFilters);
     const url = await requestedUrl(() => getProducts(sneaky as ProductFilters));

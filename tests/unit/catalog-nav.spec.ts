@@ -104,6 +104,7 @@ test.describe("shared catalog navigation lists", () => {
   test("every consumer imports the shared lists instead of keeping a copy", () => {
     for (const file of [
       "src/components/nav-mega-menu.tsx",
+      "src/components/mobile-nav.tsx",
       "src/components/site-footer.tsx",
       "src/app/page.tsx",
       "src/components/home/category-section.tsx",

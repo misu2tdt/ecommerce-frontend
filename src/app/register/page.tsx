@@ -21,7 +21,7 @@ export default async function RegisterPage({
   const nextPath = safeInternalPath(query.next, "/");
 
   return (
-    <section className="mx-auto flex max-w-6xl justify-center px-6 py-12 sm:py-16">
+    <section className="mx-auto flex max-w-6xl justify-center px-4 py-12 sm:px-6 lg:px-8 sm:py-16">
       <div className="w-full max-w-md rounded-md border border-line bg-surface p-6 sm:p-8">
         <Eyebrow>
           Customer account

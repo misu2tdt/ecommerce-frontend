@@ -22,7 +22,7 @@ export function CategorySection() {
           </div>
           <Link
             href="/products"
-            className="text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
+            className="inline-flex min-h-11 items-center text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
           >
             Browse all categories &rarr;
           </Link>

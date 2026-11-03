@@ -37,7 +37,7 @@ const categoryColumns = [
 export function NavMegaMenu() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLAnchorElement>(null);
 
   function handleBlur(e: React.FocusEvent<HTMLDivElement>) {
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -67,12 +67,13 @@ export function NavMegaMenu() {
         onMouseLeave={() => setDropdownOpen(false)}
         onBlur={handleBlur}
       >
-        <button
+        {/* A link: pointing at it (or pressing the down arrow) opens the menu, and
+            a click or Enter goes to the whole catalog instead of closing it. */}
+        <Link
           ref={triggerRef}
-          type="button"
-          onClick={() => setDropdownOpen((prev) => !prev)}
+          href="/products"
           onKeyDown={(e) => {
-            if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+            if (e.key === "ArrowDown") {
               e.preventDefault();
               setDropdownOpen(true);
             }
@@ -96,7 +97,7 @@ export function NavMegaMenu() {
               clipRule="evenodd"
             />
           </svg>
-        </button>
+        </Link>
 
         {/* Mega Menu Dropdown Content */}
         {dropdownOpen && (

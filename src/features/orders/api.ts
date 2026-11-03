@@ -1,10 +1,17 @@
 import "server-only";
 
-import { authenticatedApiFetch } from "@/features/auth/api";
+import {
+  authenticatedApiFetch,
+  authenticatedApiFetchPage,
+} from "@/features/auth/api";
 import type { CustomerOrder } from "@/types/order";
 
 export function getOrders(): Promise<CustomerOrder[]> {
   return authenticatedApiFetch<CustomerOrder[]>("/orders");
+}
+
+export function getOrdersPage(page: number) {
+  return authenticatedApiFetchPage<CustomerOrder>("/orders", page);
 }
 
 export function getOrder(orderId: number): Promise<CustomerOrder> {

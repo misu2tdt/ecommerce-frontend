@@ -10,7 +10,7 @@ export function CheckoutSummary({ cart }: { cart: Cart }) {
         <h2 className="text-title font-bold text-brand-strong">Order summary</h2>
         <Link
           href="/cart"
-          className="text-body-sm font-semibold text-brand underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-brand"
+          className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-brand"
         >
           Edit cart
         </Link>

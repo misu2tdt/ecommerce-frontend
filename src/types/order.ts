@@ -56,6 +56,9 @@ export interface CustomerOrder {
   shippingAddress: ShippingAddressSnapshot;
   createdAt: string;
   updatedAt: string;
+  // When an unpaid order is cancelled and its items go back in stock. Only set
+  // while the order is pending.
+  paymentExpiresAt: string | null;
   items: OrderItem[];
 }
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getSiteUrl } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
 import "./globals.css";
 
@@ -14,6 +15,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  // Makes every relative address in the metadata (canonical links, sharing
+  // images) absolute. See getSiteUrl for the environment variable it reads.
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: `${SITE_NAME} | Modern Everyday Fashion`,
     template: `%s | ${SITE_NAME}`,

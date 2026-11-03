@@ -47,6 +47,8 @@ function CatalogSortSelectContent({ currentSort = "featured" }: CatalogSortSelec
 
   const handleSortChange = (newSort: string) => {
     const params = new URLSearchParams(searchParams.toString());
+    // Any change of filters or sort starts again from the first page.
+    params.delete("page");
     if (newSort === "featured") {
       params.delete("sort");
     } else {

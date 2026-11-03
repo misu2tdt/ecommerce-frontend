@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BrandSection } from "@/components/home/brand-section";
 import { CategorySection } from "@/components/home/category-section";
@@ -8,7 +9,10 @@ import { ProductGrid } from "@/components/product-grid";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { getProducts } from "@/features/catalog/api";
 import { ApiError } from "@/lib/api";
+import { homeMetadata } from "@/lib/seo";
 import type { ProductSummary } from "@/types/catalog";
+
+export const metadata: Metadata = homeMetadata();
 
 // Two full rows of four on wide screens. If the catalog has fewer products,
 // each section simply shows what it gets.
@@ -57,7 +61,7 @@ export default async function Home() {
             </div>
             <Link
               href="/products"
-              className="text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
+              className="inline-flex min-h-11 items-center text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
             >
               View all products &rarr;
             </Link>
@@ -96,7 +100,7 @@ export default async function Home() {
               </div>
               <Link
                 href="/products"
-                className="text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
+                className="inline-flex min-h-11 items-center text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
               >
                 Explore entire catalog &rarr;
               </Link>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buttonStyles } from "@/components/ui/button";
 export default function OrderNotFound() {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-16">
+    <section className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">
       <div className="rounded-md border border-line bg-surface p-8 text-center">
         <h1 className="font-bold text-brand-strong text-heading">Order not found</h1>
         <p className="mt-3 text-neutral-600">

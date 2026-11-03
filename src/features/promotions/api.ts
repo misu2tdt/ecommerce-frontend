@@ -1,6 +1,9 @@
 import "server-only";
 
-import { authenticatedApiFetch } from "@/features/auth/api";
+import {
+  authenticatedApiFetch,
+  authenticatedApiFetchPage,
+} from "@/features/auth/api";
 import type {
   Coupon,
   CreateCouponInput,
@@ -9,6 +12,10 @@ import type {
 
 export function adminGetCoupons(): Promise<Coupon[]> {
   return authenticatedApiFetch<Coupon[]>("/admin/promotions");
+}
+
+export function adminGetCouponsPage(page: number) {
+  return authenticatedApiFetchPage<Coupon>("/admin/promotions", page);
 }
 
 export function adminGetCoupon(id: number): Promise<Coupon> {

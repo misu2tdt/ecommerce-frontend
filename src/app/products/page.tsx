@@ -1,32 +1,53 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { ActiveFilterChips } from "@/components/active-filter-chips";
 import { CatalogSidebar } from "@/components/catalog-sidebar";
 import { CatalogSortSelect } from "@/components/catalog-sort-select";
 import { FeedbackState } from "@/components/feedback-state";
 import { MobileFilterDrawer } from "@/components/mobile-filter-drawer";
+import { PageFocus } from "@/components/page-focus";
+import { Pagination } from "@/components/pagination";
 import { ProductCard } from "@/components/product-card";
 import { ProductGrid } from "@/components/product-grid";
 import {
   getCatalogFilterOptions,
-  getProducts,
+  getProductsPage,
   type ProductFilters,
 } from "@/features/catalog/api";
 import {
+  buildCatalogHref,
   hasProductFilters,
   parseProductFilters,
   type CatalogSearchParams,
 } from "@/features/catalog/search-params";
+import {
+  pageRange,
+  pageRedirectTarget,
+  parsePageParam,
+  type PaginationInfo,
+} from "@/lib/pagination";
 import type { CatalogFilterOptions, ProductSummary } from "@/types/catalog";
 
+import { catalogMetadata } from "@/lib/seo";
 import { Eyebrow } from "@/components/ui/eyebrow";
-export const metadata: Metadata = {
-  title: "Shop All Products | Everyday Essentials & Activewear",
-  description:
-    "Explore our complete fashion catalog of breathable t-shirts, activewear, everyday pants, and minimalist outerwear.",
-};
+// Title, description and canonical address follow the category, brand, search
+// and page of the address.
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<CatalogSearchParams>;
+}): Promise<Metadata> {
+  const query = await searchParams;
+  return catalogMetadata({
+    filters: parseProductFilters(query),
+    page: parsePageParam(query.page).page,
+  });
+}
 
 interface CatalogData {
   products: ProductSummary[];
+  pagination: PaginationInfo;
   filterOptions: CatalogFilterOptions;
 }
 
@@ -35,14 +56,17 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<CatalogSearchParams>;
 }) {
-  const filters = parseProductFilters(await searchParams);
+  const query = await searchParams;
+  const filters = parseProductFilters(query);
   const activeFilters = hasProductFilters(filters);
-  const result = await loadCatalog(filters);
+  const pageParam = parsePageParam(query.page);
+  const result = await loadCatalog(filters, pageParam.page);
 
   if ("error" in result) {
     return (
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <FeedbackState
+          as="h1"
           title="Products temporarily unavailable"
           description="Products are temporarily unavailable. Please try again shortly."
           actionHref="/products"
@@ -52,7 +76,13 @@ export default async function ProductsPage({
     );
   }
 
-  const { products, filterOptions } = result.data;
+  const { products, pagination, filterOptions } = result.data;
+
+  // An unusable page (not a number, or past the last page) goes to a real one.
+  const redirectPage = pageRedirectTarget(pageParam, pagination.totalPages);
+  if (redirectPage !== null) redirect(buildCatalogHref(filters, redirectPage));
+
+  const { from, to } = pageRange(pageParam.page, pagination.limit, pagination.total);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -92,8 +122,11 @@ export default async function ProductsPage({
                 role="status"
                 aria-live="polite"
               >
-                Showing {products.length}{" "}
-                {products.length === 1 ? "product" : "products"}
+                {pagination.total === 0
+                  ? "No products"
+                  : pagination.totalPages > 1
+                    ? `Showing ${from}–${to} of ${pagination.total} products`
+                    : `Showing ${pagination.total} ${pagination.total === 1 ? "product" : "products"}`}
                 {activeFilters && " matching filters"}
               </p>
             </div>
@@ -127,17 +160,35 @@ export default async function ProductsPage({
               />
             </div>
           ) : (
-            <ProductGrid>
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  filters={filters}
-                  headingLevel="h2"
-                  priority={index < 4}
-                />
-              ))}
-            </ProductGrid>
+            <>
+              {/* Where focus goes after a page change (see PageFocus). */}
+              <h2
+                id="catalog-results"
+                tabIndex={-1}
+                className="sr-only focus:outline-none"
+              >
+                Products, page {pageParam.page} of {pagination.totalPages}
+              </h2>
+              <Suspense fallback={null}>
+                <PageFocus targetId="catalog-results" />
+              </Suspense>
+              <ProductGrid>
+                {products.map((product, index) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    filters={filters}
+                    headingLevel="h3"
+                    priority={index < 4}
+                  />
+                ))}
+              </ProductGrid>
+              <Pagination
+                page={pageParam.page}
+                totalPages={pagination.totalPages}
+                hrefFor={(page) => buildCatalogHref(filters, page)}
+              />
+            </>
           )}
         </div>
       </div>
@@ -147,13 +198,15 @@ export default async function ProductsPage({
 
 async function loadCatalog(
   filters: ProductFilters,
+  page: number,
 ): Promise<{ data: CatalogData } | { error: true }> {
   try {
-    const [products, filterOptions] = await Promise.all([
-      getProducts(filters),
-      getCatalogFilterOptions(),
-    ]);
-    return { data: { products, filterOptions } };
+    const [{ items: products, ...pagination }, filterOptions] =
+      await Promise.all([
+        getProductsPage(filters, page),
+        getCatalogFilterOptions(),
+      ]);
+    return { data: { products, pagination, filterOptions } };
   } catch {
     return { error: true };
   }

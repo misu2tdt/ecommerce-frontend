@@ -4,18 +4,20 @@ import { notFound } from "next/navigation";
 import { FeedbackState } from "@/components/feedback-state";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductPurchasePanel } from "@/components/product-purchase-panel";
+import { ProductSelectionProvider } from "@/components/product-selection";
 import { RelatedProducts } from "@/components/related-products";
 import { ReviewManager } from "@/components/review-manager";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { getProductBySlug } from "@/features/catalog/api";
 import { getMyReview, getPublicReviews } from "@/features/reviews/api";
 import {
-  buildCatalogHref,
   buildProductDetailHref,
   parseProductFilters,
   type CatalogSearchParams,
 } from "@/features/catalog/search-params";
 import { ApiError, apiErrorMessage } from "@/lib/api";
+import { formatDate } from "@/lib/dates";
+import { noIndex, productJsonLd, productMetadata } from "@/lib/seo";
 import type { ProductDetail } from "@/types/catalog";
 import type { MyReview, PublicReview } from "@/types/reviews";
 
@@ -30,15 +32,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const product = await getProductBySlug(slug);
-    return {
-      title: `${product.name} | VERVE STUDIO`,
-      description:
-        product.description ||
-        `Explore ${product.name} in our modern everyday fashion catalog.`,
-    };
+    return productMetadata(await getProductBySlug(slug));
   } catch {
-    return { title: slug.replaceAll("-", " ") };
+    // An unknown or unavailable product has no page worth listing.
+    return { title: slug.replaceAll("-", " "), ...noIndex() };
   }
 }
 
@@ -51,7 +48,6 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
   const filters = parseProductFilters(await searchParams);
-  const backHref = buildCatalogHref(filters);
   const productHref = buildProductDetailHref(slug, filters);
   const result = await loadProduct(slug);
 
@@ -60,6 +56,7 @@ export default async function ProductDetailPage({
     return (
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <FeedbackState
+          as="h1"
           title="Product unavailable"
           description={result.error}
           actionHref="/products"
@@ -78,22 +75,39 @@ export default async function ProductDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-12">
+      {/* Machine-readable product data for search engines: only real values. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: productJsonLd({
+            name: product.name,
+            slug: product.slug,
+            description: product.description,
+            images: product.images,
+            brand: product.brand ? { name: product.brand.name } : null,
+            minPrice: product.minPrice,
+            maxPrice: product.maxPrice,
+            variants: product.variants,
+          }),
+        }}
+      />
+
       {/* Breadcrumb Navigation */}
       <nav aria-label="Breadcrumb" className="mb-6">
         <ol className="flex flex-wrap items-center gap-2 text-body-sm font-normal text-neutral-600">
           <li>
             <Link
-              href={backHref}
-              className="transition hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+              href="/"
+              className="inline-flex min-h-11 items-center transition hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
             >
-              All Products
+              Home
             </Link>
           </li>
           <li aria-hidden="true">/</li>
           <li>
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="transition hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+              className="inline-flex min-h-11 items-center transition hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
             >
               {product.category.name}
             </Link>
@@ -109,6 +123,7 @@ export default async function ProductDetailPage({
       </nav>
 
       {/* Main PDP Grid */}
+      <ProductSelectionProvider>
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)] lg:items-start lg:gap-14">
         {/* Left Column: Image Gallery V2 */}
         <div className="w-full">
@@ -188,6 +203,7 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </div>
+      </ProductSelectionProvider>
 
       {/* Customer Reviews Section */}
       <section
@@ -284,7 +300,7 @@ function PublicReviewList({ data }: { data: ReviewData }) {
               dateTime={review.createdAt}
               className="text-body-sm font-normal text-neutral-500"
             >
-              {formatReviewDate(review.createdAt)}
+              {formatDate(review.createdAt)}
             </time>
           </div>
           {review.title && (
@@ -302,7 +318,7 @@ function PublicReviewList({ data }: { data: ReviewData }) {
           )}
           {review.updatedAt !== review.createdAt && (
             <p className="mt-3 text-body-sm text-neutral-500">
-              Updated {formatReviewDate(review.updatedAt)}
+              Updated {formatDate(review.updatedAt)}
             </p>
           )}
         </article>
@@ -385,16 +401,6 @@ async function loadReviews(productId: number): Promise<ReviewData> {
     data.managementError = apiErrorMessage(mineResult.reason);
   }
   return data;
-}
-
-function formatReviewDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Date unavailable";
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
 }
 
 async function loadProduct(

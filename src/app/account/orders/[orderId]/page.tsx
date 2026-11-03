@@ -47,8 +47,9 @@ export default async function OrderDetailPage({
   if ("notFound" in result) notFound();
   if ("error" in result) {
     return (
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16">
         <FeedbackState
+          as="h1"
           title="Order unavailable"
           description={apiErrorMessage(result.error)}
           actionHref={`/account/orders/${orderId}`}
@@ -87,11 +88,11 @@ export default async function OrderDetailPage({
     : null;
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
+    <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <AccountNav />
       <Link
         href="/account/orders"
-        className="mt-8 inline-block text-body-sm font-semibold text-brand underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        className="mt-8 inline-flex min-h-11 items-center text-body-sm font-semibold text-brand underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
       >
         Back to all Orders
       </Link>

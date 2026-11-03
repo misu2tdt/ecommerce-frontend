@@ -32,6 +32,8 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
 
   const updateUrl = (modifier: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());
+    // Any change of filters or sort starts again from the first page.
+    params.delete("page");
     modifier(params);
     const queryString = params.toString();
     startTransition(() => {
@@ -137,6 +139,8 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
 
   const handleClearAll = () => {
     const params = new URLSearchParams(searchParams.toString());
+    // Any change of filters or sort starts again from the first page.
+    params.delete("page");
     // Clear all filters except sort
     params.delete("q");
     params.delete("category");
@@ -167,8 +171,10 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
             disabled={isPending}
             onClick={chip.onRemove}
             aria-label={`Remove filter ${chip.label}`}
-            className="flex h-4 w-4 items-center justify-center rounded-full text-brand hover:bg-neutral-200 hover:text-brand-strong focus:outline-none focus:ring-1 focus:ring-brand"
+            // A 44px target that takes no more room than the 16px icon (negative margin).
+            className="group -m-3.5 flex h-11 w-11 items-center justify-center rounded-full focus:outline-none focus:ring-1 focus:ring-brand"
           >
+            <span className="flex h-4 w-4 items-center justify-center rounded-full text-brand group-hover:bg-neutral-200 group-hover:text-brand-strong">
             <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fillRule="evenodd"
@@ -176,6 +182,7 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
                 clipRule="evenodd"
               />
             </svg>
+            </span>
           </button>
         </span>
       ))}
@@ -183,7 +190,7 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
         type="button"
         disabled={isPending}
         onClick={handleClearAll}
-        className="text-body-sm font-semibold text-brand underline underline-offset-2 transition hover:text-brand-strong focus:outline-none focus:ring-2 focus:ring-brand rounded px-1 disabled:opacity-50"
+        className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand underline underline-offset-2 transition hover:text-brand-strong focus:outline-none focus:ring-2 focus:ring-brand rounded px-1 disabled:opacity-50"
       >
         Clear all
       </button>

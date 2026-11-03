@@ -143,7 +143,9 @@ test("a discounted product shows a struck-through price and a -NN% badge", async
 test("a product without a discount shows a plain price and no badge", async ({
   page,
 }) => {
-  await openCatalog(page, 1440);
+  // The catalog shows 12 products a page, so look the product up by name.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/products?q=Seamless%20Performance%20Training");
   const card = page
     .locator("main article")
     .filter({

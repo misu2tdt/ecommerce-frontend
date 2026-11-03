@@ -35,8 +35,9 @@ export default async function AddressesPage({
   }
   if ("error" in result) {
     return (
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16">
         <FeedbackState
+          as="h1"
           title="Addresses unavailable"
           description={apiErrorMessage(result.error)}
           actionHref="/account/addresses"
@@ -48,7 +49,7 @@ export default async function AddressesPage({
 
   const addresses = result.data;
   return (
-    <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
+    <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <AccountNav />
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>

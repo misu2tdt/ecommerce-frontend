@@ -25,9 +25,9 @@ async function measureHeader(page: Page) {
         Array.from(range.getClientRects(), (rect) => Math.round(rect.top)),
       ).size;
     };
-    // Only rendered labels: links and the "Shop All" text.
+    // Only rendered labels: plain links, and the text span of "Shop All" (its arrow icon sits at a different height).
     const labels = nav
-      ? Array.from(nav.querySelectorAll("a, button > span")).filter(
+      ? Array.from(nav.querySelectorAll("a:not(:has(> span)), a > span")).filter(
           (element) => element.getClientRects().length > 0,
         )
       : [];
@@ -67,8 +67,8 @@ for (const width of WIDTHS) {
     if (full) {
       await expect(inlineNav).toBeVisible();
       await expect(hamburger).toBeHidden();
-      // "Shop All" plus at most 3 direct category links.
-      expect(measured.directLinkCount).toBeLessThanOrEqual(3);
+      // "Shop All" (a link to the catalog) plus at most 3 direct category links.
+      expect(measured.directLinkCount).toBeLessThanOrEqual(4);
       expect(measured.labelCount).toBeGreaterThanOrEqual(2);
     } else {
       await expect(hamburger).toBeVisible();
@@ -243,9 +243,8 @@ test("drawer search keeps 16px text and the drawer works below 1280px", async ({
 
 test("Escape closes the Shop All mega menu on desktop", async ({ page }) => {
   await openHome(page, 1440);
-  const trigger = page.getByRole("button", { name: "Shop All" });
-  // Keyboard, not click: hovering the trigger already opens the menu, so a
-  // mouse click would toggle it shut again.
+  const trigger = page.getByRole("link", { name: "Shop All", exact: true });
+  // Keyboard: the down arrow opens the menu (a click goes to the catalog).
   await trigger.focus();
   await page.keyboard.press("ArrowDown");
 

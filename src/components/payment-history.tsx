@@ -53,7 +53,7 @@ export function PaymentHistory({ payments }: { payments: Payment[] }) {
                 <div>
                   <dt className="text-neutral-600">Amount</dt>
                   <dd className="mt-1 font-semibold text-brand">
-                    {formatVnd(payment.amount)} {payment.currency}
+                    {formatVnd(payment.amount)}
                   </dd>
                 </div>
                 <div>

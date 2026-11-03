@@ -92,6 +92,8 @@ function CatalogSidebarContent({
 
   const updateUrl = (modifier: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());
+    // Any change of filters or sort starts again from the first page.
+    params.delete("page");
     modifier(params);
     const queryString = params.toString();
     startTransition(() => {

@@ -1,3 +1,5 @@
+import { readPagination, type PaginationInfo } from "./pagination";
+
 type QueryValue = string | number | boolean | null | undefined;
 
 export type ApiQuery = Record<string, QueryValue | readonly QueryValue[]>;
@@ -29,6 +31,27 @@ export async function apiFetch<T>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<T> {
+  return (await apiRequest<T>(path, options)).payload;
+}
+
+// One page of a list the backend pages. Sends `page` and `limit`; the body is
+// the rows of the page and the totals are read from the response headers.
+export async function apiFetchPage<T>(
+  path: string,
+  options: ApiRequestOptions,
+  paging: { page: number; limit: number },
+): Promise<{ items: T[] } & PaginationInfo> {
+  const { payload, headers } = await apiRequest<T[]>(path, {
+    ...options,
+    query: { ...options.query, page: paging.page, limit: paging.limit },
+  });
+  return { items: payload, ...readPagination(headers, payload.length) };
+}
+
+async function apiRequest<T>(
+  path: string,
+  options: ApiRequestOptions,
+): Promise<{ payload: T; headers: Headers }> {
   const baseUrl = getApiBaseUrl();
   const url = new URL(path.replace(/^\//, ""), `${baseUrl}/`);
   appendQuery(url, options.query);
@@ -64,7 +87,7 @@ export async function apiFetch<T>(
         response.status,
       );
     }
-    return payload as T;
+    return { payload: payload as T, headers: response.headers };
   } catch (error) {
     if (error instanceof ApiError) throw error;
     throw new ApiError(

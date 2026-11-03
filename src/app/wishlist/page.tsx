@@ -21,8 +21,9 @@ export default async function WishlistPage() {
   if ("unauthenticated" in result) redirect(buildLoginHref("/wishlist"));
   if ("error" in result) {
     return (
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
         <FeedbackState
+          as="h1"
           title="Wishlist unavailable"
           description={apiErrorMessage(result.error)}
         />
@@ -32,7 +33,7 @@ export default async function WishlistPage() {
 
   const items = result.data;
   return (
-    <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
+    <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <div className="mb-8">
         <Eyebrow>
           Saved products

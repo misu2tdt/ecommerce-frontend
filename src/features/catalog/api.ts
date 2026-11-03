@@ -1,4 +1,5 @@
-import { apiFetch, type ApiQuery } from "@/lib/api";
+import { apiFetch, apiFetchPage, type ApiQuery } from "@/lib/api";
+import { CATALOG_PAGE_SIZE, type PaginationInfo } from "@/lib/pagination";
 import type {
   Brand,
   Category,
@@ -20,10 +21,10 @@ export interface ProductFilters {
   sort?: ProductSort;
 }
 
-// The query parameters the backend's product list accepts (ProductQueryDto in
-// the backend repo). The backend answers anything else with a 400, for example
-// `limit` or `page`: the list has no pagination yet, so take the first N
-// products on the frontend instead of asking for N.
+// The filter parameters the backend's product list accepts (ProductQueryDto in
+// the backend repo). The backend answers any parameter it does not know with a
+// 400. `page` and `limit` are accepted too, but only getProductsPage sends them:
+// a plain getProducts() asks for the whole list.
 export const PRODUCT_QUERY_PARAMS = [
   "q",
   "category",
@@ -35,6 +36,9 @@ export const PRODUCT_QUERY_PARAMS = [
   "inStock",
   "sort",
 ] as const;
+
+// Sent only by getProductsPage.
+export const PRODUCT_PAGE_PARAMS = ["page", "limit"] as const;
 
 export function buildProductsQuery(filters: ProductFilters): ApiQuery {
   return {
@@ -56,6 +60,39 @@ export function getProducts(
   return apiFetch<ProductSummary[]>("/products", {
     query: buildProductsQuery(filters),
   });
+}
+
+// One page of the catalog (12 products), with the totals for the pager.
+export function getProductsPage(
+  filters: ProductFilters,
+  page: number,
+): Promise<{ items: ProductSummary[] } & PaginationInfo> {
+  return apiFetchPage<ProductSummary>(
+    "/products",
+    { query: buildProductsQuery(filters) },
+    { page, limit: CATALOG_PAGE_SIZE },
+  );
+}
+
+// Every product page address, by asking for the list page by page (48 at a time,
+// the most the backend gives). Used by the sitemap.
+export async function getAllProductSlugs(): Promise<
+  Array<{ slug: string; updatedAt: string }>
+> {
+  const products: Array<{ slug: string; updatedAt: string }> = [];
+  let totalPages = 1;
+  for (let page = 1; page <= totalPages; page += 1) {
+    const result = await apiFetchPage<ProductSummary>(
+      "/products",
+      {},
+      { page, limit: 48 },
+    );
+    totalPages = result.totalPages;
+    products.push(
+      ...result.items.map(({ slug, updatedAt }) => ({ slug, updatedAt })),
+    );
+  }
+  return products;
 }
 
 export function getCatalogFilterOptions(): Promise<CatalogFilterOptions> {

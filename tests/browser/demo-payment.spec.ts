@@ -1,15 +1,20 @@
-import {
-  expect,
-  test,
-  type Browser,
-  type BrowserContext,
-  type Page,
-} from "@playwright/test";
+import { expect, test, type Browser, type Page } from "@playwright/test";
 import { findBannedTerms, pageText } from "./support/banned-terms";
 import {
   MIN_READABLE_SHARE,
   measureReadableShare,
 } from "./support/readable-share";
+import {
+  BASE_URL,
+  CUSTOMER,
+  OTHER_USER,
+  orderStatus,
+  paymentHistory,
+  placeOrder,
+  signIn,
+  skipProductPhotos,
+  startPayment,
+} from "./support/shop";
 
 // The demo store has no real payment provider: an order is paid on a clearly
 // labelled practice page. These tests walk the whole money path in a browser
@@ -20,109 +25,19 @@ import {
 // Each order takes one pair of socks (a large stock). After many local runs,
 // `npm run seed:demo:test` in the backend resets the stock.
 
-const PASSWORD = "DemoOnly!2026";
-const CUSTOMER = "demo.customer@example.com";
-const OTHER_USER = "demo.admin@example.com";
-const BASE_URL = "http://localhost:3001";
-
-async function signIn(page: Page, email: string, next = "/account") {
-  await page.goto(`/login?next=${encodeURIComponent(next)}`);
-  await page.getByLabel("Email address").fill(email);
-  await page.getByLabel("Password").fill(PASSWORD);
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(new RegExp(`${next.replace("/", "\\/")}$`));
-}
-
-// The backend allows 10 sign-ins a minute per client, and every test needs a
-// signed-in shopper. Each account really signs in once per worker; later tests
-// reuse its session cookies.
-type SessionCookies = Parameters<BrowserContext["addCookies"]>[0];
-const sessions = new Map<string, SessionCookies>();
-
-async function signedIn(page: Page, email: string) {
-  const cached = sessions.get(email);
-  if (cached) {
-    await page.context().addCookies(cached);
-    return;
-  }
-  await signIn(page, email);
-  sessions.set(email, await page.context().cookies());
-}
-
-// The test seed finds its own delivered order by the seeded shipping address,
-// so orders shipped to that address would break the next `seed:demo:test`.
-// These tests ship to an address of their own, saved once as the default.
-const TEST_ADDRESS_LABEL = "Payment test address";
-
-async function ensureOwnShippingAddress(page: Page) {
-  await page.goto("/account/addresses");
-  if (await page.getByRole("heading", { name: TEST_ADDRESS_LABEL }).count()) return;
-
-  // Saved addresses have "Update address" forms; only the new one says "Save".
-  const form = page.locator("form").filter({
-    has: page.getByRole("button", { name: "Save address" }),
-  });
-  await form.getByLabel("Label").fill(TEST_ADDRESS_LABEL);
-  await form.getByLabel("Recipient name").fill("Payment Tester");
-  await form.getByLabel("Phone").fill("0900000000");
-  await form.getByLabel("Address line 1").fill("1 Test Street");
-  await form.getByLabel("City").fill("Ho Chi Minh City");
-  await form.getByLabel("Use as my default shipping address").check();
-  await form.getByRole("button", { name: "Save address" }).click();
-  await expect(
-    page.getByRole("heading", { name: TEST_ADDRESS_LABEL }).first(),
-  ).toBeVisible();
-}
-
-// Adds a product to the cart, checks out and returns the new order id.
-async function placeOrder(page: Page): Promise<number> {
-  await ensureOwnShippingAddress(page);
-  await page.goto("/products/cushioned-cotton-crew-socks-3-pack");
-  await page.waitForLoadState("networkidle");
-  const sizes = page.locator(
-    '[aria-label="Available sizes"] button:not([disabled])',
-  );
-  if (await sizes.count()) await sizes.first().click();
-  // Phones also show a sticky bar with the same button, so take the first.
-  await page.getByRole("button", { name: "Add to Bag" }).first().click();
-  await expect(page.getByText("Added to your cart.")).toBeVisible();
-
-  await page.goto("/checkout");
-  await page.getByRole("button", { name: "Place order" }).click();
-  await page.waitForURL(/\/checkout\/success\/\d+$/);
-  return Number(new URL(page.url()).pathname.split("/").pop());
-}
-
-// Starts a payment from the order page and lands on the demo payment page.
-async function startPayment(page: Page, orderId: number) {
-  await page.goto(`/account/orders/${orderId}`);
-  await page.getByRole("button", { name: "Pay now" }).click();
-  await page.waitForURL(/\/demo-pay\/\d+\?order=\d+$/);
-  const paymentId = Number(new URL(page.url()).pathname.split("/").pop());
-  return { paymentId, href: new URL(page.url()).pathname + new URL(page.url()).search };
-}
-
-const orderStatus = (page: Page, label: string) =>
-  page.locator(`[aria-label="Order status: ${label}"]`).first();
-const paymentHistory = (page: Page) =>
-  page.getByRole("region", { name: "Payment history" });
-
 async function expectOrderPage(page: Page, orderId: number) {
   await expect(page).toHaveURL(new RegExp(`/account/orders/${orderId}$`));
   await expect(page.locator("h1")).toHaveText(`Order #${orderId}`);
 }
 
 test.beforeEach(async ({ page }) => {
-  // Product photos come from an external host and have nothing to do with
-  // payments, so they never slow these tests down.
-  await page.route("**/_next/image**", (route) => route.abort());
-  await page.route("**://res.cloudinary.com/**", (route) => route.abort());
+  await skipProductPhotos(page);
 });
 
 test("the demo payment page is clearly a demo and fits every screen", async ({
   page,
 }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   await page.goto(`/account/orders/${orderId}`);
   const total = (await page.locator("main p.text-heading").first().innerText()).trim();
@@ -177,7 +92,7 @@ test("the demo payment page is clearly a demo and fits every screen", async ({
 });
 
 test("Pay now confirms the order", async ({ page }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   await startPayment(page, orderId);
 
@@ -201,7 +116,7 @@ test("Pay now confirms the order", async ({ page }) => {
 test("a failed payment leaves the order pending and paying again works", async ({
   page,
 }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   const first = await startPayment(page, orderId);
 
@@ -210,7 +125,7 @@ test("a failed payment leaves the order pending and paying again works", async (
     .click();
 
   await expectOrderPage(page, orderId);
-  await expect(orderStatus(page, "Pending")).toBeVisible();
+  await expect(orderStatus(page, "Awaiting payment")).toBeVisible();
   await expect(paymentHistory(page)).toContainText("failed");
   // The pay-again control is back and works.
   const second = await startPayment(page, orderId);
@@ -225,20 +140,20 @@ test("a failed payment leaves the order pending and paying again works", async (
 test("cancelling a payment keeps the order pending and allows another try", async ({
   page,
 }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   await startPayment(page, orderId);
 
   await page.getByRole("button", { name: "Cancel payment", exact: true }).click();
 
   await expectOrderPage(page, orderId);
-  await expect(orderStatus(page, "Pending")).toBeVisible();
+  await expect(orderStatus(page, "Awaiting payment")).toBeVisible();
   await expect(paymentHistory(page)).toContainText("cancelled");
   await expect(page.getByRole("button", { name: "Pay now" })).toBeVisible();
 });
 
 test("leaving the payment page open keeps a way back to it", async ({ page }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   const { paymentId } = await startPayment(page, orderId);
 
@@ -248,7 +163,7 @@ test("leaving the payment page open keeps a way back to it", async ({ page }) =>
     page.getByRole("heading", { name: "Finish your demo payment" }),
   ).toBeVisible();
   await expect(paymentHistory(page)).toContainText("Paid with: Demo payment");
-  await expect(orderStatus(page, "Pending")).toBeVisible();
+  await expect(orderStatus(page, "Awaiting payment")).toBeVisible();
   await page.getByRole("link", { name: "Continue demo payment" }).click();
   await expect(page).toHaveURL(
     new RegExp(`/demo-pay/${paymentId}\\?order=${orderId}$`),
@@ -256,7 +171,7 @@ test("leaving the payment page open keeps a way back to it", async ({ page }) =>
   await expect(page.getByRole("button", { name: "Pay now", exact: true })).toBeVisible();
 });
 test("a double click on Pay now pays once", async ({ page }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   await startPayment(page, orderId);
 
@@ -272,7 +187,7 @@ test("a double click on Pay now pays once", async ({ page }) => {
 test("a finished payment shows that it is complete, with or without the order in the link", async ({
   page,
 }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   const { paymentId, href } = await startPayment(page, orderId);
   await page.getByRole("button", { name: "Pay now", exact: true }).click();
@@ -293,7 +208,7 @@ test("someone else's payment shows the same not-found message", async ({
   page,
   browser,
 }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   const { paymentId } = await startPayment(page, orderId);
 
@@ -329,7 +244,7 @@ test("a signed-out visitor is sent to sign in and then back to the payment", asy
   page,
   browser,
 }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   const { paymentId } = await startPayment(page, orderId);
 
@@ -347,7 +262,7 @@ test("an order cancelled while the payment page is open can no longer be paid", 
   page,
   context,
 }) => {
-  await signedIn(page, CUSTOMER);
+  await signIn(page, CUSTOMER);
   const orderId = await placeOrder(page);
   await startPayment(page, orderId);
 
@@ -383,25 +298,7 @@ test("an order cancelled while the payment page is open can no longer be paid", 
 async function signedInContext(browser: Browser, email: string) {
   const context = await browser.newContext({ baseURL: BASE_URL });
   const page = await context.newPage();
-  await signedIn(page, email);
+  await signIn(page, email);
   await page.close();
   return context;
 }
-
-// The backend answers 100 /auth/me requests a minute per client, and the header
-// asks it on every page. This spec loads roughly that many pages in under a
-// minute; when the header is refused it quietly shows "Sign In", which would
-// break the signed-in checks of whichever spec runs next. So the spec ends only
-// once the minute that held its requests is over.
-const WINDOW_MS = 60_000;
-let startedAt = 0;
-
-test.beforeAll(() => {
-  startedAt = Date.now();
-});
-
-test.afterAll(async () => {
-  test.setTimeout(WINDOW_MS + 10_000);
-  const remaining = WINDOW_MS - (Date.now() - startedAt);
-  if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
-});

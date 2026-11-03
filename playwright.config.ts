@@ -1,10 +1,30 @@
-import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { defineConfig, devices } from "@playwright/test";
+import {
+  backendDirectory,
+  backendEnvironment,
+} from "./tests/browser/support/backend-env";
 
-const backendDirectory = path.resolve(
-  process.cwd(),
-  process.env.E2E_BACKEND_DIR ?? "../ecommerce-backend",
-);
+
+// The tests run against an isolated test database. A backend already running on
+// port 3000 is usually a development backend, which would silently point the
+// whole suite at the development database, so it is never reused: stop it first.
+// (CI starts from nothing, so nothing changes there.)
+function assertBackendPortFree(port: number) {
+  // Workers load this file too, after the runner has started the backend.
+  if (process.env.CI || process.env.TEST_WORKER_INDEX !== undefined) return;
+  const probe = `const s=require("net").connect(${port},"127.0.0.1");s.on("connect",()=>process.exit(1));s.on("error",()=>process.exit(0));`;
+  try {
+    execFileSync(process.execPath, ["-e", probe], { timeout: 10_000 });
+  } catch {
+    throw new Error(
+      `Port ${port} is already in use. The smoke tests start their own backend on it ` +
+        "and refuse to reuse another one, because that would run them against " +
+        "your development database. Stop your development backend and run again.",
+    );
+  }
+}
+assertBackendPortFree(3000);
 
 export default defineConfig({
   testDir: "./tests/browser",
@@ -14,6 +34,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: "line",
+  globalSetup: "./tests/browser/support/global-setup.ts",
+  globalTeardown: "./tests/browser/support/global-teardown.ts",
   use: {
     baseURL: "http://localhost:3001",
     trace: "retain-on-failure",
@@ -26,26 +48,10 @@ export default defineConfig({
       command: "npm run start:prod",
       cwd: backendDirectory,
       url: "http://localhost:3000/health",
-      reuseExistingServer: !process.env.CI,
+      // Never reuse a running backend (see assertBackendPortFree above).
+      reuseExistingServer: false,
       timeout: 60_000,
-      env: {
-        ...process.env,
-        NODE_ENV: "test",
-        PORT: "3000",
-        DB_HOST: process.env.DB_HOST ?? "localhost",
-        DB_PORT: process.env.DB_PORT ?? "5432",
-        DB_USERNAME: process.env.DB_USERNAME ?? "postgres",
-        DB_PASSWORD:
-          process.env.ECOMMERCE_TEST_DB_PASSWORD ??
-          process.env.DB_PASSWORD ??
-          "",
-        DB_NAME: process.env.DB_NAME ?? "ecommerce_test",
-        FRONTEND_ORIGIN: "http://localhost:3001",
-        SWAGGER_ENABLED: "false",
-        // The money-path tests finish orders on the demo payment page. This
-        // needs a backend that has the demo payment provider (backend main).
-        PAYMENT_PROVIDER: "demo",
-      },
+      env: backendEnvironment(),
     },
     {
       command: "npm run start",

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { logoutAction } from "@/features/auth/actions";
+import { BRANDS, FOOTER_CATEGORIES } from "@/lib/catalog-nav";
 import { HeaderSearch } from "./header-search";
 
 import { buttonStyles } from "@/components/ui/button";
@@ -11,22 +12,6 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 interface MobileNavProps {
   user: { email: string; role: string } | null;
 }
-
-const categories = [
-  { name: "All Products", href: "/products" },
-  { name: "T-Shirts & Tops", href: "/products?category=t-shirts-tops" },
-  { name: "Shirts & Polos", href: "/products?category=shirts-polos" },
-  { name: "Hoodies & Outerwear", href: "/products?category=hoodies-outerwear" },
-  { name: "Pants & Shorts", href: "/products?category=pants-shorts" },
-  { name: "Basics & Accessories", href: "/products?category=basics-accessories" },
-];
-
-const brands = [
-  { name: "AeroThread", href: "/products?brand=aerothread", tag: "Everyday Minimal" },
-  { name: "Kanso Basics", href: "/products?brand=kanso-basics", tag: "Comfort Essentials" },
-  { name: "Veloce Active", href: "/products?brand=veloce-active", tag: "Performance" },
-  { name: "Monolith Studio", href: "/products?brand=monolith-studio", tag: "Structured Tailoring" },
-];
 
 export function MobileNav(props: MobileNavProps) {
   return (
@@ -194,7 +179,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                 id="mobile-nav-title"
                 href="/"
                 onClick={() => setIsOpen(false)}
-                className="text-body font-bold tracking-wider text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
+                className="inline-flex min-h-11 items-center text-body font-bold tracking-wider text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
               >
                 VERVE STUDIO
               </Link>
@@ -203,7 +188,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Close navigation menu"
-                className="rounded-md p-1.5 text-neutral-600 hover:bg-brand-soft hover:text-brand focus-visible:outline-2 focus-visible:outline-neutral-900"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-md text-neutral-600 hover:bg-brand-soft hover:text-brand focus-visible:outline-2 focus-visible:outline-neutral-900"
               >
                 <svg
                   className="h-5 w-5"
@@ -237,14 +222,14 @@ function MobileNavContent({ user }: MobileNavProps) {
                   Catalog
                 </Eyebrow>
                 <nav className="space-y-1">
-                  {categories.map((cat) => (
+                  {FOOTER_CATEGORIES.map((cat) => (
                     <Link
                       key={cat.href}
                       href={cat.href}
                       onClick={() => setIsOpen(false)}
-                      className="block rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-800 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
+                      className="flex min-h-11 items-center rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-800 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                     >
-                      {cat.name}
+                      {cat.label}
                     </Link>
                   ))}
                 </nav>
@@ -256,15 +241,15 @@ function MobileNavContent({ user }: MobileNavProps) {
                   Featured Brands
                 </Eyebrow>
                 <nav className="space-y-1">
-                  {brands.map((b) => (
+                  {BRANDS.map((b) => (
                     <Link
                       key={b.href}
                       href={b.href}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-between rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
+                      className="flex min-h-11 items-center justify-between rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                     >
-                      <span>{b.name}</span>
-                      <span className="text-body-sm text-neutral-600">{b.tag}</span>
+                      <span>{b.label}</span>
+                      <span className="text-body-sm text-neutral-600">{b.description}</span>
                     </Link>
                   ))}
                 </nav>
@@ -279,7 +264,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                   <Link
                     href="/cart"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-between rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
+                    className="flex min-h-11 items-center justify-between rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                   >
                     <span>Shopping Cart</span>
                     <span className="text-body-sm font-bold text-neutral-600">Bag</span>
@@ -287,7 +272,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                   <Link
                     href="/wishlist"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-between rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
+                    className="flex min-h-11 items-center justify-between rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                   >
                     <span>Saved Wishlist</span>
                     <span className="text-body-sm font-bold text-neutral-600">Saved</span>
@@ -298,14 +283,14 @@ function MobileNavContent({ user }: MobileNavProps) {
                       <Link
                         href="/account"
                         onClick={() => setIsOpen(false)}
-                        className="block rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
+                        className="flex min-h-11 items-center rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                       >
                         Account Profile
                       </Link>
                       <Link
                         href="/account/orders"
                         onClick={() => setIsOpen(false)}
-                        className="block rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
+                        className="flex min-h-11 items-center rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900"
                       >
                         Order History
                       </Link>
@@ -313,7 +298,7 @@ function MobileNavContent({ user }: MobileNavProps) {
                         <Link
                           href="/admin"
                           onClick={() => setIsOpen(false)}
-                          className="block rounded-md bg-amber-50 px-3 py-2 font-semibold text-amber-900 hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-amber-900"
+                          className="flex min-h-11 items-center rounded-md bg-amber-50 px-3 py-2 font-semibold text-amber-900 hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-amber-900"
                         >
                           Catalog Administration
                         </Link>
@@ -327,9 +312,9 @@ function MobileNavContent({ user }: MobileNavProps) {
                       >
                         <button
                           type="submit"
-                          className="w-full rounded-md px-3 py-2 text-left font-semibold text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-600"
+                          className="min-h-11 w-full rounded-md px-3 py-2 text-left font-semibold text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-600"
                         >
-                          Sign Out ({user.email})
+                          Sign Out{user.email ? ` (${user.email})` : ""}
                         </button>
                       </form>
                     </>

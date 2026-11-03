@@ -1,20 +1,29 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { logoutAction } from "@/features/auth/actions";
 import { getCurrentUser } from "@/features/auth/current-user";
+import { resolveHeaderSession } from "@/features/auth/header-session";
+import { getSessionToken } from "@/features/auth/session";
 import { SITE_NAME } from "@/lib/site";
+import { HeaderAuth } from "./header-auth";
 import { HeaderSearch } from "./header-search";
-import { buttonStyles } from "./ui/button";
 import { MobileNav } from "./mobile-nav";
 import { NavMegaMenu } from "./nav-mega-menu";
 
 export async function SiteHeader() {
-  let user = null;
-  try {
-    user = await getCurrentUser();
-  } catch {
-    // Keep public navigation usable if auth service has transient issue
-  }
+  // A failed check (rate limit, server error, network) is not "signed out": the
+  // header keeps the signed-in view and the reason goes to the server log.
+  const session = await resolveHeaderSession({
+    hasSession: async () => (await getSessionToken()) !== null,
+    loadUser: () => getCurrentUser(),
+    log: (message) => console.warn(message),
+  });
+  // The drawer only needs to know whether to offer account links.
+  const drawerUser =
+    session.kind === "user"
+      ? session.user
+      : session.kind === "unverified"
+        ? { email: "", role: "user" }
+        : null;
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
@@ -35,7 +44,7 @@ export async function SiteHeader() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
           {/* Left: Mobile trigger & Brand Logo */}
           <div className="flex min-w-0 items-center gap-1 sm:gap-3">
-            <MobileNav user={user} />
+            <MobileNav user={drawerUser} />
             <Link
               href="/"
               aria-label={SITE_NAME}
@@ -103,90 +112,10 @@ export async function SiteHeader() {
             </Link>
 
             {/* Auth Navigation */}
-            <Suspense fallback={<GuestAuthButtons />}>
-              <UserAuthSection user={user} />
-            </Suspense>
+            <HeaderAuth session={session} signOut={logoutAction} />
           </div>
         </div>
       </div>
     </header>
-  );
-}
-
-function UserAuthSection({
-  user,
-}: {
-  user: { email: string; role: string } | null;
-}) {
-  if (!user) {
-    return <GuestAuthButtons />;
-  }
-
-  return (
-    <div className="flex items-center gap-0.5 sm:gap-1.5">
-      {user.role === "admin" && (
-        <Link
-          href="/admin"
-          className={buttonStyles({
-            variant: "secondary",
-            size: "sm",
-            className: "max-sm:hidden",
-          })}
-        >
-          Admin
-        </Link>
-      )}
-      <Link
-        href="/account"
-        aria-label="View account profile"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-md text-neutral-700 transition hover:bg-brand-soft hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
-      >
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-          />
-        </svg>
-      </Link>
-      <form action={logoutAction} className="hidden sm:inline-block">
-        <button
-          type="submit"
-          className={buttonStyles({ variant: "ghost", size: "sm" })}
-        >
-          Sign Out
-        </button>
-      </form>
-    </div>
-  );
-}
-
-function GuestAuthButtons() {
-  return (
-    <div className="flex items-center gap-0.5 sm:gap-1.5">
-      <Link
-        href="/login"
-        className={buttonStyles({ variant: "ghost", size: "sm" })}
-      >
-        Sign In
-      </Link>
-      <Link
-        href="/register"
-        className={buttonStyles({
-          variant: "primary",
-          size: "sm",
-          className: "max-sm:hidden",
-        })}
-      >
-        Register
-      </Link>
-    </div>
   );
 }

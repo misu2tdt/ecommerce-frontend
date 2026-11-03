@@ -105,8 +105,12 @@ export function SizeGuideModal({
             >
               Size & Fit Guide
             </h2>
+            <p className="mt-1 text-body-sm font-semibold text-amber-700">
+              Approximate guide
+            </p>
             <p className="mt-1 text-body-sm text-neutral-600">
-              General garment measurements for standard fit guidance.
+              General measurements to help you choose. They are not specific to
+              one brand or style and can differ a little between products.
             </p>
           </div>
           <button

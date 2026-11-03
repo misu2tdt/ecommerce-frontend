@@ -1,6 +1,12 @@
 import "server-only";
 
-import { ApiError, apiFetch, type ApiRequestOptions } from "@/lib/api";
+import {
+  ApiError,
+  apiFetch,
+  apiFetchPage,
+  type ApiRequestOptions,
+} from "@/lib/api";
+import { LIST_PAGE_SIZE, type PaginationInfo } from "@/lib/pagination";
 import type {
   CurrentUser,
   LoginResponse,
@@ -36,4 +42,14 @@ export async function authenticatedApiFetch<T>(
   const token = await getSessionToken();
   if (!token) throw new ApiError("Authentication is required.", 401);
   return apiFetch<T>(path, { ...options, token });
+}
+
+// One page of a list for the signed-in visitor (20 rows), with its totals.
+export async function authenticatedApiFetchPage<T>(
+  path: string,
+  page: number,
+): Promise<{ items: T[] } & PaginationInfo> {
+  const token = await getSessionToken();
+  if (!token) throw new ApiError("Authentication is required.", 401);
+  return apiFetchPage<T>(path, { token }, { page, limit: LIST_PAGE_SIZE });
 }

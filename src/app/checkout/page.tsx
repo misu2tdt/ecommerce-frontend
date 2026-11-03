@@ -33,8 +33,9 @@ export default async function CheckoutPage({
   if ("unauthenticated" in result) redirect(buildLoginHref("/checkout"));
   if ("error" in result) {
     return (
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
         <FeedbackState
+          as="h1"
           title="Checkout unavailable"
           description={apiErrorMessage(result.error)}
           actionHref="/checkout"
@@ -47,7 +48,7 @@ export default async function CheckoutPage({
   const { cart, addresses } = result;
   if (cart.items.length === 0) {
     return (
-      <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="mb-8">
           <Eyebrow>
             Checkout
@@ -67,7 +68,7 @@ export default async function CheckoutPage({
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
+    <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <Eyebrow>
         Secure checkout
       </Eyebrow>

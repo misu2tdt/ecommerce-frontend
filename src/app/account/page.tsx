@@ -17,8 +17,9 @@ export default async function AccountPage() {
   const result = await loadAccountUser();
   if ("error" in result) {
     return (
-      <section className="mx-auto max-w-3xl px-6 py-16">
+      <section className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">
         <FeedbackState
+          as="h1"
           title="Account unavailable"
           description={apiErrorMessage(result.error)}
         />
@@ -30,7 +31,7 @@ export default async function AccountPage() {
   if (!user) redirect(buildLoginHref("/account"));
 
   return (
-    <section className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
+    <section className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       <div className="rounded-md border border-line bg-surface p-6 sm:p-8">
         <Eyebrow>
           Signed in

@@ -1,4 +1,5 @@
 import type { ProductSort } from "@/types/catalog";
+import { withPage } from "@/lib/pagination";
 import type { ProductFilters } from "./api";
 
 export type CatalogSearchParams = Record<
@@ -66,9 +67,9 @@ export function countActiveFilters(filters: ProductFilters): number {
   return count;
 }
 
-export function buildCatalogHref(filters: ProductFilters): string {
-  const query = buildCatalogQuery(filters);
-  return query ? `/products?${query}` : "/products";
+// The address of the catalog for some filters. Page 1 has no `page` parameter.
+export function buildCatalogHref(filters: ProductFilters, page = 1): string {
+  return withPage("/products", buildCatalogQuery(filters), page);
 }
 
 export function buildProductDetailHref(

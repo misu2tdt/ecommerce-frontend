@@ -1,6 +1,9 @@
 import "server-only";
 
-import { authenticatedApiFetch } from "@/features/auth/api";
+import {
+  authenticatedApiFetch,
+  authenticatedApiFetchPage,
+} from "@/features/auth/api";
 import type { Brand, Category, ProductImage } from "@/types/catalog";
 import type {
   AdminOrder,
@@ -16,6 +19,9 @@ import type { OrderStatus } from "@/types/order";
 
 export const getAdminProducts = () =>
   authenticatedApiFetch<AdminProduct[]>("/products/admin");
+
+export const getAdminProductsPage = (page: number) =>
+  authenticatedApiFetchPage<AdminProduct>("/products/admin", page);
 
 export const getAdminProduct = (id: number) =>
   authenticatedApiFetch<AdminProduct>(`/products/admin/${id}`);
@@ -92,6 +98,9 @@ export const deleteProductImage = (productId: number, imageId: number) =>
 export const getAdminOrders = () =>
   authenticatedApiFetch<AdminOrder[]>("/admin/orders");
 
+export const getAdminOrdersPage = (page: number) =>
+  authenticatedApiFetchPage<AdminOrder>("/admin/orders", page);
+
 export const getAdminOrder = (orderId: number) =>
   authenticatedApiFetch<AdminOrder>(`/admin/orders/${orderId}`);
 
@@ -106,6 +115,9 @@ export const updateAdminOrderStatus = (
 
 export const getAdminReviews = () =>
   authenticatedApiFetch<AdminReview[]>("/admin/reviews");
+
+export const getAdminReviewsPage = (page: number) =>
+  authenticatedApiFetchPage<AdminReview>("/admin/reviews", page);
 
 export const updateAdminReviewVisibility = (
   reviewId: number,

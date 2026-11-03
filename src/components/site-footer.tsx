@@ -22,7 +22,7 @@ export function SiteFooter() {
           <div className="col-span-2 md:col-span-1">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-body font-bold tracking-tight text-white focus-visible:outline-2 focus-visible:outline-white"
+              className="inline-flex min-h-11 items-center gap-1.5 text-body font-bold tracking-tight text-white focus-visible:outline-2 focus-visible:outline-white"
             >
               <span className="tracking-widest">VERVE</span>
               <span className="text-body-sm font-semibold tracking-widest text-neutral-400">STUDIO</span>
@@ -35,12 +35,12 @@ export function SiteFooter() {
           {/* Col 2: Categories */}
           <div>
             <p className={columnTitle}>Categories</p>
-            <ul className="mt-4 space-y-2.5 text-body-sm">
+            <ul className="mt-4 text-body-sm md:space-y-2.5">
               {FOOTER_CATEGORIES.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="transition hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-white"
+                    className="transition hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-white max-md:flex max-md:min-h-11 max-md:items-center"
                   >
                     {item.label}
                   </Link>
@@ -52,12 +52,12 @@ export function SiteFooter() {
           {/* Col 3: Brands */}
           <div>
             <p className={columnTitle}>Brands</p>
-            <ul className="mt-4 space-y-2.5 text-body-sm">
+            <ul className="mt-4 text-body-sm md:space-y-2.5">
               {FOOTER_BRANDS.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="group flex flex-col transition hover:text-white focus-visible:outline-2 focus-visible:outline-white"
+                    className="group flex flex-col justify-center transition hover:text-white focus-visible:outline-2 focus-visible:outline-white max-md:min-h-11"
                   >
                     <span className="font-normal group-hover:underline">{item.label}</span>
                     <span className="text-body-sm text-neutral-400">{item.desc}</span>
@@ -70,12 +70,12 @@ export function SiteFooter() {
           {/* Col 4: Customer Care */}
           <div>
             <p className={columnTitle}>Customer Care</p>
-            <ul className="mt-4 space-y-2.5 text-body-sm">
+            <ul className="mt-4 text-body-sm md:space-y-2.5">
               {customerLinks.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="transition hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-white"
+                    className="transition hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-white max-md:flex max-md:min-h-11 max-md:items-center"
                   >
                     {item.label}
                   </Link>

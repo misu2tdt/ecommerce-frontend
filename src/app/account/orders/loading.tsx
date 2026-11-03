@@ -1,7 +1,7 @@
 export default function OrdersLoading() {
   return (
     <section
-      className="mx-auto max-w-5xl px-6 py-12"
+      className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12"
       aria-busy="true"
       aria-label="Loading Orders"
     >

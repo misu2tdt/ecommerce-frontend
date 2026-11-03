@@ -1,6 +1,6 @@
 import { ProductCard } from "@/components/product-card";
 import { ProductGrid } from "@/components/product-grid";
-import { getProducts } from "@/features/catalog/api";
+import { getProductsPage } from "@/features/catalog/api";
 import type { ProductSummary } from "@/types/catalog";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -18,7 +18,8 @@ export async function RelatedProducts({
   let related: ProductSummary[] = [];
 
   try {
-    const products = await getProducts({ category: categorySlug });
+    // One page of the category (12) is plenty for four other products.
+    const { items: products } = await getProductsPage({ category: categorySlug }, 1);
     related = products
       .filter((product) => product.id !== currentProductId)
       .slice(0, 4);

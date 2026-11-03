@@ -6,7 +6,7 @@ interface RouteLoadingProps {
 export function RouteLoading({ label, width = "wide" }: RouteLoadingProps) {
   return (
     <section
-      className={`mx-auto px-6 py-12 ${width === "content" ? "max-w-3xl" : "max-w-6xl"}`}
+      className={`mx-auto px-4 py-12 sm:px-6 lg:px-8 ${width === "content" ? "max-w-3xl" : "max-w-6xl"}`}
       aria-busy="true"
       aria-live="polite"
     >

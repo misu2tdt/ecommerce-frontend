@@ -41,12 +41,13 @@ function HeaderSearchFallback({
 }) {
   return (
     <div className={`relative flex items-center ${className}`}>
-      <label htmlFor={id} className="sr-only">
+      {/* Its own id: the live search input replaces this one with the real id. */}
+      <label htmlFor={`${id}-loading`} className="sr-only">
         Search catalog
       </label>
       <div className="relative w-full">
         <input
-          id={id}
+          id={`${id}-loading`}
           type="search"
           placeholder={placeholder}
           disabled

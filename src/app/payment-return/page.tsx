@@ -36,6 +36,7 @@ export default async function PaymentReturnPage({
     return (
       <ReturnShell>
         <FeedbackState
+          as="h1"
           title="Payment return could not be identified"
           description="We could not tell which payment you came back from. Check your order history for the latest status."
           actionHref="/account/orders"
@@ -52,6 +53,7 @@ export default async function PaymentReturnPage({
     return (
       <ReturnShell>
         <FeedbackState
+          as="h1"
           title="Payment return unavailable"
           description="We could not find this payment in your account. Check your order history for the latest status."
           actionHref="/account/orders"
@@ -64,6 +66,7 @@ export default async function PaymentReturnPage({
     return (
       <ReturnShell>
         <FeedbackState
+          as="h1"
           title="Unable to check Payment"
           description={apiErrorMessage(result.error)}
           actionHref={returnPath}
@@ -137,7 +140,7 @@ export default async function PaymentReturnPage({
 
 function ReturnShell({ children }: { children: React.ReactNode }) {
   return (
-    <section className="mx-auto max-w-4xl px-6 py-10 sm:py-14">
+    <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       {children}
     </section>
   );

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { buttonStyles } from "@/components/ui/button";
 export default function GlobalError({ reset }: { reset: () => void }) {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-16">
+    <section className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">
       <div className="rounded-md border border-red-200 bg-surface px-6 py-12 text-center">
         <h1 className="font-bold text-brand-strong text-heading">
           Something went wrong

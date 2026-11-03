@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { imageIndexForColor } from "@/lib/product-detail";
 import type { ProductImage } from "@/types/catalog";
+import { useProductColor } from "./product-selection";
 import { ProductMedia } from "./product-media";
 
 interface ProductGalleryProps {
@@ -12,10 +14,19 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [prevImages, setPrevImages] = useState(images);
+  const { color } = useProductColor();
+  const [seenColor, setSeenColor] = useState(color);
 
   if (images !== prevImages) {
     setPrevImages(images);
     setSelectedImageIndex(0);
+  }
+
+  // Choosing a colour shows that colour's photo, when there is one.
+  if (color !== seenColor) {
+    setSeenColor(color);
+    const index = imageIndexForColor(images, color);
+    if (index !== -1) setSelectedImageIndex(index);
   }
 
   const safeIndex = selectedImageIndex < images.length ? selectedImageIndex : 0;
