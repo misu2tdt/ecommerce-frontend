@@ -62,10 +62,11 @@ export async function SiteHeader() {
           </div>
 
           {/* Right: Search, Wishlist, Cart, Account */}
-          <div className="flex shrink-0 items-center gap-0.5 sm:gap-2">
+          {/* From xl, tighter gaps (and 8px less padding on the text buttons) leave the category menu room to spare, even for an admin and with wider fonts */}
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-2 xl:gap-1">
             {/* Desktop Search */}
-            {/* Narrower where the bar is full: 128px at 768px, 160px from 1280px (the category menu sits beside it, and an admin has one more button) */}
-            <div className="hidden w-32 md:block lg:w-60 xl:w-40">
+            {/* Narrower where the bar is full: 128px at 768px and from 1280px, where the category menu sits beside it and an admin has one more button. The 128px minimum keeps it usable. */}
+            <div className="hidden w-32 md:block lg:w-60 xl:w-32">
               <HeaderSearch id="desktop-header-search-input" />
             </div>
 

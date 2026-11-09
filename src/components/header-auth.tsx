@@ -29,7 +29,7 @@ export function HeaderAuth({
           className={buttonStyles({
             variant: "secondary",
             size: "sm",
-            className: "max-sm:hidden",
+            className: "max-sm:hidden xl:px-2",
           })}
         >
           Admin
@@ -54,7 +54,7 @@ export function HeaderAuth({
       <form action={signOut} className="hidden sm:inline-block">
         <button
           type="submit"
-          className={buttonStyles({ variant: "ghost", size: "sm" })}
+          className={buttonStyles({ variant: "ghost", size: "sm", className: "xl:px-2" })}
         >
           Sign Out
         </button>

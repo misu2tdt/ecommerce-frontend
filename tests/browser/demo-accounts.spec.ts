@@ -251,6 +251,24 @@ test.describe("the link in the top bar", () => {
       `the search box stays usable at ${label}`,
     ).toBeGreaterThanOrEqual(128);
 
+    // Free room in the row: what the category menu's slot has left once the menu
+    // is in it (negative = the menu spills over its neighbours). Fonts are a bit
+    // wider on Linux than on Windows, so a header that only just fits here would
+    // overlap there; this margin catches that on any machine.
+    if (width >= 1280) {
+      const slack = await page.evaluate(() => {
+        const nav = document.querySelector('nav[aria-label="Store navigation"]')!;
+        return (
+          nav.parentElement!.getBoundingClientRect().width -
+          nav.getBoundingClientRect().width
+        );
+      });
+      expect(
+        slack,
+        `free room in the header row at ${label}: ${slack.toFixed(1)}px (needs at least ${MIN_SLACK}px)`,
+      ).toBeGreaterThanOrEqual(MIN_SLACK);
+    }
+
     const wrapped = await page.evaluate(() => {
       const lines = (element: Element) => {
         const range = document.createRange();
@@ -273,6 +291,7 @@ test.describe("the link in the top bar", () => {
     ).toBeLessThanOrEqual(width);
   }
 
+  const MIN_SLACK = 16;
   const WIDTHS = [768, 1024, 1280, 1440, 1920];
   // From 1280px the category menu sits between the logo and the search.
   const leftOf = (width: number) =>

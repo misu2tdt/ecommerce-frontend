@@ -13,7 +13,7 @@ export function DemoAccountsLink() {
     <Link
       href={DEMO_ACCOUNTS_PATH}
       aria-current={current ? "page" : undefined}
-      className="hidden h-11 shrink-0 items-center whitespace-nowrap rounded-md px-3 text-body-sm font-semibold text-neutral-700 transition hover:bg-brand-soft hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand aria-[current=page]:bg-brand-soft aria-[current=page]:text-brand-strong md:inline-flex"
+      className="hidden h-11 shrink-0 items-center whitespace-nowrap rounded-md px-3 xl:px-2 text-body-sm font-semibold text-neutral-700 transition hover:bg-brand-soft hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand aria-[current=page]:bg-brand-soft aria-[current=page]:text-brand-strong md:inline-flex"
     >
       Demo accounts
     </Link>
