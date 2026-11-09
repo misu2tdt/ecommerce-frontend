@@ -57,6 +57,7 @@ test.describe("design system in the browser", () => {
     ["catalog", "/products"],
     ["login", "/login"],
     ["about demo", "/about-demo"],
+    ["demo accounts", "/demo-accounts"],
   ];
 
   for (const [name, path] of pages) {

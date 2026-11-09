@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { logoutAction } from "@/features/auth/actions";
 import { BRANDS, FOOTER_CATEGORIES } from "@/lib/catalog-nav";
+import { DEMO_ACCOUNTS_PATH } from "@/lib/site";
 import { HeaderSearch } from "./header-search";
 
 import { buttonStyles } from "@/components/ui/button";
@@ -261,6 +262,15 @@ function MobileNavContent({ user }: MobileNavProps) {
                   Customer
                 </Eyebrow>
                 <div className="space-y-1 text-body-sm">
+                  <Link
+                    href={DEMO_ACCOUNTS_PATH}
+                    onClick={() => setIsOpen(false)}
+                    aria-current={pathname === DEMO_ACCOUNTS_PATH ? "page" : undefined}
+                    className="flex min-h-11 items-center justify-between rounded-md px-3 py-2 font-semibold text-neutral-700 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900 aria-[current=page]:bg-surface-muted aria-[current=page]:text-brand-strong"
+                  >
+                    <span>Demo accounts</span>
+                    <span className="text-body-sm font-bold text-neutral-600">Try it</span>
+                  </Link>
                   <Link
                     href="/cart"
                     onClick={() => setIsOpen(false)}

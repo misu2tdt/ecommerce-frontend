@@ -19,7 +19,7 @@ test("public pages use shopper language", async ({ page }) => {
   await page.route("**://res.cloudinary.com/**", (route) => route.abort());
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  for (const path of ["/", "/products", "/login", "/register"]) {
+  for (const path of ["/", "/products", "/login", "/register", "/demo-accounts"]) {
     await expectNoBannedTerms(page, path);
   }
 

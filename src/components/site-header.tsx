@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/features/auth/current-user";
 import { resolveHeaderSession } from "@/features/auth/header-session";
 import { getSessionToken } from "@/features/auth/session";
 import { SITE_NAME } from "@/lib/site";
+import { DemoAccountsLink } from "./demo-accounts-link";
 import { HeaderAuth } from "./header-auth";
 import { HeaderSearch } from "./header-search";
 import { MobileNav } from "./mobile-nav";
@@ -45,6 +46,8 @@ export async function SiteHeader() {
           {/* Left: Mobile trigger & Brand Logo */}
           <div className="flex min-w-0 items-center gap-1 sm:gap-3">
             <MobileNav user={drawerUser} />
+            {/* From md up; phones get the same link in the drawer */}
+            <DemoAccountsLink />
             <Link
               href="/"
               aria-label={SITE_NAME}
@@ -63,7 +66,8 @@ export async function SiteHeader() {
           {/* Right: Search, Wishlist, Cart, Account */}
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-2">
             {/* Desktop Search */}
-            <div className="hidden w-44 md:block lg:w-60 xl:w-44 2xl:w-60">
+            {/* Stays 176px from xl up: the Demo accounts link took the room a wider search used on very wide screens */}
+            <div className="hidden w-44 md:block lg:w-60 xl:w-44">
               <HeaderSearch id="desktop-header-search-input" />
             </div>
 

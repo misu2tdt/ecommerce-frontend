@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buttonStyles } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { REPOSITORIES, SITE_NAME } from "@/lib/site";
+import { DEMO_ACCOUNTS, REPOSITORIES, SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About this demo",
@@ -61,10 +61,13 @@ export default function AboutDemoPage() {
           </Link>
           , or sign in as the sample customer:{" "}
           <span className="font-semibold text-brand-strong">
-            demo.customer@example.com
+            {DEMO_ACCOUNTS.customer.email}
           </span>{" "}
           with the password{" "}
-          <span className="font-semibold text-brand-strong">DemoOnly!2026</span>.
+          <span className="font-semibold text-brand-strong">
+            {DEMO_ACCOUNTS.customer.password}
+          </span>
+          .
         </p>
       </section>
 
