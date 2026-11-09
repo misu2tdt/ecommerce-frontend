@@ -1,5 +1,5 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
-import { skipProductPhotos } from "./support/shop";
+﻿import { expect, test, type Locator, type Page } from "@playwright/test";
+import { CUSTOMER, OTHER_USER, signIn, skipProductPhotos } from "./support/shop";
 
 // The Demo accounts page lists the sample customer and admin sign-ins, and a
 // link in the top bar (from md up) or the menu drawer (phones) leads to it.
@@ -149,23 +149,40 @@ test.describe("the copy buttons", () => {
 });
 
 test.describe("the link in the top bar", () => {
-  test("sits left of the logo on desktop, leads to the page and marks it as current", async ({
+  test("is the last item of the header actions, leads to the page and marks it as current", async ({
     page,
   }) => {
     await open(page, 1440, "/");
     const link = headerLink(page);
-    const logo = page.locator("header").getByRole("link", { name: /VERVE\s*STUDIO/ });
     await expect(link).toBeVisible();
     await expect(link).not.toHaveAttribute("aria-current", /.+/);
-
-    const [linkBox, logoBox] = [(await link.boundingBox())!, (await logo.boundingBox())!];
-    expect(linkBox.x + linkBox.width, "left of the logo").toBeLessThanOrEqual(logoBox.x);
-    expect(linkBox.height).toBeGreaterThanOrEqual(44);
+    expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    // Not on the left any more: the logo is the first item.
+    const parts = await headerItems(page);
+    expect(parts[0].name).toBe("logo");
 
     await link.click();
     await expect(page).toHaveURL(/\/demo-accounts$/);
     await expect(page.locator("h1")).toHaveText("Demo accounts");
     await expect(headerLink(page)).toHaveAttribute("aria-current", "page");
+  });
+
+  test("can be reached and used with the keyboard, with a visible focus ring", async ({
+    page,
+  }) => {
+    await open(page, 1440, "/");
+    const link = headerLink(page);
+    await link.focus();
+    await expect(link).toBeFocused();
+    const outline = await link.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { style: style.outlineStyle, width: parseFloat(style.outlineWidth) };
+    });
+    expect(outline.style).not.toBe("none");
+    expect(outline.width).toBeGreaterThanOrEqual(2);
+
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/demo-accounts$/);
   });
 
   test("is in the menu drawer on a phone, not in the bar", async ({ page }) => {
@@ -189,65 +206,122 @@ test.describe("the link in the top bar", () => {
     ).toHaveAttribute("aria-current", "page");
   });
 
-  test("is in the bar on a tablet too", async ({ page }) => {
-    await open(page, 768, "/");
-    await expect(headerLink(page)).toBeVisible();
+  // The header's items, left to right, with where they sit.
+  async function headerItems(page: Page) {
+    const header = page.locator("header");
+    const candidates: Record<string, Locator> = {
+      logo: header.getByRole("link", { name: /VERVE\s*STUDIO/ }),
+      menu: header.getByRole("navigation", { name: "Store navigation" }),
+      search: header.locator('input[name="q"]#desktop-header-search-input'),
+      wishlist: header.getByRole("link", { name: "View saved wishlist items" }),
+      cart: header.getByRole("link", { name: "View shopping cart" }),
+      admin: header.getByRole("link", { name: "Admin", exact: true }),
+      "sign in": header.getByRole("link", { name: "Sign In" }),
+      register: header.getByRole("link", { name: "Register" }),
+      account: header.getByRole("link", { name: "View account profile" }),
+      "sign out": header.getByRole("button", { name: "Sign Out" }),
+      "demo accounts": headerLink(page),
+    };
+    const items: Array<{ name: string; x: number; right: number; width: number }> = [];
+    for (const [name, locator] of Object.entries(candidates)) {
+      if (!(await locator.isVisible())) continue;
+      const box = (await locator.boundingBox())!;
+      items.push({ name, x: box.x, right: box.x + box.width, width: box.width });
+    }
+    return items.sort((a, b) => a.x - b.x);
+  }
+
+  // Nothing in the header may overlap, wrap, leave the screen or push the page
+  // sideways, and the link stays visible as the last item.
+  async function expectHeaderFits(page: Page, width: number, order: string[]) {
+    await page.evaluate(() => document.fonts.ready);
+    const items = await headerItems(page);
+    const label = `${width}px`;
+
+    expect(items.map((item) => item.name), `order at ${label}`).toEqual(order);
+    for (let index = 1; index < items.length; index += 1) {
+      expect(
+        items[index].x,
+        `${items[index - 1].name} runs into ${items[index].name} at ${label}`,
+      ).toBeGreaterThanOrEqual(items[index - 1].right - 0.5);
+    }
+    expect(items.at(-1)!.right, `inside the screen at ${label}`).toBeLessThanOrEqual(width);
+    expect(
+      items.find((item) => item.name === "search")!.width,
+      `the search box stays usable at ${label}`,
+    ).toBeGreaterThanOrEqual(128);
+
+    const wrapped = await page.evaluate(() => {
+      const lines = (element: Element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        return new Set(
+          Array.from(range.getClientRects(), (rect) => Math.round(rect.top)),
+        ).size;
+      };
+      return Array.from(
+        document.querySelectorAll("header a:not(:has(> span)), header button"),
+      )
+        .filter((element) => element.getClientRects().length > 0)
+        .filter((element) => lines(element) > 1)
+        .map((element) => element.textContent?.trim());
+    });
+    expect(wrapped, `links that wrap at ${label}`).toEqual([]);
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth),
-    ).toBeLessThanOrEqual(768);
-  });
+      `page width at ${label}`,
+    ).toBeLessThanOrEqual(width);
+  }
 
-  // The header needs the most room from 1280px. Nothing in it may overlap, wrap
-  // or push the page sideways, and the link stays visible.
-  for (const width of [1280, 1366, 1440, 1920]) {
-    test(`nothing in the header overlaps or wraps at ${width}px`, async ({ page }) => {
+  const WIDTHS = [768, 1024, 1280, 1440, 1920];
+  // From 1280px the category menu sits between the logo and the search.
+  const leftOf = (width: number) =>
+    width >= 1280 ? ["logo", "menu", "search"] : ["logo", "search"];
+
+  for (const width of WIDTHS) {
+    test(`guest: Demo accounts comes right after Register at ${width}px, nothing overlaps`, async ({
+      page,
+    }) => {
       await open(page, width, "/");
-      await page.evaluate(() => document.fonts.ready);
-      const header = page.locator("header");
+      await expectHeaderFits(page, width, [
+        ...leftOf(width),
+        "wishlist",
+        "cart",
+        "sign in",
+        "register",
+        "demo accounts",
+      ]);
+    });
 
-      const parts: Record<string, Locator> = {
-        "demo accounts": headerLink(page),
-        logo: header.getByRole("link", { name: /VERVE\s*STUDIO/ }),
-        menu: header.getByRole("navigation", { name: "Store navigation" }),
-        search: header.locator('input[name="q"]#desktop-header-search-input'),
-        wishlist: header.getByRole("link", { name: "View saved wishlist items" }),
-        cart: header.getByRole("link", { name: "View shopping cart" }),
-        "sign in": header.getByRole("link", { name: "Sign In" }),
-        register: header.getByRole("link", { name: "Register" }),
-      };
-      const boxes: Array<{ name: string; x: number; right: number }> = [];
-      for (const [name, locator] of Object.entries(parts)) {
-        await expect(locator, name).toBeVisible();
-        const box = (await locator.boundingBox())!;
-        boxes.push({ name, x: box.x, right: box.x + box.width });
-      }
+    test(`customer: Demo accounts is the last item at ${width}px, nothing overlaps`, async ({
+      page,
+    }) => {
+      await signIn(page, CUSTOMER);
+      await open(page, width, "/");
+      await expectHeaderFits(page, width, [
+        ...leftOf(width),
+        "wishlist",
+        "cart",
+        "account",
+        "sign out",
+        "demo accounts",
+      ]);
+    });
 
-      const ordered = boxes.sort((a, b) => a.x - b.x);
-      for (let index = 1; index < ordered.length; index += 1) {
-        expect(
-          ordered[index].x,
-          `${ordered[index - 1].name} runs into ${ordered[index].name}`,
-        ).toBeGreaterThanOrEqual(ordered[index - 1].right - 0.5);
-      }
-      expect(ordered.at(-1)!.right, "inside the screen").toBeLessThanOrEqual(width);
-
-      const wrapped = await page.evaluate(() => {
-        const lines = (element: Element) => {
-          const range = document.createRange();
-          range.selectNodeContents(element);
-          return new Set(
-            Array.from(range.getClientRects(), (rect) => Math.round(rect.top)),
-          ).size;
-        };
-        return Array.from(document.querySelectorAll("header a:not(:has(> span))"))
-          .filter((element) => element.getClientRects().length > 0)
-          .filter((element) => lines(element) > 1)
-          .map((element) => element.textContent?.trim());
-      });
-      expect(wrapped, "links that wrap").toEqual([]);
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth),
-      ).toBeLessThanOrEqual(width);
+    test(`admin: Demo accounts is the last item at ${width}px, nothing overlaps`, async ({
+      page,
+    }) => {
+      await signIn(page, OTHER_USER);
+      await open(page, width, "/");
+      await expectHeaderFits(page, width, [
+        ...leftOf(width),
+        "wishlist",
+        "cart",
+        "admin",
+        "account",
+        "sign out",
+        "demo accounts",
+      ]);
     });
   }
 });

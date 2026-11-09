@@ -46,8 +46,6 @@ export async function SiteHeader() {
           {/* Left: Mobile trigger & Brand Logo */}
           <div className="flex min-w-0 items-center gap-1 sm:gap-3">
             <MobileNav user={drawerUser} />
-            {/* From md up; phones get the same link in the drawer */}
-            <DemoAccountsLink />
             <Link
               href="/"
               aria-label={SITE_NAME}
@@ -66,8 +64,8 @@ export async function SiteHeader() {
           {/* Right: Search, Wishlist, Cart, Account */}
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-2">
             {/* Desktop Search */}
-            {/* Stays 176px from xl up: the Demo accounts link took the room a wider search used on very wide screens */}
-            <div className="hidden w-44 md:block lg:w-60 xl:w-44">
+            {/* Narrower where the bar is full: 128px at 768px, 160px from 1280px (the category menu sits beside it, and an admin has one more button) */}
+            <div className="hidden w-32 md:block lg:w-60 xl:w-40">
               <HeaderSearch id="desktop-header-search-input" />
             </div>
 
@@ -117,6 +115,9 @@ export async function SiteHeader() {
 
             {/* Auth Navigation */}
             <HeaderAuth session={session} signOut={logoutAction} />
+
+            {/* Always the last item; from md up (phones get it in the drawer) */}
+            <DemoAccountsLink />
           </div>
         </div>
       </div>
