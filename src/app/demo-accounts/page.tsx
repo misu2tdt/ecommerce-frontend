@@ -25,7 +25,7 @@ const ACCOUNTS = [
     role: "Admin",
     account: DEMO_ACCOUNTS.admin,
     description:
-      "Manage products, categories, brands, promotions and orders, moderate reviews and handle late-payment review.",
+      "Manage products, categories, brands, promotions and orders, and moderate reviews.",
   },
 ] as const;
 
