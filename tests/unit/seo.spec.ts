@@ -3,6 +3,9 @@ import robots from "@/app/robots";
 import {
   absoluteUrl,
   catalogMetadata,
+  collectionJsonLd,
+  collectionMetadata,
+  collectionsIndexMetadata,
   getSiteUrl,
   homeMetadata,
   noIndex,
@@ -162,6 +165,117 @@ test.describe("productMetadata", () => {
   });
 });
 
+test.describe("collection metadata", () => {
+  const collection = {
+    name: "Everyday Essentials",
+    slug: "everyday-essentials",
+    description: "Simple pieces that go with everything.",
+    heroImageUrl: null,
+  };
+
+  test("the list of collections has its own title, description and canonical address", () => {
+    const first = collectionsIndexMetadata(1);
+    const second = collectionsIndexMetadata(2);
+
+    expect(first.title).toBe("Collections");
+    expect(first.description).toMatch(/collections/i);
+    expect(first.alternates?.canonical).toBe("/collections");
+    expect(second.title).toBe("Collections, page 2");
+    expect(second.alternates?.canonical).toBe("/collections?page=2");
+    expect(second.description).not.toBe(first.description);
+  });
+
+  test("a collection page uses its own name and text, with no page parameter on page 1", () => {
+    const first = collectionMetadata({ collection, sort: undefined, page: 1 });
+
+    expect(first.title).toBe("Everyday Essentials");
+    expect(first.description).toBe("Simple pieces that go with everything.");
+    expect(first.alternates?.canonical).toBe("/collections/everyday-essentials");
+    expect(first.robots).toBeUndefined();
+  });
+
+  test("later pages say which page they are and have their own canonical address", () => {
+    const third = collectionMetadata({ collection, sort: "price_asc", page: 3 });
+
+    expect(third.title).toBe("Everyday Essentials, page 3");
+    expect(third.alternates?.canonical).toBe(
+      "/collections/everyday-essentials?sort=price_asc&page=3",
+    );
+    expect(third.description).toBe("Simple pieces that go with everything. Page 3.");
+  });
+
+  test("without a description it says what the collection is, and never invents an image", () => {
+    const meta = collectionMetadata({
+      collection: { ...collection, description: null },
+      sort: undefined,
+      page: 1,
+    });
+
+    expect(meta.description).toBe("Shop the Everyday Essentials collection at VERVE STUDIO.");
+    expect(meta.openGraph?.images).toBeUndefined();
+    expect(meta.twitter).toMatchObject({ card: "summary" });
+  });
+
+  test("a cover picture becomes the sharing preview", () => {
+    const meta = collectionMetadata({
+      collection: { ...collection, heroImageUrl: "https://res.cloudinary.com/x/hero.jpg" },
+      sort: undefined,
+      page: 1,
+    });
+
+    expect(meta.openGraph?.images).toEqual([
+      { url: "https://res.cloudinary.com/x/hero.jpg", alt: "Everyday Essentials" },
+    ]);
+    expect(meta.twitter).toMatchObject({ card: "summary_large_image" });
+  });
+});
+
+test.describe("collectionJsonLd", () => {
+  test("is a CollectionPage with an ItemList of the products on the page", () => {
+    const data = JSON.parse(
+      collectionJsonLd(
+        { name: "Everyday Essentials", slug: "everyday-essentials", description: "Simple pieces." },
+        [
+          { name: "Classic Tee", slug: "classic-tee" },
+          { name: "Canvas Tote", slug: "canvas-tote" },
+        ],
+        13,
+        SITE,
+      ),
+    );
+
+    expect(data).toEqual({
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Everyday Essentials",
+      description: "Simple pieces.",
+      url: `${SITE}/collections/everyday-essentials`,
+      mainEntity: {
+        "@type": "ItemList",
+        itemListElement: [
+          { "@type": "ListItem", position: 13, name: "Classic Tee", url: `${SITE}/products/classic-tee` },
+          { "@type": "ListItem", position: 14, name: "Canvas Tote", url: `${SITE}/products/canvas-tote` },
+        ],
+      },
+    });
+  });
+
+  test("leaves out a missing description and cannot close the script tag", () => {
+    const text = collectionJsonLd(
+      { name: "</script><b>", slug: "x", description: null },
+      [],
+      1,
+      SITE,
+    );
+
+    expect(text).not.toContain("<");
+    const data = JSON.parse(text);
+    expect(data.name).toBe("</script><b>");
+    expect(data).not.toHaveProperty("description");
+    expect(data.mainEntity.itemListElement).toEqual([]);
+  });
+});
+
 test.describe("noIndex", () => {
   test("keeps a page out of search results and does not follow its links", () => {
     expect(noIndex().robots).toEqual({ index: false, follow: false });
@@ -218,6 +332,27 @@ test.describe("sitemap", () => {
 
     expect(entries.length).toBe(staticSitemapPaths().length);
     expect(entries.every((entry) => entry.url.startsWith(SITE))).toBe(true);
+  });
+
+  test("lists the collections page and every collection page when there are collections", () => {
+    const entries = sitemapEntries(SITE, [{ slug: "a-tee" }], [
+      { slug: "everyday-essentials" },
+      { slug: "layering-pieces" },
+    ]);
+
+    const urls = entries.map((entry) => entry.url);
+    expect(urls).toContain(`${SITE}/collections`);
+    expect(urls).toContain(`${SITE}/collections/everyday-essentials`);
+    expect(urls).toContain(`${SITE}/collections/layering-pieces`);
+    expect(urls).toContain(`${SITE}/products/a-tee`);
+    expect(new Set(urls).size).toBe(urls.length);
+  });
+
+  test("with no collections (none exist, or the backend has none) they are left out", () => {
+    const urls = sitemapEntries(SITE, [{ slug: "a-tee" }]).map((entry) => entry.url);
+
+    expect(urls.some((url) => url.includes("/collections"))).toBe(false);
+    expect(sitemapEntries(SITE, [], []).length).toBe(staticSitemapPaths().length);
   });
 
   test("encodes a slug so the address stays valid", () => {

@@ -19,6 +19,7 @@ import { VALID_SORTS } from "@/features/catalog/search-params";
 const BACKEND_ACCEPTS = [
   "category",
   "brand",
+  "collection",
   "q",
   "size",
   "color",
@@ -41,6 +42,7 @@ const EVERY_FILTER: ProductFilters = {
   q: "tee",
   category: "t-shirts-tops",
   brand: "aerothread",
+  collection: "everyday-essentials",
   size: ["M", "L"],
   color: ["Black"],
   minPrice: 100000,
@@ -94,6 +96,15 @@ test.describe("the products request only uses parameters the backend accepts", (
     expect(sent).toEqual([...BACKEND_ACCEPTS].sort());
     expect(url.searchParams.getAll("size")).toEqual(["M", "L"]);
     expect(url.searchParams.get("inStock")).toBe("true");
+  });
+
+  test("a collection filter is sent as `collection` with the collection's slug", async () => {
+    const url = await requestedUrl(() =>
+      getProducts({ collection: "layering-pieces", sort: "price_asc" }),
+    );
+
+    expect(url.searchParams.get("collection")).toBe("layering-pieces");
+    expect(url.searchParams.get("sort")).toBe("price_asc");
   });
 
   test("the allow-lists in the frontend match the backend's", () => {

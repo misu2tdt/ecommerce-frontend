@@ -6,6 +6,8 @@
 // Page sizes the backend accepts (catalog: up to 48, other lists: up to 100).
 export const CATALOG_PAGE_SIZE = 12;
 export const LIST_PAGE_SIZE = 20;
+// The collection grid: 12 cards fill complete rows of 2 and 3 columns.
+export const COLLECTIONS_PAGE_SIZE = 12;
 
 // The backend rejects a page number above this.
 export const MAX_PAGE = 100_000;

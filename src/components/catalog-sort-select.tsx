@@ -7,6 +7,8 @@ import type { ProductSort } from "@/types/catalog";
 import { Eyebrow } from "@/components/ui/eyebrow";
 interface CatalogSortSelectProps {
   currentSort?: ProductSort;
+  // The page the sort belongs to: the catalog, or a collection's own address.
+  basePath?: string;
 }
 
 export function CatalogSortSelect(props: CatalogSortSelectProps) {
@@ -40,7 +42,10 @@ function CatalogSortSelectFallback({ currentSort = "featured" }: CatalogSortSele
   );
 }
 
-function CatalogSortSelectContent({ currentSort = "featured" }: CatalogSortSelectProps) {
+function CatalogSortSelectContent({
+  currentSort = "featured",
+  basePath = "/products",
+}: CatalogSortSelectProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -56,7 +61,7 @@ function CatalogSortSelectContent({ currentSort = "featured" }: CatalogSortSelec
     }
     const queryString = params.toString();
     startTransition(() => {
-      router.push(queryString ? `/products?${queryString}` : "/products");
+      router.push(queryString ? `${basePath}?${queryString}` : basePath);
     });
   };
 

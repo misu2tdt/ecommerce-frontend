@@ -55,7 +55,9 @@ test("the home page shows real product cards, not the unavailable message", asyn
   await openHome(page, 1440);
 
   await expect(page.getByText("temporarily unavailable")).toHaveCount(0);
-  await expect(page.locator("main article")).toHaveCount(16);
+  // The featured collection has 7 products, so 4 are shown (complete rows of
+  // four), then 8 more from the catalog.
+  await expect(page.locator("main article")).toHaveCount(12);
 });
 
 // Photo facts the hero relies on (measured on banner-hero-wide, 1672x941): the
@@ -444,13 +446,19 @@ test("every brand card is one link named exactly like its label", async ({
   }
 });
 
-test("each product section has 8 cards in complete rows: 2 columns on a phone, 4 on a wide screen", async ({
+// The seeded featured collection, "Everyday Essentials", holds 7 products: the
+// home page shows 4 of them (a lone fifth card would sit alone in a row), and the
+// second section is renamed so two sections never share a name.
+test("each product section has cards in complete rows: 2 columns on a phone, 4 on a wide screen", async ({
   page,
 }) => {
-  for (const section of ["Featured Collection", "Everyday Essentials"]) {
+  for (const [section, cards] of [
+    ["Everyday Essentials", 4],
+    ["Wardrobe Staples", 8],
+  ] as const) {
     await openHome(page, 390);
     const phone = await gridShape(page, section);
-    expect(phone.total, `${section} cards`).toBe(8);
+    expect(phone.total, `${section} cards`).toBe(cards);
     expect(phone.perRow).toBe(2);
     expect(phone.total % phone.perRow).toBe(0);
 
@@ -459,6 +467,15 @@ test("each product section has 8 cards in complete rows: 2 columns on a phone, 4
     expect(wide.perRow).toBe(4);
     expect(wide.total % wide.perRow).toBe(0);
   }
+});
+
+test("no two home sections share a heading", async ({ page }) => {
+  await openHome(page, 1440);
+  const headings = await page
+    .locator("main h2")
+    .evaluateAll((nodes) => nodes.map((node) => (node.textContent ?? "").trim()));
+
+  expect(new Set(headings).size, headings.join(" | ")).toBe(headings.length);
 });
 
 test("headings never skip a level", async ({ page }) => {

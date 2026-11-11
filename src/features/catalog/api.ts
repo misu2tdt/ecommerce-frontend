@@ -12,6 +12,9 @@ import type {
 export interface ProductFilters {
   category?: string;
   brand?: string;
+  // The slug of a collection. Only the collection pages and the home page set
+  // it; the catalog's own address does not carry it (see parseProductFilters).
+  collection?: string;
   q?: string;
   size?: string[];
   color?: string[];
@@ -29,6 +32,7 @@ export const PRODUCT_QUERY_PARAMS = [
   "q",
   "category",
   "brand",
+  "collection",
   "size",
   "color",
   "minPrice",
@@ -45,6 +49,7 @@ export function buildProductsQuery(filters: ProductFilters): ApiQuery {
     q: filters.q,
     category: filters.category,
     brand: filters.brand,
+    collection: filters.collection,
     size: filters.size,
     color: filters.color,
     minPrice: filters.minPrice,

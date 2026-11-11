@@ -34,7 +34,9 @@ const categoryColumns = [
   },
 ];
 
-export function NavMegaMenu() {
+// `showCollections`: whether the shop has any active collection (the header looks
+// it up); with none, the menu leaves the "Collections" link out.
+export function NavMegaMenu({ showCollections = false }: { showCollections?: boolean }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLAnchorElement>(null);
@@ -132,13 +134,24 @@ export function NavMegaMenu() {
 
             <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4 text-body-sm font-normal text-neutral-600">
               <span>Prices shown in VND</span>
-              <Link
-                href="/products"
-                onClick={() => setDropdownOpen(false)}
-                className="font-semibold text-brand hover:underline focus-visible:outline-2 focus-visible:outline-neutral-900"
-              >
-                Browse all products &rarr;
-              </Link>
+              <div className="flex items-center gap-6">
+                {showCollections && (
+                  <Link
+                    href="/collections"
+                    onClick={() => setDropdownOpen(false)}
+                    className="font-semibold text-brand hover:underline focus-visible:outline-2 focus-visible:outline-neutral-900"
+                  >
+                    Collections &rarr;
+                  </Link>
+                )}
+                <Link
+                  href="/products"
+                  onClick={() => setDropdownOpen(false)}
+                  className="font-semibold text-brand hover:underline focus-visible:outline-2 focus-visible:outline-neutral-900"
+                >
+                  Browse all products &rarr;
+                </Link>
+              </div>
             </div>
           </div>
         )}

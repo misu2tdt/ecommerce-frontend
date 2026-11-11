@@ -76,6 +76,7 @@ sequenceDiagram
 ```mermaid
 flowchart TD
   Home["/ home"] --> Catalog["/products?category, brand, q, sort, filters, page"]
+  Home --> Collections["/collections"] --> Collection["/collections/[slug]?sort, page"] --> Product
   Catalog --> Product["/products/[slug]"]
   Home --> Product
   Product --> Cart["/cart"]
@@ -88,14 +89,37 @@ flowchart TD
   Account --> Addresses["/account/addresses"]
   Header["Header"] --> Wishlist["/wishlist"]
   Header --> Login["/login, /register"]
-  Staff["/admin: products, categories, brands, orders, reviews, promotions"]
+  Staff["/admin: products, collections, categories, brands, orders, reviews, promotions"]
   About["/about-demo"]
 ```
 
-Public pages: home, catalog, product, About, sign-in, register. Pages that need a
+Public pages: home, catalog, collections, product, About, sign-in, register. Pages that need a
 sign-in (cart, checkout, wishlist, account, orders, the payment page) redirect a
 signed-out visitor to sign in and back. The `/admin` pages check the role on the
 server; a visitor who is not an admin gets an explanation, not the page.
+
+## Collections
+
+A collection is a curated, ordered group of products (the backend owns the data;
+see its `docs/collections.md`).
+
+- `/collections` is a paged grid of cards; `/collections/[slug]` shows one
+  collection with the catalog's sort control and pager. Products come in the
+  collection's own order unless a sort is chosen. An unknown or inactive slug is a
+  real 404 and `noindex`; a page past the end goes to a real page.
+- The home page's featured section is the first collection marked as featured
+  (up to 8 products, rounded down to complete rows of four). With no featured
+  collection, or if the request fails (it is logged once with its HTTP status), the
+  earlier "Featured Collection" section is shown instead.
+- "Collections" appears in the Shop All menu, the phone drawer and the footer only
+  when an active collection exists. That lookup is cached for 5 minutes and a
+  failed lookup just hides the entry. There is deliberately no new item in the
+  header bar, which has little spare width for an admin (see the header tests).
+- `/admin/collections` lists, creates and edits collections, activates and
+  deactivates them, and has a product picker: search the catalog, add products,
+  reorder them with "Move up" and "Move down", remove them and save (one request
+  that replaces the whole list). The collections sitemap entries and the
+  `CollectionPage` data only list what shoppers can see.
 
 ## Checkout and the demo payment
 
@@ -170,16 +194,17 @@ What is actually in place, and tested where noted:
   the interactive parts (menus, the gallery and size picker, forms).
 - Search engines: `robots.txt`, a sitemap built from the live catalog (it falls
   back to the fixed pages if the API is down), a title and description per kind of
-  page, canonical addresses for catalog pages, product data (`schema.org/Product`,
-  only real values) and `noindex` for private pages. Set `NEXT_PUBLIC_SITE_URL` to
+  page, canonical addresses for catalog and collection pages, product and collection
+  data (`schema.org/Product` and `CollectionPage`, only real values) and `noindex`
+  for private pages. Set `NEXT_PUBLIC_SITE_URL` to
   the public address; on Vercel the production host is used when it is not set.
 
 ## Tests
 
-| Suite | Command | Count (latest run) |
+| Suite | Command | Count |
 | --- | --- | --- |
-| Unit | `npm run test:unit` | 168 tests |
-| Browser smoke | `npm run test:smoke` | 129 (127 run; 2 product-photo tests skip when the test database has no photos) tests |
+| Unit | `npm run test:unit` | 217 tests |
+| Browser smoke | `npm run test:smoke` | 182 tests (2 product-photo tests skip when the test database has no photos) |
 
 - **Unit tests** are Playwright's runner on plain functions: formatters, status
   words, paging maths, request parameters (checked against what the backend
@@ -190,7 +215,7 @@ What is actually in place, and tested where noted:
 - **Browser smoke tests** drive a real Chromium against the **real backend** with
   a seeded test database, so they exercise the whole stack: sign in, add to cart,
   check out, pay on the demo page (success, failure, cancel, double click, someone
-  else's payment), paging, the product page, the header, SEO output, phone layouts
+  else's payment), paging, the product page, collections (storefront and staff), the header, SEO output, phone layouts
   and the readable-text, overflow and touch-target guards.
 - Tests were written before the code where practical. Checking a test by breaking
   the code on purpose was done by hand while developing; it is not part of CI.

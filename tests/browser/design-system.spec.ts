@@ -55,6 +55,8 @@ test.describe("design system in the browser", () => {
   const pages: Array<[string, string]> = [
     ["home", "/"],
     ["catalog", "/products"],
+    ["collections", "/collections"],
+    ["collection", "/collections/everyday-essentials"],
     ["login", "/login"],
     ["about demo", "/about-demo"],
     ["demo accounts", "/demo-accounts"],

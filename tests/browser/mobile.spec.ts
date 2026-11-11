@@ -113,6 +113,8 @@ test.describe("page padding", () => {
     await sweep(page, [
       "/",
       "/products",
+      "/collections",
+      "/collections/everyday-essentials",
       "/about-demo",
       "/cart",
       "/checkout",
@@ -131,7 +133,13 @@ test.describe("page padding", () => {
 
   test("admin pages keep clear of the edge", async ({ page }) => {
     await signIn(page, OTHER_USER);
-    await sweep(page, ["/admin", "/admin/orders", "/admin/products"]);
+    await sweep(page, [
+      "/admin",
+      "/admin/orders",
+      "/admin/products",
+      "/admin/collections",
+      "/admin/collections/new",
+    ]);
   });
 });
 
@@ -177,6 +185,8 @@ test.describe("touch targets on phones", () => {
       "/",
       "/products",
       "/products?category=t-shirts-tops",
+      "/collections",
+      "/collections/everyday-essentials",
       "/products/classic-crewneck-cotton-tee",
       "/about-demo",
       "/cart",
@@ -210,6 +220,8 @@ test.describe("touch targets on phones", () => {
       "Kanso Basics",
       "Veloce Active",
       "Monolith Studio",
+      // Shown because the seeded shop has active collections.
+      "Collections",
     ]) {
       await expect(drawer.getByRole("link", { name: new RegExp(name) })).toBeVisible();
     }

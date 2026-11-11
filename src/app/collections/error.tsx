@@ -1,0 +1,25 @@
+"use client";
+
+import { buttonStyles } from "@/components/ui/button";
+
+export default function CollectionsError({ reset }: { reset: () => void }) {
+  return (
+    <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
+      <div className="rounded-md border border-red-200 bg-surface px-6 py-12 text-center">
+        <h2 className="text-title font-semibold text-brand">
+          Collections unavailable
+        </h2>
+        <p className="mt-3 text-body-sm text-neutral-600">
+          We could not load the collections right now. Please try again in a moment.
+        </p>
+        <button
+          type="button"
+          onClick={reset}
+          className={buttonStyles({ variant: "primary", size: "md", className: "mt-6" })}
+        >
+          Try again
+        </button>
+      </div>
+    </section>
+  );
+}

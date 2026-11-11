@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import type { ProductFilters } from "@/features/catalog/api";
 import { buildCatalogHref } from "@/features/catalog/search-params";
+import {
+  buildCollectionHref,
+  buildCollectionsHref,
+  collectionPath,
+  type CollectionSort,
+} from "@/features/collections/search-params";
 import { BANNERS } from "@/lib/banners";
 import { BRANDS, CATEGORIES } from "@/lib/catalog-nav";
 import { SITE_NAME } from "@/lib/site";
@@ -131,6 +137,100 @@ export function catalogMetadata({
   };
 }
 
+const COLLECTIONS_DESCRIPTION =
+  "Browse curated collections of everyday fashion, hand-picked by the VERVE STUDIO team.";
+
+// Title, description and canonical address of the list of collections. Page 1 has
+// no `page` parameter; later pages say which page they are, like the catalog.
+export function collectionsIndexMetadata(page: number): Metadata {
+  return {
+    title: page > 1 ? `Collections, page ${page}` : "Collections",
+    description:
+      page > 1 ? `${COLLECTIONS_DESCRIPTION} Page ${page}.` : COLLECTIONS_DESCRIPTION,
+    alternates: { canonical: buildCollectionsHref(page) },
+  };
+}
+
+export interface CollectionForMetadata {
+  name: string;
+  slug: string;
+  description: string | null;
+  heroImageUrl: string | null;
+}
+
+// Title, description, canonical address and sharing preview of a collection page,
+// built only from what the collection really has. Page 2 and later say which page
+// they are and have their own canonical address, while page 1 has no `page`
+// parameter (the same rule as the catalog).
+export function collectionMetadata({
+  collection,
+  sort,
+  page,
+}: {
+  collection: CollectionForMetadata;
+  sort: CollectionSort | undefined;
+  page: number;
+}): Metadata {
+  const baseDescription =
+    collection.description?.trim() ||
+    `Shop the ${collection.name} collection at ${SITE_NAME}.`;
+  const title = page > 1 ? `${collection.name}, page ${page}` : collection.name;
+  const description =
+    page > 1 ? `${baseDescription} Page ${page}.` : baseDescription;
+  const path = buildCollectionHref(collection.slug, sort, page);
+  const image = collection.heroImageUrl;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: path,
+      siteName: SITE_NAME,
+      ...(image ? { images: [{ url: image, alt: collection.name }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
+}
+
+// schema.org CollectionPage data for a collection page, as text to put in a
+// <script type="application/ld+json">: the collection's name and description and
+// an ItemList of the products on this page of the list (numbered by their place in
+// the whole collection). Nothing else is made up, and "<" is escaped so the text
+// can never close the script tag.
+export function collectionJsonLd(
+  collection: Pick<CollectionForMetadata, "name" | "slug" | "description">,
+  products: Array<{ name: string; slug: string }>,
+  firstPosition: number,
+  siteUrl: string = getSiteUrl(),
+): string {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: collection.name,
+    ...(collection.description ? { description: collection.description } : {}),
+    url: absoluteUrl(collectionPath(collection.slug), siteUrl),
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: products.map((product, index) => ({
+        "@type": "ListItem",
+        position: firstPosition + index,
+        name: product.name,
+        url: absoluteUrl(`/products/${encodeURIComponent(product.slug)}`, siteUrl),
+      })),
+    },
+  };
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
 export interface ProductForMetadata {
   name: string;
   slug: string;
@@ -247,15 +347,28 @@ export interface SitemapEntry {
   lastModified?: Date;
 }
 
-// The fixed pages, then a page for every product. With no products (the backend
-// could not be reached) it is still a valid sitemap of the fixed pages.
+export interface SitemapCollection {
+  slug: string;
+}
+
+// The fixed pages, then the list of collections and a page for every collection
+// (only when there are any: an empty list is not worth listing), then a page for
+// every product. With no products or collections (the backend could not be
+// reached) it is still a valid sitemap of the fixed pages.
 export function sitemapEntries(
   siteUrl: string,
   products: SitemapProduct[],
+  collections: SitemapCollection[] = [],
 ): SitemapEntry[] {
   const entries: SitemapEntry[] = staticSitemapPaths().map((path) => ({
     url: absoluteUrl(path, siteUrl),
   }));
+  if (collections.length > 0) {
+    entries.push({ url: absoluteUrl("/collections", siteUrl) });
+    for (const collection of collections) {
+      entries.push({ url: absoluteUrl(collectionPath(collection.slug), siteUrl) });
+    }
+  }
   for (const product of products) {
     entries.push({
       url: absoluteUrl(`/products/${encodeURIComponent(product.slug)}`, siteUrl),

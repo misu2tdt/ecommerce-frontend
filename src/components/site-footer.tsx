@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { hasActiveCollections } from "@/features/collections/nav";
 import { FOOTER_BRANDS, FOOTER_CATEGORIES } from "@/lib/catalog-nav";
 import { SITE_NAME } from "@/lib/site";
 
@@ -13,7 +14,9 @@ const customerLinks = [
   { label: "Saved Wishlist", href: "/wishlist" },
 ];
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  // Offered only when the shop has an active collection (see hasActiveCollections).
+  const showCollections = await hasActiveCollections();
   return (
     <footer className="border-t border-line bg-brand-strong text-neutral-400">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
@@ -46,6 +49,16 @@ export function SiteFooter() {
                   </Link>
                 </li>
               ))}
+              {showCollections && (
+                <li>
+                  <Link
+                    href="/collections"
+                    className="transition hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-white max-md:flex max-md:min-h-11 max-md:items-center"
+                  >
+                    Collections
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

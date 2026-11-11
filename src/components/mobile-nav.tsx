@@ -12,6 +12,9 @@ import { buttonStyles } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 interface MobileNavProps {
   user: { email: string; role: string } | null;
+  // Whether the shop has any active collection; with none the drawer leaves the
+  // "Collections" link out.
+  showCollections?: boolean;
 }
 
 export function MobileNav(props: MobileNavProps) {
@@ -50,7 +53,7 @@ function MobileNavTriggerFallback() {
   );
 }
 
-function MobileNavContent({ user }: MobileNavProps) {
+function MobileNavContent({ user, showCollections = false }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -233,6 +236,16 @@ function MobileNavContent({ user }: MobileNavProps) {
                       {cat.label}
                     </Link>
                   ))}
+                  {showCollections && (
+                    <Link
+                      href="/collections"
+                      onClick={() => setIsOpen(false)}
+                      aria-current={pathname === "/collections" ? "page" : undefined}
+                      className="flex min-h-11 items-center rounded-md px-3 py-2 text-body-sm font-semibold text-neutral-800 hover:bg-surface-muted hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-neutral-900 aria-[current=page]:bg-surface-muted aria-[current=page]:text-brand-strong"
+                    >
+                      Collections
+                    </Link>
+                  )}
                 </nav>
               </div>
 

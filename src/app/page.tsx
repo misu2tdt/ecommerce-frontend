@@ -8,18 +8,27 @@ import { ProductCard } from "@/components/product-card";
 import { ProductGrid } from "@/components/product-grid";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { getProducts } from "@/features/catalog/api";
+import {
+  HOME_SECTION_PRODUCTS,
+  loadHomeFeatured,
+  secondSectionHeading,
+} from "@/features/collections/home";
+import { collectionPath } from "@/features/collections/search-params";
 import { ApiError } from "@/lib/api";
 import { homeMetadata } from "@/lib/seo";
 import type { ProductSummary } from "@/types/catalog";
 
 export const metadata: Metadata = homeMetadata();
 
-// Two full rows of four on wide screens. If the catalog has fewer products,
-// each section simply shows what it gets.
-const PRODUCTS_PER_SECTION = 8;
+const featuredFallbackText =
+  "Foundational tees, polos, and daily layers from our catalog.";
+
+const viewLink =
+  "inline-flex min-h-11 items-center text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand";
 
 export default async function Home() {
   let products: ProductSummary[] = [];
+  const featuredRequest = loadHomeFeatured();
 
   try {
     products = await getProducts();
@@ -33,12 +42,19 @@ export default async function Home() {
     );
   }
 
-  // Curate products deterministically without repeating
-  const featuredCollection = products.slice(0, PRODUCTS_PER_SECTION);
-  const everydayEssentials = products.slice(
-    PRODUCTS_PER_SECTION,
-    PRODUCTS_PER_SECTION * 2,
-  );
+  // The featured collection when there is one (a failed request or no featured
+  // collection gives null and the previous behaviour below), otherwise the first
+  // products of the catalog. Products are never repeated between the sections.
+  const featured = await featuredRequest;
+  const featuredProducts =
+    featured?.products ?? products.slice(0, HOME_SECTION_PRODUCTS);
+  const featuredText = featured
+    ? featured.collection.description
+    : featuredFallbackText;
+  const shownIds = new Set(featuredProducts.map((product) => product.id));
+  const everydayEssentials = products
+    .filter((product) => !shownIds.has(product.id))
+    .slice(0, HOME_SECTION_PRODUCTS);
 
   return (
     <div className="flex flex-col">
@@ -53,28 +69,31 @@ export default async function Home() {
             <div>
               <Eyebrow className="text-neutral-600">Featured</Eyebrow>
               <h2 className="mt-1 text-heading font-bold tracking-tight text-brand-strong">
-                Featured Collection
+                {featured ? featured.collection.name : "Featured Collection"}
               </h2>
-              <p className="mt-1 text-body-sm text-neutral-600">
-                Foundational tees, polos, and daily layers from our catalog.
-              </p>
+              {featuredText && (
+                <p className="mt-1 text-body-sm text-neutral-600">{featuredText}</p>
+              )}
             </div>
-            <Link
-              href="/products"
-              className="inline-flex min-h-11 items-center text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
-            >
-              View all products &rarr;
-            </Link>
+            {featured ? (
+              <Link href={collectionPath(featured.collection.slug)} className={viewLink}>
+                View collection &rarr;
+              </Link>
+            ) : (
+              <Link href="/products" className={viewLink}>
+                View all products &rarr;
+              </Link>
+            )}
           </div>
 
-          {featuredCollection.length === 0 ? (
+          {featuredProducts.length === 0 ? (
             <div className="mt-8 rounded-md border border-dashed border-field-border bg-surface p-12 text-center text-neutral-600">
               <p className="font-semibold text-brand">Products are temporarily unavailable.</p>
               <p className="mt-1 text-body-sm">Please try again shortly.</p>
             </div>
           ) : (
             <ProductGrid variant="home" className="mt-8">
-              {featuredCollection.map((product) => (
+              {featuredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </ProductGrid>
@@ -84,7 +103,7 @@ export default async function Home() {
 
       <BrandSection />
 
-      {/* EVERYDAY ESSENTIALS (only when the catalog has more than 8 products) */}
+      {/* EVERYDAY ESSENTIALS (only when the catalog has more products to show) */}
       {everydayEssentials.length > 0 && (
         <section className="border-t border-line bg-surface-muted py-14 sm:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -92,16 +111,13 @@ export default async function Home() {
               <div>
                 <Eyebrow className="text-neutral-600">Core Wardrobe</Eyebrow>
                 <h2 className="mt-1 text-heading font-bold tracking-tight text-brand-strong">
-                  Everyday Essentials
+                  {secondSectionHeading(featured?.collection.name ?? null)}
                 </h2>
                 <p className="mt-1 text-body-sm text-neutral-600">
                   Versatile staples designed for comfortable daily rotation.
                 </p>
               </div>
-              <Link
-                href="/products"
-                className="inline-flex min-h-11 items-center text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand"
-              >
+              <Link href="/products" className={viewLink}>
                 Explore entire catalog &rarr;
               </Link>
             </div>

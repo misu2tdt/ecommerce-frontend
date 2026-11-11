@@ -75,7 +75,9 @@ async function apiRequest<T>(
   try {
     const response = await fetch(url, {
       ...requestInit,
-      cache: options.cache ?? "no-store",
+      // Uncached unless the caller asks for a revalidate time (`next`), which
+      // Next refuses to combine with "no-store".
+      cache: options.cache ?? (options.next ? undefined : "no-store"),
       headers,
       body: requestBody,
     });
