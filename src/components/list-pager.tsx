@@ -12,6 +12,7 @@ export function ListPager({
   total,
   limit,
   label,
+  query = "",
 }: {
   path: string;
   page: number;
@@ -19,6 +20,8 @@ export function ListPager({
   total: number;
   limit: number;
   label?: string;
+  // Filters that stay in every page link, such as "status=resolved".
+  query?: string;
 }) {
   if (totalPages <= 1) return null;
   const { from, to } = pageRange(page, limit, total);
@@ -33,7 +36,7 @@ export function ListPager({
       <Pagination
         page={page}
         totalPages={totalPages}
-        hrefFor={(target) => withPage(path, "", target)}
+        hrefFor={(target) => withPage(path, query, target)}
         label={label}
       />
     </div>

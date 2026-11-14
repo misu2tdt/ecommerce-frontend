@@ -8,6 +8,7 @@ const links = [
   ["Products", "/admin/products"],
   ["Collections", "/admin/collections"],
   ["Orders", "/admin/orders"],
+  ["Reconciliation", "/admin/reconciliation"],
   ["Promotions", "/admin/promotions"],
   ["Reviews", "/admin/reviews"],
   ["Categories", "/admin/categories"],
