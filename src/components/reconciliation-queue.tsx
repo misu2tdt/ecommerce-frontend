@@ -25,6 +25,7 @@ import {
   formatEventAmount,
   formatResolver,
   isResolved,
+  reconciliationEmptyState,
   trimmedNoteLength,
   validateResolutionNote,
 } from "@/lib/reconciliation";
@@ -35,36 +36,19 @@ import type {
 
 const INITIAL_STATE: ResolveReconciliationState = {};
 
-const EMPTY_STATES: Record<
-  ReconciliationStatusFilter,
-  { title: string; description: string }
-> = {
-  unresolved: {
-    title: "Nothing to reconcile",
-    description:
-      "No payment events are waiting for an admin. An event appears here when a payment result could not be applied cleanly, for example a success that arrives after the order was cancelled.",
-  },
-  resolved: {
-    title: "No resolved events",
-    description: "Events that an admin has handled will be listed here.",
-  },
-  all: {
-    title: "No payment events to show",
-    description:
-      "Events that need an admin, and the ones already handled, will be listed here.",
-  },
-};
-
 // The table of events and the resolve dialog. The dialog belongs to this
 // component (not to a row), so it stays open when the refreshed list no longer
 // holds the row it was opened for.
 export function ReconciliationQueue({
   items,
   status,
+  orderId = null,
 }: {
   items: ReconciliationItem[];
   status: ReconciliationStatusFilter;
+  orderId?: number | null;
 }) {
+  const empty = reconciliationEmptyState(status, orderId);
   const [target, setTarget] = useState<ReconciliationItem | null>(null);
   // The table box below is "relative" on purpose: it is then the containing
   // block of the visually hidden "Actions" heading (sr-only is absolutely
@@ -72,7 +56,6 @@ export function ReconciliationQueue({
   // widen the whole page on a phone.
 
   if (items.length === 0 && target === null) {
-    const empty = EMPTY_STATES[status];
     return (
       <div className="mt-8">
         <FeedbackState title={empty.title} description={empty.description} />
@@ -85,8 +68,8 @@ export function ReconciliationQueue({
       {items.length === 0 ? (
         <div className="mt-8">
           <FeedbackState
-            title={EMPTY_STATES[status].title}
-            description={EMPTY_STATES[status].description}
+            title={empty.title}
+            description={empty.description}
           />
         </div>
       ) : (

@@ -64,7 +64,25 @@ export interface ImageMetadataInput {
   isPrimary?: boolean;
 }
 
-export type AdminOrder = CustomerOrder;
+// A payment attempt as the admin order detail lists it (newest first). The
+// backend sends the same safe fields a customer gets, without a checkout link.
+export interface AdminOrderPayment {
+  id: number;
+  provider: string;
+  amount: VndAmount;
+  currency: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  succeededAt: string | null;
+}
+
+export interface AdminOrder extends CustomerOrder {
+  // Only the order detail has it. Optional on the client for one reason: a
+  // backend older than this field must not break the page (the section is
+  // hidden). The order lists and a status change never carry it.
+  payments?: AdminOrderPayment[];
+}
 
 export interface AdminReview {
   id: number;

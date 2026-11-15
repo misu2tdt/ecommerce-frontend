@@ -5,12 +5,16 @@ import {
   type APIRequestContext,
   type Page,
 } from "@playwright/test";
-import { CUSTOMER, signIn } from "./support/shop";
+import { CUSTOMER, signIn, vietnamParts } from "./support/shop";
 import {
   adminGet,
   adminUserId,
+  cancelOrderQuietly,
   createFailureAfterSuccessEvent,
   createLateSuccessEvent,
+  createOrderWithTwoEvents,
+  createOrderWithTwoPayments,
+  createOrderWithoutPayment,
   createShopper,
   listEvents,
   loginsPerformed,
@@ -47,12 +51,25 @@ let toResolveInUi: TestEvent;
 let conflictEvent: TestEvent;
 let doubleClickEvent: TestEvent;
 let alreadyResolved: TestEvent;
+// Orders for the order page and the order filter.
+let orderWithoutPayment: number;
+let orderWithTwoPayments: Awaited<ReturnType<typeof createOrderWithTwoPayments>>;
+let orderWithTwoEvents: Awaited<ReturnType<typeof createOrderWithTwoEvents>>;
 
 test.beforeAll(async () => {
   test.setTimeout(240_000);
   api = await playwrightRequest.newContext();
   adminId = await adminUserId(api);
   shopper = await createShopper(api, BULK_EVENTS + 20);
+
+  // Made first, so the events below stay the newest of the queue.
+  orderWithoutPayment = await createOrderWithoutPayment(api, shopper);
+  orderWithTwoPayments = await createOrderWithTwoPayments(api, shopper);
+  orderWithTwoEvents = await createOrderWithTwoEvents(api, shopper);
+  // The first of its two events is handled, the second stays open.
+  expect(
+    await resolveViaApi(api, orderWithTwoEvents.eventIds[0], NOTE_RESOLVED),
+  ).toBe(200);
 
   for (let index = 0; index < BULK_EVENTS; index += 1) {
     bulk.push(await createLateSuccessEvent(api, shopper));
@@ -75,6 +92,10 @@ test.afterAll(async () => {
   try {
     if (api && shopper) {
       await resolveOpenEventsOf(api, shopper, `${NOTE_PREFIX}: clean-up`);
+      // The unpaid order would otherwise keep its stock reserved.
+      if (orderWithoutPayment) {
+        await cancelOrderQuietly(api, shopper, orderWithoutPayment);
+      }
     }
   } finally {
     // How close the run came to the limit of 20 logins a minute per email.
@@ -524,6 +545,229 @@ test.describe("navigation and dashboard", () => {
   });
 });
 
+interface ApiPayment {
+  id: number;
+  provider: string;
+  amount: number;
+  currency: string;
+  status: string;
+  createdAt: string;
+  succeededAt: string | null;
+}
+
+const PAYMENTS_LINK = "View reconciliation items for this order";
+
+test.describe("the order page and the order filter", () => {
+  test("the order page lists the payments newest first, as the backend returns them", async ({
+    page,
+  }) => {
+    const { orderId, firstPaymentId, secondPaymentId } = orderWithTwoPayments;
+    await openQueue(page, `/admin/orders/${orderId}`);
+
+    const fromApi = (await (
+      await adminGet(api, `/admin/orders/${orderId}`)
+    ).json()) as { payments: ApiPayment[] };
+    expect(fromApi.payments.map((payment) => payment.id)).toEqual([
+      secondPaymentId,
+      firstPaymentId,
+    ]);
+
+    const region = page.getByRole("region", { name: "Payments" });
+    await expect(region).toBeVisible();
+    const items = region.getByRole("listitem");
+    await expect(items).toHaveCount(2);
+    for (const [index, payment] of fromApi.payments.entries()) {
+      const item = items.nth(index);
+      await expect(item).toContainText(`Payment #${payment.id}`);
+      await expect(item).toContainText(payment.provider);
+      // The backend's own status word.
+      await expect(item).toContainText(payment.status);
+      await expect(item).toContainText(payment.amount.toLocaleString("vi-VN"));
+      await expect(item).toContainText("₫");
+      const created = vietnamParts(payment.createdAt);
+      await expect(item).toContainText(`${created.date}, ${created.time}`);
+      if (payment.succeededAt) {
+        const succeeded = vietnamParts(payment.succeededAt);
+        await expect(item).toContainText(
+          `Succeeded${succeeded.date}, ${succeeded.time}`,
+        );
+      } else {
+        await expect(item).not.toContainText("Succeeded");
+      }
+    }
+    // The first attempt failed and the second one succeeded.
+    await expect(items.nth(0)).toContainText("succeeded");
+    await expect(items.nth(1)).toContainText("failed");
+    // The rest of the page is still there.
+    await expect(page.getByRole("heading", { name: "Purchased items" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Update status" })).toBeVisible();
+  });
+
+  test("an order that was never paid for says so and has no link to the queue", async ({
+    page,
+  }) => {
+    await openQueue(page, `/admin/orders/${orderWithoutPayment}`);
+
+    const region = page.getByRole("region", { name: "Payments" });
+    await expect(region).toBeVisible();
+    await expect(region).toContainText("No payment attempts yet");
+    await expect(region.getByRole("listitem")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: PAYMENTS_LINK })).toHaveCount(0);
+  });
+
+  test("an order with a payment links to its events, shown with the order chip", async ({
+    page,
+  }) => {
+    const { orderId } = orderWithTwoEvents;
+    await openQueue(page, `/admin/orders/${orderId}`);
+
+    const link = page.getByRole("link", { name: PAYMENTS_LINK });
+    await expect(link).toHaveAttribute(
+      "href",
+      `/admin/reconciliation?orderId=${orderId}&status=all`,
+    );
+    await link.click();
+    await expect(page).toHaveURL(
+      new RegExp(`/admin/reconciliation\\?orderId=${orderId}&status=all$`),
+    );
+    await expect(page.getByText(`Filtered by order #${orderId}`)).toBeVisible();
+    await expect(page.getByRole("status").filter({ hasText: "2 events" })).toBeVisible();
+    // Only rows of this order, the handled one and the open one.
+    const rows = page.getByRole("table").getByRole("row");
+    await expect(rows).toHaveCount(3);
+    for (const index of [1, 2]) {
+      await expect(rows.nth(index)).toContainText(`Order #${orderId}`);
+    }
+    await expect(
+      page.getByRole("table").getByText("Resolved", { exact: true }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole("table").getByText("Unresolved", { exact: true }),
+    ).toHaveCount(1);
+  });
+
+  test("the chip names the order, Clear drops it, and the status switch keeps it", async ({
+    page,
+  }) => {
+    const { orderId, eventIds } = orderWithTwoEvents;
+    await openQueue(page, `${PATH}?orderId=${orderId}&status=all`);
+    const filter = page.getByRole("navigation", {
+      name: "Reconciliation status filter",
+    });
+    const chip = page.getByText(`Filtered by order #${orderId}`);
+    await expect(chip).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: `View order #${orderId}` }),
+    ).toHaveAttribute("href", `/admin/orders/${orderId}`);
+
+    // Unresolved: the one open event, the order is kept in the address.
+    await filter.getByRole("link", { name: "Unresolved", exact: true }).click();
+    await expect(page).toHaveURL(
+      new RegExp(`/admin/reconciliation\\?orderId=${orderId}$`),
+    );
+    await expect(chip).toBeVisible();
+    await expect(page.getByRole("table").getByRole("row")).toHaveCount(2);
+    await expect(page.getByRole("table")).toContainText(`Event #${eventIds[1]}`);
+    await expect(page.getByRole("table")).not.toContainText(
+      `Event #${eventIds[0]}`,
+    );
+
+    // Resolved: the handled one.
+    await filter.getByRole("link", { name: "Resolved", exact: true }).click();
+    await expect(page).toHaveURL(
+      new RegExp(`/admin/reconciliation\\?orderId=${orderId}&status=resolved$`),
+    );
+    await expect(chip).toBeVisible();
+    await expect(page.getByRole("table").getByRole("row")).toHaveCount(2);
+    await expect(page.getByRole("table")).toContainText(`Event #${eventIds[0]}`);
+    await expect(page.getByRole("table")).toContainText(NOTE_RESOLVED);
+
+    // Clear: the order goes, the status stays, and the queue is whole again.
+    await page.getByRole("link", { name: "Clear", exact: true }).click();
+    await expect(page).toHaveURL(/\/admin\/reconciliation\?status=resolved$/);
+    await expect(page.getByText(/^Filtered by order/)).toHaveCount(0);
+    const resolvedTotal = (await listEvents(api, "resolved", 1, 1)).total;
+    await expect(page.getByRole("status").filter({ hasText: /^\d+ events?$/ })).toHaveText(
+      `${resolvedTotal} ${resolvedTotal === 1 ? "event" : "events"}`,
+    );
+    expect(resolvedTotal).toBeGreaterThan(1);
+  });
+
+  test("an order id that is not a positive whole number is ignored and never sent", async ({
+    page,
+  }) => {
+    const open = (await listEvents(api, "unresolved", 1, 1)).total;
+    await openQueue(page);
+    for (const bad of [
+      "abc",
+      "0",
+      "-1",
+      "1.5",
+      "1e1",
+      "007",
+      "2147483648",
+      "99999999999999999999",
+      "",
+    ]) {
+      await page.goto(`${PATH}?orderId=${encodeURIComponent(bad)}`);
+      // The backend would answer 400 for these; the page shows the whole queue.
+      await expect(
+        page.getByRole("heading", { level: 2, name: "Payment reconciliation" }),
+        `orderId=${bad}`,
+      ).toBeVisible();
+      await expect(page.getByText(/^Filtered by order/), `orderId=${bad}`).toHaveCount(0);
+      await expect(
+        page.getByRole("status").filter({ hasText: /^\d+ events?$/ }),
+        `orderId=${bad}`,
+      ).toHaveText(`${open} ${open === 1 ? "event" : "events"}`);
+    }
+    // A repeated parameter too.
+    await page.goto(`${PATH}?orderId=1&orderId=2`);
+    await expect(page.getByText(/^Filtered by order/)).toHaveCount(0);
+  });
+
+  test("an order without events gets a message about that order, for each status", async ({
+    page,
+  }) => {
+    const { orderId } = orderWithTwoPayments;
+    await openQueue(page, `${PATH}?orderId=${orderId}&status=all`);
+    await expect(
+      page.getByRole("heading", { name: `No events for order #${orderId}` }),
+    ).toBeVisible();
+    await expect(page.getByText("has no payment events that needed reconciliation")).toBeVisible();
+    await expect(page.getByRole("table")).toHaveCount(0);
+    await expect(page.getByText(`Filtered by order #${orderId}`)).toBeVisible();
+
+    await page.getByRole("link", { name: "Unresolved", exact: true }).click();
+    await expect(page.getByText("has no unresolved payment events")).toBeVisible();
+    await page.getByRole("link", { name: "Resolved", exact: true }).click();
+    await expect(page.getByText("has no resolved payment events")).toBeVisible();
+
+    // An order that does not exist is an empty list too, not an error.
+    await page.goto(`${PATH}?orderId=2147483647&status=all`);
+    await expect(
+      page.getByRole("heading", { name: "No events for order #2147483647" }),
+    ).toBeVisible();
+    await expect(page.getByText("0 events")).toBeVisible();
+  });
+
+  test("the order page and the filtered queue do not scroll sideways on a phone", async ({
+    page,
+  }) => {
+    for (const path of [
+      `/admin/orders/${orderWithTwoPayments.orderId}`,
+      `/admin/orders/${orderWithoutPayment}`,
+      `${PATH}?orderId=${orderWithTwoEvents.orderId}&status=all`,
+      `${PATH}?orderId=${orderWithTwoPayments.orderId}&status=all`,
+    ]) {
+      await openQueue(page, path, 390);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+        `${path} at 390px`,
+      ).toBeLessThanOrEqual(390);
+    }
+  });
+});
 test.describe("access", () => {
   test("a visitor who is not signed in is sent to sign in and back", async ({
     page,

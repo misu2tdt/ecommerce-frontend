@@ -37,28 +37,99 @@ export function parseStatusFilter(
     : DEFAULT_RECONCILIATION_FILTER;
 }
 
-// The query of one list request. `status` is the backend's own parameter.
+// The largest order id the backend accepts (a PostgreSQL integer). A bigger
+// number could not match any order and the backend answers 400 for it.
+export const ORDER_ID_MAX = 2_147_483_647;
+
+// Reads `?orderId=` from an address: a positive whole number the backend would
+// accept, or null. Anything else (letters, 0, a sign, a decimal, a repeated
+// parameter, too big) is ignored, never sent to the backend.
+export function parseOrderIdParam(
+  value: string | string[] | undefined,
+): number | null {
+  if (typeof value !== "string" || !/^[1-9]\d*$/.test(value)) return null;
+  const orderId = Number(value);
+  return Number.isSafeInteger(orderId) && orderId <= ORDER_ID_MAX
+    ? orderId
+    : null;
+}
+
+// The query of one list request. `status` and `orderId` are the backend's own
+// parameters; `orderId` is sent only when there is one.
 export function reconciliationQuery(
   status: ReconciliationStatusFilter,
   page: number,
   limit: number = RECONCILIATION_PAGE_SIZE,
+  orderId: number | null = null,
 ): ApiQuery {
-  return { status, page, limit };
+  return orderId === null
+    ? { status, page, limit }
+    : { status, page, limit, orderId };
 }
 
-// The part of an address that keeps the filter: nothing for the default, so the
-// default view has one address.
-export function filterQuery(status: ReconciliationStatusFilter): string {
-  return status === DEFAULT_RECONCILIATION_FILTER ? "" : `status=${status}`;
+// The part of an address that keeps the filters: nothing for the default view,
+// so it has one address. The order comes first, as in the link from an order.
+export function filterQuery(
+  status: ReconciliationStatusFilter,
+  orderId: number | null = null,
+): string {
+  const parts: string[] = [];
+  if (orderId !== null) parts.push(`orderId=${orderId}`);
+  if (status !== DEFAULT_RECONCILIATION_FILTER) parts.push(`status=${status}`);
+  return parts.join("&");
 }
 
 export function reconciliationHref(
   status: ReconciliationStatusFilter,
   page = 1,
+  orderId: number | null = null,
 ): string {
-  return withPage(RECONCILIATION_PATH, filterQuery(status), page);
+  return withPage(RECONCILIATION_PATH, filterQuery(status, orderId), page);
 }
 
+// From an order's page: every event of that order, open or resolved.
+export function orderReconciliationHref(orderId: number): string {
+  return reconciliationHref("all", 1, orderId);
+}
+
+// What an empty list says. With an order filter it names the order and the
+// status, so it is clear that the filter, not the queue, is empty.
+export function reconciliationEmptyState(
+  status: ReconciliationStatusFilter,
+  orderId: number | null,
+): { title: string; description: string } {
+  if (orderId !== null) {
+    const what: Record<ReconciliationStatusFilter, string> = {
+      unresolved: "has no unresolved payment events",
+      resolved: "has no resolved payment events",
+      all: "has no payment events that needed reconciliation",
+    };
+    return {
+      title: `No events for order #${orderId}`,
+      description: `Order #${orderId} ${what[status]}. Clear the order filter to see the whole queue.`,
+    };
+  }
+  const general: Record<
+    ReconciliationStatusFilter,
+    { title: string; description: string }
+  > = {
+    unresolved: {
+      title: "Nothing to reconcile",
+      description:
+        "No payment events are waiting for an admin. An event appears here when a payment result could not be applied cleanly, for example a success that arrives after the order was cancelled.",
+    },
+    resolved: {
+      title: "No resolved events",
+      description: "Events that an admin has handled will be listed here.",
+    },
+    all: {
+      title: "No payment events to show",
+      description:
+        "Events that need an admin, and the ones already handled, will be listed here.",
+    },
+  };
+  return general[status];
+}
 export function totalPagesOf(total: number, limit: number): number {
   return limit > 0 ? Math.ceil(total / limit) : 0;
 }

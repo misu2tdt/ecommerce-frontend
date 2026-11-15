@@ -384,3 +384,75 @@ export async function createFailureAfterSuccessEvent(
     eventId: await findEventOfPayment(request, paymentId),
   };
 }
+
+// ---- orders for the order page and the order filter --------------------------
+
+// An order nobody has started to pay for.
+export async function createOrderWithoutPayment(
+  request: APIRequestContext,
+  shopper: TestShopper,
+): Promise<number> {
+  const order = await post(request, shopper.token, "/orders/checkout", {
+    addressId: shopper.addressId,
+    items: [{ variantId: shopper.variantId, quantity: 1 }],
+  });
+  return order.id as number;
+}
+
+// Cancelling an order that has no payment gives its stock back. Used to tidy
+// up; an order that can no longer be cancelled is left alone.
+export async function cancelOrderQuietly(
+  request: APIRequestContext,
+  shopper: TestShopper,
+  orderId: number,
+): Promise<void> {
+  await request.post(`${API_URL}/orders/${orderId}/cancel`, {
+    headers: { Authorization: `Bearer ${shopper.token}` },
+  });
+}
+
+// Two payment attempts: the first one fails, the second one succeeds. The
+// order page lists the second one first.
+export async function createOrderWithTwoPayments(
+  request: APIRequestContext,
+  shopper: TestShopper,
+): Promise<{ orderId: number; firstPaymentId: number; secondPaymentId: number }> {
+  const { orderId, paymentId: firstPaymentId } = await orderWithPayment(
+    request,
+    shopper,
+  );
+  await complete(request, shopper, firstPaymentId, "failure");
+  const second = await post(
+    request,
+    shopper.token,
+    `/orders/${orderId}/payments`,
+    undefined,
+    { "Idempotency-Key": `reconciliation-retry-${orderId}-${Date.now()}` },
+  );
+  const secondPaymentId = second.id as number;
+  await complete(request, shopper, secondPaymentId, "success");
+  return { orderId, firstPaymentId, secondPaymentId };
+}
+
+// One paid order that then gets a late failure and a late cancel: two events
+// for review on the same order, newest last.
+export async function createOrderWithTwoEvents(
+  request: APIRequestContext,
+  shopper: TestShopper,
+): Promise<{ orderId: number; paymentId: number; eventIds: number[] }> {
+  const { orderId, paymentId } = await orderWithPayment(request, shopper);
+  await complete(request, shopper, paymentId, "success");
+  for (const outcome of ["failure", "cancel"] as const) {
+    const answer = await complete(request, shopper, paymentId, outcome);
+    expect(answer.result, `the late ${outcome} is recorded for review`).toBe(
+      "recorded_for_review",
+    );
+  }
+  const all = await listEvents(request, "all", 1, 100);
+  const eventIds = all.items
+    .filter((item) => item.payment.id === paymentId)
+    .map((item) => item.id)
+    .sort((a, b) => a - b);
+  expect(eventIds, "two events for the payment").toHaveLength(2);
+  return { orderId, paymentId, eventIds };
+}

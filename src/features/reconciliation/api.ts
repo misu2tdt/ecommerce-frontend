@@ -1,7 +1,10 @@
 import "server-only";
 
 import { authenticatedApiFetch } from "@/features/auth/api";
-import { reconciliationQuery } from "@/lib/reconciliation";
+import {
+  RECONCILIATION_PAGE_SIZE,
+  reconciliationQuery,
+} from "@/lib/reconciliation";
 import type {
   ReconciliationItem,
   ReconciliationPage,
@@ -10,12 +13,15 @@ import type {
 
 // GET /admin/payments/reconciliation answers with { items, page, limit, total }
 // in the body (not in headers like the other admin lists).
+// `orderId` (already checked as a positive whole number) narrows the list to
+// one order; without it the whole queue is listed.
 export const getReconciliationPage = (
   status: ReconciliationStatusFilter,
   page: number,
+  orderId: number | null = null,
 ) =>
   authenticatedApiFetch<ReconciliationPage>("/admin/payments/reconciliation", {
-    query: reconciliationQuery(status, page),
+    query: reconciliationQuery(status, page, RECONCILIATION_PAGE_SIZE, orderId),
   });
 
 // How many events still wait for an admin: the total of a one-row page.

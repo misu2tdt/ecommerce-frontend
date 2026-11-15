@@ -1,13 +1,17 @@
 import { expect, test } from "@playwright/test";
 import {
   DEFAULT_RECONCILIATION_FILTER,
+  ORDER_ID_MAX,
   RECONCILIATION_PAGE_SIZE,
   RESOLUTION_NOTE_MAX,
   filterQuery,
   formatEventAmount,
   formatResolver,
   isResolved,
+  orderReconciliationHref,
+  parseOrderIdParam,
   parseStatusFilter,
+  reconciliationEmptyState,
   reconciliationHref,
   reconciliationQuery,
   totalPagesOf,
@@ -136,5 +140,97 @@ test.describe("reconciliation text", () => {
   test("tells resolved events from open ones by resolvedAt", () => {
     expect(isResolved({ resolvedAt: null })).toBe(false);
     expect(isResolved({ resolvedAt: "2026-10-28T10:15:00.000Z" })).toBe(true);
+  });
+});
+
+test.describe("reconciliation order filter", () => {
+  test("reads a positive whole number", () => {
+    expect(parseOrderIdParam("1")).toBe(1);
+    expect(parseOrderIdParam("42")).toBe(42);
+    expect(parseOrderIdParam(String(ORDER_ID_MAX))).toBe(ORDER_ID_MAX);
+  });
+
+  test("ignores everything the backend would refuse", () => {
+    for (const value of [
+      undefined,
+      "",
+      "0",
+      "-1",
+      "+5",
+      "1.5",
+      "abc",
+      "1e1",
+      "0x10",
+      " 2",
+      "2 ",
+      "007",
+      String(ORDER_ID_MAX + 1),
+      "99999999999999999999",
+      ["1", "2"],
+      [],
+    ]) {
+      expect(parseOrderIdParam(value), JSON.stringify(value)).toBeNull();
+    }
+  });
+
+  test("is sent to the backend only when there is one", () => {
+    expect(reconciliationQuery("all", 1, 20, 7)).toEqual({
+      status: "all",
+      page: 1,
+      limit: 20,
+      orderId: 7,
+    });
+    expect(reconciliationQuery("all", 1, 20, null)).toEqual({
+      status: "all",
+      page: 1,
+      limit: 20,
+    });
+    expect(reconciliationQuery("all", 1, 20)).not.toHaveProperty("orderId");
+  });
+
+  test("stays in the address with the status and the page", () => {
+    expect(filterQuery("unresolved", 7)).toBe("orderId=7");
+    expect(filterQuery("all", 7)).toBe("orderId=7&status=all");
+    expect(filterQuery("resolved", null)).toBe("status=resolved");
+    expect(reconciliationHref("unresolved", 1, 7)).toBe(
+      "/admin/reconciliation?orderId=7",
+    );
+    expect(reconciliationHref("resolved", 1, 7)).toBe(
+      "/admin/reconciliation?orderId=7&status=resolved",
+    );
+    expect(reconciliationHref("all", 3, 7)).toBe(
+      "/admin/reconciliation?orderId=7&status=all&page=3",
+    );
+    // Clearing the order keeps the status.
+    expect(reconciliationHref("resolved")).toBe(
+      "/admin/reconciliation?status=resolved",
+    );
+  });
+
+  test("the link from an order shows every event of it", () => {
+    expect(orderReconciliationHref(12)).toBe(
+      "/admin/reconciliation?orderId=12&status=all",
+    );
+  });
+
+  test("an empty list names the order and the status", () => {
+    expect(reconciliationEmptyState("unresolved", null).title).toBe(
+      "Nothing to reconcile",
+    );
+    expect(reconciliationEmptyState("all", 9).title).toBe(
+      "No events for order #9",
+    );
+    expect(reconciliationEmptyState("unresolved", 9).description).toContain(
+      "no unresolved payment events",
+    );
+    expect(reconciliationEmptyState("resolved", 9).description).toContain(
+      "no resolved payment events",
+    );
+    expect(reconciliationEmptyState("all", 9).description).toContain(
+      "Order #9 has no payment events",
+    );
+    expect(reconciliationEmptyState("all", 9).description).toContain(
+      "Clear the order filter",
+    );
   });
 });

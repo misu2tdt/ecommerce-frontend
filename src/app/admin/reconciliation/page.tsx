@@ -13,6 +13,7 @@ import {
   RECONCILIATION_FILTERS,
   RECONCILIATION_PATH,
   filterQuery,
+  parseOrderIdParam,
   parseStatusFilter,
   reconciliationHref,
   totalPagesOf,
@@ -28,10 +29,13 @@ export default async function AdminReconciliationPage({
   const params = await searchParams;
   const status = parseStatusFilter(params.status);
   const pageParam = parsePageParam(params.page);
+  // An order id that is not a positive whole number is ignored: no chip, and
+  // it is never sent to the backend.
+  const orderId = parseOrderIdParam(params.orderId);
 
   let result;
   try {
-    result = await getReconciliationPage(status, pageParam.page);
+    result = await getReconciliationPage(status, pageParam.page, orderId);
   } catch (error) {
     return (
       <FeedbackState
@@ -42,7 +46,7 @@ export default async function AdminReconciliationPage({
   }
   const totalPages = totalPagesOf(result.total, result.limit);
   const redirectPage = pageRedirectTarget(pageParam, totalPages);
-  if (redirectPage !== null) redirect(reconciliationHref(status, redirectPage));
+  if (redirectPage !== null) redirect(reconciliationHref(status, redirectPage, orderId));
 
   return (
     <>
@@ -67,7 +71,7 @@ export default async function AdminReconciliationPage({
           return (
             <Link
               key={filter.value}
-              href={reconciliationHref(filter.value)}
+              href={reconciliationHref(filter.value, 1, orderId)}
               aria-current={current ? "page" : undefined}
               className={`inline-flex min-h-11 items-center rounded-md border px-4 py-2 text-body-sm font-semibold focus-visible:outline-2 focus-visible:outline-brand ${
                 current
@@ -81,14 +85,38 @@ export default async function AdminReconciliationPage({
         })}
       </nav>
 
+      {orderId !== null && (
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <span className="inline-flex min-h-11 items-center rounded-full border border-brand bg-brand-soft px-4 text-body-sm font-semibold text-brand-strong">
+            Filtered by order #{orderId}
+          </span>
+          <Link
+            href={reconciliationHref(status)}
+            className="inline-flex min-h-11 items-center font-semibold text-brand underline focus-visible:outline-2 focus-visible:outline-brand"
+          >
+            Clear
+          </Link>
+          <Link
+            href={`/admin/orders/${orderId}`}
+            className="inline-flex min-h-11 items-center font-semibold text-brand underline focus-visible:outline-2 focus-visible:outline-brand"
+          >
+            View order #{orderId}
+          </Link>
+        </div>
+      )}
+
       <p className="mt-4 text-body-sm text-neutral-600" role="status">
         {result.total} {result.total === 1 ? "event" : "events"}
       </p>
 
-      <ReconciliationQueue items={result.items} status={status} />
+      <ReconciliationQueue
+        items={result.items}
+        status={status}
+        orderId={orderId}
+      />
       <ListPager
         path={RECONCILIATION_PATH}
-        query={filterQuery(status)}
+        query={filterQuery(status, orderId)}
         page={pageParam.page}
         totalPages={totalPages}
         total={result.total}
