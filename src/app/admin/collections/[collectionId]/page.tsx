@@ -11,6 +11,7 @@ import { getAdminProducts } from "@/features/admin/api";
 import { adminGetCollection } from "@/features/collections/admin-api";
 import { collectionPath } from "@/features/collections/search-params";
 import { ApiError, apiErrorMessage } from "@/lib/api";
+import { parseId } from "@/lib/ids";
 
 export const metadata: Metadata = { title: "Manage Collection" };
 
@@ -21,14 +22,14 @@ export default async function ManageCollectionPage({
   params: Promise<{ collectionId: string }>;
   searchParams: Promise<{ created?: string }>;
 }) {
-  const rawId = (await params).collectionId;
-  if (!/^[1-9]\d*$/.test(rawId)) notFound();
+  const collectionId = parseId((await params).collectionId);
+  if (!collectionId) notFound();
   const justCreated = (await searchParams).created === "1";
 
   let data;
   try {
     const [collection, products] = await Promise.all([
-      adminGetCollection(Number(rawId)),
+      adminGetCollection(collectionId),
       getAdminProducts(),
     ]);
     data = { collection, products };

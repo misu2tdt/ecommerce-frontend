@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
+import { readIdField } from "@/lib/ids";
+import { ID_MAX, PRICE_MAX_VND } from "@/lib/limits";
+import { formatVnd } from "@/lib/money";
 import {
   adminCreateCoupon,
   adminToggleCouponActive,
@@ -54,6 +57,9 @@ export async function createCouponAction(
     maxDiscountRaw && maxDiscountRaw.trim().length > 0 && type === "PERCENTAGE"
       ? Number(maxDiscountRaw)
       : null;
+  if ([value, minSubtotal, maxDiscount].some((amount) => amount !== null && amount > PRICE_MAX_VND)) {
+    return { status: "error", message: `Amounts must be at most ${formatVnd(PRICE_MAX_VND)}.` };
+  }
 
   const startsAt =
     startsAtRaw && startsAtRaw.trim().length > 0
@@ -92,9 +98,8 @@ export async function updateCouponAction(
   _prevState: AdminCouponActionState,
   formData: FormData,
 ): Promise<AdminCouponActionState> {
-  const idRaw = formData.get("id")?.toString();
-  const id = Number(idRaw);
-  if (!id || !Number.isSafeInteger(id)) {
+  const id = readIdField(formData, "id");
+  if (!id) {
     return { status: "error", message: "Invalid coupon ID." };
   }
 
@@ -134,6 +139,9 @@ export async function updateCouponAction(
     maxDiscountRaw && maxDiscountRaw.trim().length > 0 && type === "PERCENTAGE"
       ? Number(maxDiscountRaw)
       : null;
+  if ([value, minSubtotal, maxDiscount].some((amount) => amount !== null && amount > PRICE_MAX_VND)) {
+    return { status: "error", message: `Amounts must be at most ${formatVnd(PRICE_MAX_VND)}.` };
+  }
 
   const startsAt =
     startsAtRaw && startsAtRaw.trim().length > 0
@@ -171,6 +179,9 @@ export async function updateCouponAction(
 export async function toggleCouponActiveAction(
   couponId: number,
 ): Promise<{ success: boolean; error?: string }> {
+  if (!Number.isInteger(couponId) || couponId < 1 || couponId > ID_MAX) {
+    return { success: false, error: "Invalid coupon ID." };
+  }
   try {
     await adminToggleCouponActive(couponId);
     revalidatePath("/admin/promotions");

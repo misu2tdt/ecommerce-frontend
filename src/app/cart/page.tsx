@@ -11,6 +11,7 @@ import { getCart } from "@/features/cart/api";
 import { formatAttributeLabel } from "@/lib/attributes";
 import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatVnd } from "@/lib/money";
+import { canAddNewLine, LINE_LIMIT_MESSAGE } from "@/lib/quantity-limits";
 import type { Cart } from "@/types/cart";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -80,6 +81,15 @@ export default async function CartPage() {
         Items in your cart are not reserved. Stock is checked again when you
         place your order.
       </p>
+
+      {!canAddNewLine(cart.items.length) && (
+        <p
+          role="note"
+          className="mt-4 rounded-md border border-line bg-surface-muted px-4 py-3 text-body-sm text-neutral-700"
+        >
+          {LINE_LIMIT_MESSAGE}
+        </p>
+      )}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
         <div className="space-y-5">
@@ -165,7 +175,11 @@ export default async function CartPage() {
                   </div>
                 </div>
 
-                <CartItemControls itemId={item.id} quantity={item.quantity} />
+                <CartItemControls
+                  itemId={item.id}
+                  quantity={item.quantity}
+                  stock={item.variant.stock}
+                />
               </article>
             );
           })}

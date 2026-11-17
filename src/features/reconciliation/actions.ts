@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/features/auth/current-user";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
+import { parseId } from "@/lib/ids";
 import { RECONCILIATION_PATH, validateResolutionNote } from "@/lib/reconciliation";
 import { resolveReconciliationEvent } from "./api";
 
@@ -84,8 +85,5 @@ function readString(value: FormDataEntryValue | null): string {
 }
 
 function readPositiveInteger(value: FormDataEntryValue | null): number | null {
-  const raw = readString(value);
-  if (!/^[1-9]\d*$/.test(raw)) return null;
-  const parsed = Number(raw);
-  return Number.isSafeInteger(parsed) ? parsed : null;
+  return parseId(readString(value));
 }

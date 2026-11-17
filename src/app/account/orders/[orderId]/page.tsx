@@ -26,6 +26,7 @@ import type { Payment } from "@/types/payment";
 import { buttonStyles } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { SITE_NAME } from "@/lib/site";
+import { parseId } from "@/lib/ids";
 export const metadata: Metadata = {
   title: "Order details",
   description: `Review an owned ${SITE_NAME} Order.`,
@@ -37,7 +38,7 @@ export default async function OrderDetailPage({
   params: Promise<{ orderId: string }>;
 }) {
   const { orderId: rawOrderId } = await params;
-  const orderId = readPositiveInteger(rawOrderId);
+  const orderId = parseId(rawOrderId);
   if (!orderId) notFound();
 
   const result = await loadOrder(orderId);
@@ -375,10 +376,4 @@ async function loadOrder(
     }
     return { error };
   }
-}
-
-function readPositiveInteger(value: string): number | null {
-  if (!/^[1-9]\d*$/.test(value)) return null;
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) ? parsed : null;
 }

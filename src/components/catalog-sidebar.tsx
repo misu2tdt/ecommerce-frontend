@@ -4,6 +4,7 @@ import { Suspense, useId, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { CatalogFilterOptions } from "@/types/catalog";
 import type { ProductFilters } from "@/features/catalog/api";
+import { PRICE_MAX_VND } from "@/lib/limits";
 import { formatVnd } from "@/lib/money";
 
 import { buttonStyles } from "@/components/ui/button";
@@ -151,12 +152,12 @@ function CatalogSidebarContent({
       const min = minRaw ? Math.floor(Number(minRaw)) : NaN;
       const max = maxRaw ? Math.floor(Number(maxRaw)) : NaN;
 
-      if (minRaw && !isNaN(min) && isFinite(min) && min >= 0) {
+      if (minRaw && !isNaN(min) && isFinite(min) && min >= 0 && min <= PRICE_MAX_VND) {
         p.set("minPrice", String(min));
       } else {
         p.delete("minPrice");
       }
-      if (maxRaw && !isNaN(max) && isFinite(max) && max >= 0) {
+      if (maxRaw && !isNaN(max) && isFinite(max) && max >= 0 && max <= PRICE_MAX_VND) {
         p.set("maxPrice", String(max));
       } else {
         p.delete("maxPrice");
@@ -396,6 +397,7 @@ function CatalogSidebarContent({
                 id={minPriceInputId}
                 type="number"
                 min="0"
+                max={PRICE_MAX_VND}
                 step="10000"
                 placeholder="Min ₫"
                 value={displayedMinPrice}
@@ -411,6 +413,7 @@ function CatalogSidebarContent({
                 id={maxPriceInputId}
                 type="number"
                 min="0"
+                max={PRICE_MAX_VND}
                 step="10000"
                 placeholder="Max ₫"
                 value={displayedMaxPrice}

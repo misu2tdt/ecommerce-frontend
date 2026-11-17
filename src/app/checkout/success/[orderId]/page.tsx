@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { FeedbackState } from "@/components/feedback-state";
 import { OrderStatusBadge } from "@/components/order-status";
 import { PaymentCreationControl } from "@/components/payment-creation-control";
@@ -19,6 +19,7 @@ import type { Payment } from "@/types/payment";
 import { buttonStyles } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { SITE_NAME } from "@/lib/site";
+import { parseId } from "@/lib/ids";
 export const metadata: Metadata = {
   title: "Order placed",
   description: `Your ${SITE_NAME} order was placed.`,
@@ -29,10 +30,8 @@ export default async function CheckoutSuccessPage({
   params: Promise<{ orderId: string }>;
 }) {
   const { orderId: rawOrderId } = await params;
-  const orderId = readPositiveInteger(rawOrderId);
-  if (!orderId) {
-    return <InvalidOrder />;
-  }
+  const orderId = parseId(rawOrderId);
+  if (!orderId) notFound();
 
   const result = await loadOrder(orderId);
   if ("unauthenticated" in result) {
@@ -260,19 +259,6 @@ function OrderFacts({ order }: { order: CheckoutOrder }) {
     </dl>
   );
 }
-function InvalidOrder() {
-  return (
-    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-      <FeedbackState
-        as="h1"
-        title="Invalid Order"
-        description="The Order identifier is invalid."
-        actionHref="/account"
-        actionLabel="Go to account"
-      />
-    </section>
-  );
-}
 
 async function loadOrder(orderId: number): Promise<
   { data: CheckoutOrder } | { unauthenticated: true } | { error: unknown }
@@ -295,10 +281,4 @@ async function loadPayments(orderId: number): Promise<Payment[]> {
   } catch {
     return [];
   }
-}
-
-function readPositiveInteger(value: string): number | null {
-  if (!/^[1-9]\d*$/.test(value)) return null;
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) ? parsed : null;
 }

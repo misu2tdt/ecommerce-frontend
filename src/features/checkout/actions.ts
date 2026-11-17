@@ -6,6 +6,7 @@ import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
 import { toShopperMessage } from "@/lib/shopper-messages";
 import { checkoutCart } from "./api";
+import { readIdField } from "@/lib/ids";
 
 export interface CheckoutActionState {
   status?: "error";
@@ -89,8 +90,5 @@ function checkoutFailure(error: unknown): CheckoutActionState {
 }
 
 function readPositiveInteger(formData: FormData, key: string): number | null {
-  const raw = formData.get(key);
-  if (typeof raw !== "string" || !/^[1-9]\d*$/.test(raw)) return null;
-  const value = Number(raw);
-  return Number.isSafeInteger(value) ? value : null;
+  return readIdField(formData, key);
 }

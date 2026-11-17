@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { DemoPaymentForm } from "@/components/demo-payment-form";
 import { FeedbackState } from "@/components/feedback-state";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -8,6 +8,7 @@ import { getOrders } from "@/features/orders/api";
 import { getOrderPayments } from "@/features/payments/api";
 import { demoPayHref, isOpenPayment } from "@/features/payments/demo-pay";
 import { ApiError, apiErrorMessage } from "@/lib/api";
+import { parseId } from "@/lib/ids";
 import { formatVnd } from "@/lib/money";
 import { SITE_NAME } from "@/lib/site";
 import type { Payment } from "@/types/payment";
@@ -28,18 +29,16 @@ export default async function DemoPayPage({
 }) {
   const { paymentId: rawPaymentId } = await params;
   const query = await searchParams;
-  const paymentId = readPositiveInteger(rawPaymentId);
-  const orderHint = readPositiveInteger(first(query.order));
+  // An id that is not a whole number from 1 to 2147483647 is not a payment.
+  const paymentId = parseId(rawPaymentId);
+  if (!paymentId) notFound();
+  const orderHint = parseId(first(query.order));
 
-  const result = paymentId
-    ? await loadOwnedPayment(paymentId, orderHint)
-    : ({ notFound: true } as const);
+  const result = await loadOwnedPayment(paymentId, orderHint);
   if ("unauthenticated" in result) {
     redirect(
       buildLoginHref(
-        orderHint && paymentId
-          ? demoPayHref(paymentId, orderHint)
-          : `/demo-pay/${paymentId ?? ""}`,
+        orderHint ? demoPayHref(paymentId, orderHint) : `/demo-pay/${paymentId}`,
       ),
     );
   }
@@ -191,10 +190,4 @@ async function findInOrder(
 
 function first(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function readPositiveInteger(value: string | undefined): number | null {
-  if (!value || !/^[1-9]\d*$/.test(value)) return null;
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) ? parsed : null;
 }

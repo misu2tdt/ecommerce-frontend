@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { buildLoginHref, safeInternalPath } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
 import { createReview, deleteMyReview, updateMyReview } from "./api";
+import { readIdField } from "@/lib/ids";
 
 export interface ReviewActionState {
   status?: "success" | "error";
@@ -112,10 +113,7 @@ function readRating(formData: FormData): number | null {
 }
 
 function readPositiveInteger(formData: FormData, key: string): number | null {
-  const rawValue = readString(formData, key);
-  if (!/^[1-9]\d*$/.test(rawValue)) return null;
-  const value = Number(rawValue);
-  return Number.isSafeInteger(value) ? value : null;
+  return readIdField(formData, key);
 }
 
 function optionalText(formData: FormData, key: string): string | undefined {

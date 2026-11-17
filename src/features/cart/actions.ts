@@ -11,6 +11,9 @@ import {
   removeCartItem,
   updateCartItem,
 } from "./api";
+import { readIdField } from "@/lib/ids";
+import { QUANTITY_MAX_PER_LINE } from "@/lib/limits";
+import { QUANTITY_LIMIT_MESSAGE } from "@/lib/quantity-limits";
 
 export interface CartActionState {
   status?: "success" | "error";
@@ -25,6 +28,9 @@ export async function addToCartAction(
   const quantity = readPositiveInteger(formData, "quantity");
   if (!variantId || !quantity) {
     return { status: "error", message: "Choose an option and a quantity." };
+  }
+  if (quantity > QUANTITY_MAX_PER_LINE) {
+    return { status: "error", message: QUANTITY_LIMIT_MESSAGE };
   }
 
   const returnPath = safeInternalPath(readString(formData, "returnPath"), "/products");
@@ -43,6 +49,9 @@ export async function updateCartItemAction(
   const quantity = readPositiveInteger(formData, "quantity");
   if (!itemId || !quantity) {
     return { status: "error", message: "Quantity must be at least 1." };
+  }
+  if (quantity > QUANTITY_MAX_PER_LINE) {
+    return { status: "error", message: QUANTITY_LIMIT_MESSAGE };
   }
 
   return runCartMutation(
@@ -101,10 +110,7 @@ async function runCartMutation(
 }
 
 function readPositiveInteger(formData: FormData, key: string): number | null {
-  const rawValue = readString(formData, key);
-  if (!/^[1-9]\d*$/.test(rawValue)) return null;
-  const value = Number(rawValue);
-  return Number.isSafeInteger(value) ? value : null;
+  return readIdField(formData, key);
 }
 
 function readString(formData: FormData, key: string): string {

@@ -11,6 +11,7 @@ import {
   demoPayHref,
   parseDemoOutcome,
 } from "./demo-pay";
+import { readIdField } from "@/lib/ids";
 
 export interface DemoPayState {
   // "error": try again on this page. "unavailable": the order can no longer
@@ -81,10 +82,7 @@ function failureMessage(error: unknown): string {
 }
 
 function readPositiveInteger(formData: FormData, key: string): number | null {
-  const raw = readString(formData, key);
-  if (!/^[1-9]\d*$/.test(raw)) return null;
-  const value = Number(raw);
-  return Number.isSafeInteger(value) ? value : null;
+  return readIdField(formData, key);
 }
 
 function readString(formData: FormData, key: string): string {

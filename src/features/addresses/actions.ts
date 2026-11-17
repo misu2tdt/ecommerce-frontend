@@ -10,6 +10,7 @@ import {
   deleteAddress,
   updateAddress,
 } from "./api";
+import { readIdField } from "@/lib/ids";
 
 type AddressField = keyof AddressInput;
 
@@ -184,10 +185,7 @@ function readOptionalString(formData: FormData, key: string): string | null {
 }
 
 function readPositiveInteger(formData: FormData, key: string): number | null {
-  const raw = readString(formData, key);
-  if (!/^[1-9]\d*$/.test(raw)) return null;
-  const value = Number(raw);
-  return Number.isSafeInteger(value) ? value : null;
+  return readIdField(formData, key);
 }
 
 function redirectIfUnauthenticated(error: unknown, returnPath: string): void {

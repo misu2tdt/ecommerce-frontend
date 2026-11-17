@@ -1,4 +1,5 @@
 import type { ProductSort } from "@/types/catalog";
+import { PRICE_MAX_VND } from "@/lib/limits";
 import { withPage } from "@/lib/pagination";
 import type { ProductFilters } from "./api";
 
@@ -145,13 +146,29 @@ function readArrayFilter(
   return unique.length > 0 ? unique : undefined;
 }
 
-function readNumber(value: string | string[] | undefined): number | undefined {
+// A price from the address: a number from 0 to the backend's price limit, in
+// whole VND. Anything else (text, a negative, above the limit) is undefined,
+// so it is never sent to the backend, which would refuse it.
+export function readNumber(
+  value: string | string[] | undefined,
+): number | undefined {
   const candidate = Array.isArray(value) ? value[0] : value;
   if (!candidate || !candidate.trim()) return undefined;
   const parsed = Number(candidate.trim());
-  return !isNaN(parsed) && isFinite(parsed) && parsed >= 0
-    ? Math.floor(parsed)
-    : undefined;
+  if (isNaN(parsed) || !isFinite(parsed) || parsed < 0) return undefined;
+  const whole = Math.floor(parsed);
+  return whole <= PRICE_MAX_VND ? whole : undefined;
+}
+
+// True when the address asks for a minimum or maximum price that was not used
+// (see readNumber), so the page can say so instead of silently showing
+// everything.
+export function hasIgnoredPriceFilter(searchParams: CatalogSearchParams): boolean {
+  return (["minPrice", "maxPrice"] as const).some((key) => {
+    const raw = searchParams[key];
+    const candidate = Array.isArray(raw) ? raw[0] : raw;
+    return Boolean(candidate?.trim()) && readNumber(raw) === undefined;
+  });
 }
 
 function readBooleanFilter(

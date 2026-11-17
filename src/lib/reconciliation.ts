@@ -3,6 +3,8 @@
 // and the check of the note an admin writes when resolving an event.
 
 import type { ApiQuery } from "@/lib/api";
+import { parseId } from "@/lib/ids";
+import { ID_MAX } from "@/lib/limits";
 import { formatVnd } from "@/lib/money";
 import { withPage } from "@/lib/pagination";
 import type { ReconciliationStatusFilter } from "@/types/reconciliation";
@@ -39,7 +41,7 @@ export function parseStatusFilter(
 
 // The largest order id the backend accepts (a PostgreSQL integer). A bigger
 // number could not match any order and the backend answers 400 for it.
-export const ORDER_ID_MAX = 2_147_483_647;
+export const ORDER_ID_MAX = ID_MAX;
 
 // Reads `?orderId=` from an address: a positive whole number the backend would
 // accept, or null. Anything else (letters, 0, a sign, a decimal, a repeated
@@ -47,11 +49,7 @@ export const ORDER_ID_MAX = 2_147_483_647;
 export function parseOrderIdParam(
   value: string | string[] | undefined,
 ): number | null {
-  if (typeof value !== "string" || !/^[1-9]\d*$/.test(value)) return null;
-  const orderId = Number(value);
-  return Number.isSafeInteger(orderId) && orderId <= ORDER_ID_MAX
-    ? orderId
-    : null;
+  return parseId(value);
 }
 
 // The query of one list request. `status` and `orderId` are the backend's own

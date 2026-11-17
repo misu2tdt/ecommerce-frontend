@@ -26,6 +26,30 @@ const RULES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   ],
   [/^Cannot (checkout|quote) an empty cart$/i, () => "Your cart is empty."],
   [/^Cart item not found$/i, () => "That item is no longer in your cart."],
+  // The limits of one cart line and of one cart (and the same for an order).
+  // Their numbers come from the message, so the wording follows the backend.
+  [
+    /^A cart line holds at most (\d+) units$/i,
+    (match) => `You can buy up to ${match[1]} of one item at a time.`,
+  ],
+  [
+    /^A cart holds at most (\d+) different products$/i,
+    (match) =>
+      `Your cart can hold at most ${match[1]} different products. Remove one to add another.`,
+  ],
+  [
+    /^An order holds at most (\d+) units of one product$/i,
+    (match) => `You can buy up to ${match[1]} of one item at a time.`,
+  ],
+  [
+    /^An order holds at most (\d+) different products$/i,
+    (match) =>
+      `An order can hold at most ${match[1]} different products. Remove some from your cart.`,
+  ],
+  [
+    /^quantity must not be greater than (\d+)$/i,
+    (match) => `You can buy up to ${match[1]} of one item at a time.`,
+  ],
   [
     /^Payment not found$/i,
     () => "We could not find this payment in your account.",

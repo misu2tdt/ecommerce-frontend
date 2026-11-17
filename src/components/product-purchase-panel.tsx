@@ -12,6 +12,7 @@ import {
 import { addToCartAction, type CartActionState } from "@/features/cart/actions";
 import { formatVnd } from "@/lib/money";
 import { stockHint } from "@/lib/product-detail";
+import { QUANTITY_LIMIT_MESSAGE, quantityCap } from "@/lib/quantity-limits";
 import {
   clampQuantity,
   determineSelectorMode,
@@ -143,13 +144,17 @@ export function ProductPurchasePanel({
   };
 
   // Safe quantity calculation
-  const maxStock = selectedVariant ? selectedVariant.stock : 0;
-  const currentQuantity = selectedVariant && maxStock > 0 ? clampQuantity(quantity, maxStock) : 1;
+  // The most that can be chosen: the stock, but never more than the limit for
+  // one cart line (see lib/limits.ts).
+  const cap = quantityCap(selectedVariant ? selectedVariant.stock : 0);
+  const maxQuantity = cap.max;
+  const currentQuantity = selectedVariant && maxQuantity > 0 ? clampQuantity(quantity, maxQuantity) : 1;
+  const atLineLimit = cap.limitedBy === "line" && currentQuantity >= maxQuantity;
 
   const handleQuantityChange = (delta: number) => {
-    if (!selectedVariant || maxStock <= 0) return;
+    if (!selectedVariant || maxQuantity <= 0) return;
     const nextVal = currentQuantity + delta;
-    if (nextVal >= 1 && nextVal <= maxStock) {
+    if (nextVal >= 1 && nextVal <= maxQuantity) {
       setQuantity(nextVal);
     }
   };
@@ -171,7 +176,7 @@ export function ProductPurchasePanel({
     if (low === high || high === 0) {
       return formatVnd(low);
     }
-    return `${formatVnd(low)} – ${formatVnd(high)}`;
+    return `${formatVnd(low)} â€“ ${formatVnd(high)}`;
   }, [selectedVariant, variants, minPrice, maxPrice]);
 
   // Compute compare-at price & discount percent
@@ -459,7 +464,7 @@ export function ProductPurchasePanel({
                     {secondaryLabel}
                   </p>
                   <p className="mt-1 text-body-sm text-neutral-600">
-                    {formatVnd(v.price)} — {inStock ? `${v.stock} in stock` : "Out of stock"}
+                    {formatVnd(v.price)} â€” {inStock ? `${v.stock} in stock` : "Out of stock"}
                   </p>
                 </button>
               );
@@ -504,19 +509,20 @@ export function ProductPurchasePanel({
                 aria-label="Decrease quantity"
                 className="flex h-11 w-11 items-center justify-center rounded-l-md text-title font-bold text-neutral-700 hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40"
               >
-                −
+                âˆ’
               </button>
               <input
                 id="quantity-input"
                 type="number"
                 inputMode="numeric"
                 min={1}
-                max={Math.max(1, maxStock)}
+                max={Math.max(1, maxQuantity)}
                 value={currentQuantity}
+                aria-describedby={atLineLimit ? "quantity-limit-note" : undefined}
                 onChange={(e) => {
                   const val = Number(e.target.value);
-                  if (Number.isFinite(val) && maxStock > 0) {
-                    setQuantity(Math.min(maxStock, Math.max(1, val)));
+                  if (Number.isFinite(val) && maxQuantity > 0) {
+                    setQuantity(Math.min(maxQuantity, Math.max(1, val)));
                   }
                 }}
                 disabled={!isPurchasable || pending}
@@ -525,7 +531,7 @@ export function ProductPurchasePanel({
               <button
                 type="button"
                 onClick={() => handleQuantityChange(1)}
-                disabled={!isPurchasable || currentQuantity >= maxStock || pending}
+                disabled={!isPurchasable || currentQuantity >= maxQuantity || pending}
                 aria-label="Increase quantity"
                 className="flex h-11 w-11 items-center justify-center rounded-r-md text-title font-bold text-neutral-700 hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40"
               >
@@ -559,6 +565,12 @@ export function ProductPurchasePanel({
           </div>
         </div>
 
+        {atLineLimit && (
+          <p id="quantity-limit-note" className="text-body-sm text-neutral-600">
+            {QUANTITY_LIMIT_MESSAGE}
+          </p>
+        )}
+
         {selectionError && (
           <p
             id="selection-error"
@@ -585,7 +597,7 @@ export function ProductPurchasePanel({
                 href="/cart"
                 className="font-bold underline underline-offset-2 hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
               >
-                View Bag →
+                View Bag â†’
               </Link>
             )}
           </div>

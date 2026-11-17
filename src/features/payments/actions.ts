@@ -7,7 +7,9 @@ import { ApiError } from "@/lib/api";
 import { toShopperMessage } from "@/lib/shopper-messages";
 import type { Payment } from "@/types/payment";
 import { createOrderPayment } from "./api";
+import { paymentLinkDecision } from "./checkout-link";
 import { demoPayHref } from "./demo-pay";
+import { readIdField } from "@/lib/ids";
 
 export interface CreatePaymentState {
   status?: "success" | "error";
@@ -63,36 +65,21 @@ export async function createPaymentAction(
     redirect(demoPayHref(payment.id, orderId));
   }
 
-  const checkoutUrl = safeCheckoutUrl(payment.checkoutUrl);
-  if (payment.checkoutUrl && !checkoutUrl) {
+  // Only a processing payment with a safe link gets one; see checkout-link.ts.
+  const decision = paymentLinkDecision(payment);
+  if (decision.kind === "continue") {
     return {
-      status: "error",
-      message:
-        "We could not open the MoMo payment page. Check your payment status before trying again.",
+      status: "success",
       payment,
+      checkoutUrl: decision.href,
+      message: decision.message,
     };
   }
-
   return {
-    status: "success",
+    status: decision.tone === "error" ? "error" : "success",
     payment,
-    checkoutUrl: checkoutUrl ?? undefined,
-    message: checkoutUrl
-      ? "Payment started. Continue to MoMo to complete it."
-      : payment.status === "succeeded"
-        ? "This payment is already confirmed."
-        : "We started your payment but could not open the MoMo page. Check your payment status before trying again.",
+    message: decision.message,
   };
-}
-
-function safeCheckoutUrl(value: string | undefined): string | null {
-  if (!value) return null;
-  try {
-    const url = new URL(value);
-    return ["http:", "https:"].includes(url.protocol) ? url.toString() : null;
-  } catch {
-    return null;
-  }
 }
 
 function isSafeIdempotencyKey(value: string): boolean {
@@ -102,10 +89,7 @@ function isSafeIdempotencyKey(value: string): boolean {
 }
 
 function readPositiveInteger(formData: FormData, key: string): number | null {
-  const raw = readString(formData, key);
-  if (!/^[1-9]\d*$/.test(raw)) return null;
-  const value = Number(raw);
-  return Number.isSafeInteger(value) ? value : null;
+  return readIdField(formData, key);
 }
 
 function readString(formData: FormData, key: string): string {

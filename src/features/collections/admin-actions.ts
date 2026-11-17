@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/features/auth/current-user";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
 import { parseCollectionForm, parseProductIds } from "@/lib/collection-form";
+import { readIdField } from "@/lib/ids";
 import { toCollectionAdminMessage } from "@/lib/shopper-messages";
 import type { AdminCollectionProduct } from "@/types/collections";
 import { COLLECTIONS_NAV_TAG } from "./api";
@@ -162,8 +163,5 @@ function revalidateCollections(id?: number) {
 }
 
 function readId(formData: FormData): number | null {
-  const value = formData.get("id");
-  if (typeof value !== "string" || !/^[1-9]\d*$/.test(value)) return null;
-  const id = Number(value);
-  return Number.isSafeInteger(id) ? id : null;
+  return readIdField(formData, "id");
 }

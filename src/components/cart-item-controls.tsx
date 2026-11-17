@@ -6,16 +6,23 @@ import {
   updateCartItemAction,
   type CartActionState,
 } from "@/features/cart/actions";
+import { canIncreaseQuantity } from "@/lib/quantity-limits";
 
 const INITIAL_STATE: CartActionState = {};
 
 export function CartItemControls({
   itemId,
   quantity,
+  stock,
 }: {
   itemId: number;
   quantity: number;
+  // The variant's current stock: the quantity can go no higher than this, or
+  // than the limit for one line (99), whichever is lower.
+  stock: number;
 }) {
+  const increase = canIncreaseQuantity(quantity, stock);
+  const limitNoteId = `cart-quantity-limit-${itemId}`;
   const [updateState, updateAction, updating] = useActionState(
     updateCartItemAction,
     INITIAL_STATE,
@@ -55,8 +62,9 @@ export function CartItemControls({
               <input type="hidden" name="quantity" value={quantity + 1} />
               <button
                 type="submit"
-                disabled={pending}
+                disabled={pending || !increase.allowed}
                 aria-label="Increase cart quantity"
+                aria-describedby={increase.allowed ? undefined : limitNoteId}
                 className="h-11 w-11 rounded-md border border-field-border bg-surface text-title font-semibold text-neutral-800 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-wait disabled:opacity-55"
               >
                 +
@@ -77,6 +85,11 @@ export function CartItemControls({
         </form>
       </div>
 
+      {!increase.allowed && (
+        <p id={limitNoteId} className="mt-3 text-body-sm text-neutral-600">
+          {increase.reason}
+        </p>
+      )}
       {updateState.message && (
         <p
           role={updateState.status === "error" ? "alert" : "status"}

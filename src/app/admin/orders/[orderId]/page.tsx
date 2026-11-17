@@ -9,16 +9,17 @@ import { getAdminOrder } from "@/features/admin/api";
 import { formatAttributeLabel } from "@/lib/attributes";
 import { ApiError, apiErrorMessage } from "@/lib/api";
 import { formatDateTime } from "@/lib/dates";
+import { parseId } from "@/lib/ids";
 import { formatVnd } from "@/lib/money";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
 export const metadata: Metadata = { title: "Admin Order details" };
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ orderId: string }> }) {
-  const rawId = (await params).orderId;
-  if (!/^[1-9]\d*$/.test(rawId)) notFound();
+  const orderId = parseId((await params).orderId);
+  if (!orderId) notFound();
   let order;
-  try { order = await getAdminOrder(Number(rawId)); } catch (error) { if (error instanceof ApiError && error.status === 404) notFound(); return <FeedbackState title="Order unavailable" description={apiErrorMessage(error)} />; }
+  try { order = await getAdminOrder(orderId); } catch (error) { if (error instanceof ApiError && error.status === 404) notFound(); return <FeedbackState title="Order unavailable" description={apiErrorMessage(error)} />; }
   const shipping = order.shippingAddress;
   const locality = [shipping.ward, shipping.district, shipping.city, shipping.stateProvince].filter(Boolean);
   return <><Link href="/admin/orders" className="font-semibold text-brand underline focus-visible:outline-2 focus-visible:outline-brand">← Orders</Link><div className="mt-5 flex flex-wrap items-start justify-between gap-4"><div><div className="flex flex-wrap items-center gap-3"><h2 className="text-heading font-bold text-brand-strong">Order #{order.id}</h2><OrderStatusBadge status={order.status} audience="admin" /></div><p className="mt-2 text-neutral-600">Customer User #{order.userId} · Placed {formatDateTime(order.createdAt)}</p><p className="mt-1 text-body-sm text-neutral-600">Last updated {formatDateTime(order.updatedAt)}</p></div><p className="text-heading font-bold text-brand-strong">{formatVnd(order.totalPrice)}</p></div>

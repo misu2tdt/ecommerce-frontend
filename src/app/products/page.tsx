@@ -17,10 +17,13 @@ import {
 } from "@/features/catalog/api";
 import {
   buildCatalogHref,
+  hasIgnoredPriceFilter,
   hasProductFilters,
   parseProductFilters,
   type CatalogSearchParams,
 } from "@/features/catalog/search-params";
+import { PRICE_MAX_VND } from "@/lib/limits";
+import { formatVnd } from "@/lib/money";
 import {
   pageRange,
   pageRedirectTarget,
@@ -59,6 +62,7 @@ export default async function ProductsPage({
   const query = await searchParams;
   const filters = parseProductFilters(query);
   const activeFilters = hasProductFilters(filters);
+  const priceIgnored = hasIgnoredPriceFilter(query);
   const pageParam = parsePageParam(query.page);
   const result = await loadCatalog(filters, pageParam.page);
 
@@ -137,6 +141,17 @@ export default async function ProductsPage({
           {/* Active Filter Chips */}
           <div className="mb-6">
             <ActiveFilterChips filters={filters} options={filterOptions} />
+            {priceIgnored && (
+              <p
+                role="note"
+                className="mt-3 rounded-md border border-line bg-surface-muted px-3 py-2 text-body-sm text-neutral-700"
+              >
+                <strong className="font-semibold text-brand-strong">
+                  Price filter ignored.
+                </strong>{" "}
+                A price must be a number from 0 to {formatVnd(PRICE_MAX_VND)}.
+              </p>
+            )}
           </div>
 
           {/* Results Display */}

@@ -1,3 +1,4 @@
+import { ID_MAX } from "@/lib/limits";
 import type { CreateCollectionInput } from "@/types/collections";
 
 // What an admin may type into the collection form, checked before it is sent
@@ -123,7 +124,7 @@ export type ParsedProductIds =
 export function parseProductIds(value: unknown): ParsedProductIds {
   if (
     !Array.isArray(value) ||
-    !value.every((id) => Number.isSafeInteger(id) && id >= 1)
+    !value.every((id) => Number.isSafeInteger(id) && id >= 1 && id <= ID_MAX)
   ) {
     return { ok: false, message: "The product list is invalid. Reload the page and try again." };
   }

@@ -8,6 +8,7 @@ import {
   type AdminCouponActionState,
 } from "@/features/promotions/admin-actions";
 import { formatDateTime } from "@/lib/dates";
+import { PRICE_MAX_VND } from "@/lib/limits";
 import { formatVnd } from "@/lib/money";
 import type { Coupon } from "@/types/promotions";
 
@@ -249,6 +250,7 @@ export function PromotionsManager({ coupons }: { coupons: Coupon[] }) {
                     type="number"
                     name="value"
                     min="1"
+                    max={PRICE_MAX_VND}
                     required
                     placeholder="e.g. 10 or 50000"
                     className={fieldStyles("mt-1.5")}
@@ -265,6 +267,7 @@ export function PromotionsManager({ coupons }: { coupons: Coupon[] }) {
                     type="number"
                     name="minSubtotal"
                     min="0"
+                    max={PRICE_MAX_VND}
                     placeholder="Optional minimum"
                     className={fieldStyles("mt-1.5")}
                   />
@@ -277,6 +280,7 @@ export function PromotionsManager({ coupons }: { coupons: Coupon[] }) {
                     type="number"
                     name="maxDiscount"
                     min="1"
+                    max={PRICE_MAX_VND}
                     placeholder="Optional cap (Percentage)"
                     className={fieldStyles("mt-1.5")}
                   />
@@ -424,6 +428,7 @@ export function PromotionsManager({ coupons }: { coupons: Coupon[] }) {
                     type="number"
                     name="value"
                     min="1"
+                    max={PRICE_MAX_VND}
                     defaultValue={editingCoupon.value}
                     required
                     className={fieldStyles("mt-1.5")}
@@ -440,6 +445,7 @@ export function PromotionsManager({ coupons }: { coupons: Coupon[] }) {
                     type="number"
                     name="minSubtotal"
                     min="0"
+                    max={PRICE_MAX_VND}
                     defaultValue={editingCoupon.minSubtotal ?? ""}
                     placeholder="Optional minimum"
                     className={fieldStyles("mt-1.5")}
@@ -453,6 +459,7 @@ export function PromotionsManager({ coupons }: { coupons: Coupon[] }) {
                     type="number"
                     name="maxDiscount"
                     min="1"
+                    max={PRICE_MAX_VND}
                     defaultValue={editingCoupon.maxDiscount ?? ""}
                     placeholder="Optional cap (Percentage)"
                     className={fieldStyles("mt-1.5")}

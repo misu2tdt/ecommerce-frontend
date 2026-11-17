@@ -16,6 +16,7 @@ import {
   uploadImageAction,
   type AdminActionState,
 } from "@/features/admin/actions";
+import { POSITION_MAX, PRICE_MAX_VND, STOCK_MAX } from "@/lib/limits";
 import { formatVnd } from "@/lib/money";
 import type { AdminProduct, AdminProductVariant } from "@/types/admin";
 import type { Brand, Category, ProductImage } from "@/types/catalog";
@@ -124,9 +125,9 @@ function VariantForm({ productId, mode, variant }: { productId: number; mode: "c
       <Hidden values={{ productId, variantId: variant?.id ?? "", mode, returnPath: `/admin/products/${productId}` }} />
       {mode === "create" && <Field label="SKU" name="sku" maxLength={64} required />}
       <Field label="Variant name" name="name" defaultValue={variant?.name} maxLength={255} required />
-      <Field label="Price (integer VND)" name="price" type="number" min={0} step={1} defaultValue={variant?.price} required />
-      <Field label="Stock" name="stock" type="number" min={0} step={1} defaultValue={variant?.stock ?? 0} required />
-      <Field label="Position" name="position" type="number" min={0} step={1} defaultValue={variant?.position ?? 0} required />
+      <Field label="Price (integer VND)" name="price" type="number" min={0} max={PRICE_MAX_VND} step={1} defaultValue={variant?.price} required error={state.fieldErrors?.price} />
+      <Field label="Stock" name="stock" type="number" min={0} max={STOCK_MAX} step={1} defaultValue={variant?.stock ?? 0} required error={state.fieldErrors?.stock} />
+      <Field label="Position" name="position" type="number" min={0} max={POSITION_MAX} step={1} defaultValue={variant?.position ?? 0} required error={state.fieldErrors?.position} />
       <label className="flex min-h-11 items-center gap-3 self-end rounded-md border border-line px-4 py-3"><input type="checkbox" name="isActive" defaultChecked={variant?.isActive ?? true} className="h-5 w-5 accent-brand" /><span className={labelClass}>Active SKU</span></label>
       <div className="sm:col-span-2"><AttributeEditor initial={variant?.attributes ?? {}} /></div>
       <div className="sm:col-span-2"><ActionMessage state={state} /><SubmitButton idle={mode === "create" ? "Create Variant" : "Save Variant"} pending="Saving Variant..." /></div>
@@ -163,7 +164,7 @@ function ImageUploadForm({ productId }: { productId: number }) {
       <Hidden values={{ productId, returnPath: `/admin/products/${productId}` }} />
       <Field label="Image file" name="file" type="file" accept="image/jpeg,image/png,image/webp" required className="sm:col-span-2" />
       <Field label="Alt text" name="altText" maxLength={255} />
-      <Field label="Position" name="position" type="number" min={0} step={1} defaultValue={0} required />
+      <Field label="Position" name="position" type="number" min={0} max={POSITION_MAX} step={1} defaultValue={0} required error={state.fieldErrors?.position} />
       <label className="flex min-h-11 items-center gap-3 rounded-md border border-line bg-surface px-4 py-3 sm:col-span-2"><input type="checkbox" name="isPrimary" className="h-5 w-5 accent-brand" /><span className={labelClass}>Set as primary image</span></label>
       <div className="sm:col-span-2"><p className="mb-3 text-body-sm text-neutral-600">JPEG, PNG, or WebP; maximum 5 MB. Upload goes through the authenticated backend.</p><ActionMessage state={state} /><SubmitButton idle="Upload image" pending="Uploading..." /></div>
     </form>
@@ -173,7 +174,7 @@ function ImageUploadForm({ productId }: { productId: number }) {
 function ImageEditor({ productId, productName, image }: { productId: number; productName: string; image: ProductImage }) {
   const [state, action] = useActionState(updateImageAction, INITIAL_STATE);
   return (
-    <article className="overflow-hidden rounded-md border border-line bg-surface"><div className="relative aspect-[4/3] bg-brand-soft"><Image src={image.url} alt={image.altText || productName} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" /></div><form action={action} className="grid gap-4 p-4 sm:grid-cols-2"><Hidden values={{ productId, imageId: image.id, returnPath: `/admin/products/${productId}` }} /><Field label="Alt text" name="altText" defaultValue={image.altText ?? ""} maxLength={255} className="sm:col-span-2" /><Field label="Position" name="position" type="number" min={0} step={1} defaultValue={image.position} required /><label className="flex min-h-11 items-center gap-3 self-end rounded-md border border-line px-4 py-3"><input type="checkbox" name="isPrimary" defaultChecked={image.isPrimary} className="h-5 w-5 accent-brand" /><span className={labelClass}>Primary</span></label><div className="sm:col-span-2"><ActionMessage state={state} /><SubmitButton idle="Save image metadata" pending="Saving..." /></div></form><div className="px-4 pb-4"><DeleteForm action={deleteImageAction} label="Delete image" confirmMessage="Delete this image from the Product? This cannot be undone." hidden={{ productId, imageId: image.id, returnPath: `/admin/products/${productId}` }} /></div></article>
+    <article className="overflow-hidden rounded-md border border-line bg-surface"><div className="relative aspect-[4/3] bg-brand-soft"><Image src={image.url} alt={image.altText || productName} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" /></div><form action={action} className="grid gap-4 p-4 sm:grid-cols-2"><Hidden values={{ productId, imageId: image.id, returnPath: `/admin/products/${productId}` }} /><Field label="Alt text" name="altText" defaultValue={image.altText ?? ""} maxLength={255} className="sm:col-span-2" /><Field label="Position" name="position" type="number" min={0} max={POSITION_MAX} step={1} defaultValue={image.position} required error={state.fieldErrors?.position} /><label className="flex min-h-11 items-center gap-3 self-end rounded-md border border-line px-4 py-3"><input type="checkbox" name="isPrimary" defaultChecked={image.isPrimary} className="h-5 w-5 accent-brand" /><span className={labelClass}>Primary</span></label><div className="sm:col-span-2"><ActionMessage state={state} /><SubmitButton idle="Save image metadata" pending="Saving..." /></div></form><div className="px-4 pb-4"><DeleteForm action={deleteImageAction} label="Delete image" confirmMessage="Delete this image from the Product? This cannot be undone." hidden={{ productId, imageId: image.id, returnPath: `/admin/products/${productId}` }} /></div></article>
   );
 }
 
@@ -193,7 +194,7 @@ function ActionMessage({ state }: { state: AdminActionState }) {
 }
 
 function Hidden({ values }: { values: Record<string, string | number> }) { return <>{Object.entries(values).map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}</>; }
-function Field({ label, className = "", ...props }: { label: string; className?: string } & React.InputHTMLAttributes<HTMLInputElement>) { const id = useId(); return <div className={className}><label htmlFor={id} className={labelClass}>{label}</label><input {...props} id={id} className={inputClass} /></div>; }
+function Field({ label, className = "", error, ...props }: { label: string; className?: string; error?: string } & React.InputHTMLAttributes<HTMLInputElement>) { const id = useId(); const errorId = `${id}-error`; return <div className={className}><label htmlFor={id} className={labelClass}>{label}</label><input {...props} id={id} aria-invalid={error ? true : undefined} aria-describedby={error ? errorId : undefined} className={inputClass} />{error && <p id={errorId} role="alert" className="mt-1 text-body-sm text-red-700">{error}</p>}</div>; }
 function TextArea({ label, className = "", ...props }: { label: string; className?: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) { const id = useId(); return <div className={className}><label htmlFor={id} className={labelClass}>{label}</label><textarea {...props} id={id} rows={4} className={`${inputClass} py-3`} /></div>; }
 function SelectField({ label, options, ...props }: { label: string; options: Array<{ value: string | number; label: string }> } & React.SelectHTMLAttributes<HTMLSelectElement>) { const id = useId(); return <div><label htmlFor={id} className={labelClass}>{label}</label><select {...props} id={id} className={inputClass}>{options.map((option) => <option key={String(option.value)} value={option.value}>{option.label}</option>)}</select></div>; }
 function StatusBadge({ active }: { active: boolean }) { return <Badge variant={active ? "success" : "neutral"} className="uppercase tracking-eyebrow">{active ? "Active" : "Inactive"}</Badge>; }

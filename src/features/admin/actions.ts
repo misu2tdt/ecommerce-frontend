@@ -6,6 +6,13 @@ import { CATALOG_NAV_TAG } from "@/features/catalog/api";
 import { getCurrentUser } from "@/features/auth/current-user";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
+import { parseId, readIdField } from "@/lib/ids";
+import {
+  fieldErrorsFromBackend,
+  parseNumberField,
+  type FieldErrors,
+  type NumberField,
+} from "./number-fields";
 import {
   createBrand,
   createCategory,
@@ -31,6 +38,8 @@ export interface AdminActionState {
   status?: "success" | "error";
   message?: string;
   entityId?: number;
+  // Messages for single fields (price, stock, position), shown under the field.
+  fieldErrors?: FieldErrors;
 }
 
 export async function saveNamedCatalogAction(
@@ -144,18 +153,21 @@ export async function saveVariantAction(
   const mode = readString(formData, "mode");
   const sku = readString(formData, "sku").trim().toUpperCase();
   const name = readString(formData, "name").trim();
-  const price = readNonNegativeInteger(formData, "price");
-  const stock = readNonNegativeInteger(formData, "stock");
-  const position = readNonNegativeInteger(formData, "position");
+  const price = parseNumberField("price", readString(formData, "price"));
+  const stock = parseNumberField("stock", readString(formData, "stock"));
+  const position = parseNumberField("position", readString(formData, "position"));
   const attributes = parseAttributes(readString(formData, "attributes"));
-  if (!productId || !name || price === null || stock === null || position === null || !attributes) {
-    return { status: "error", message: "Provide a name, integer VND price, stock, position, and valid attributes." };
+  if ("error" in price || "error" in stock || "error" in position) {
+    return fieldErrorState({ price, stock, position });
+  }
+  if (!productId || !name || !attributes) {
+    return { status: "error", message: "Provide a name and valid attributes." };
   }
   if (mode === "create" && (!sku || sku.length > 64)) {
     return { status: "error", message: "SKU is required and must be at most 64 characters." };
   }
   if (!["create", "edit"].includes(mode) || (mode === "edit" && !variantId)) return { status: "error", message: "The Variant request is invalid." };
-  const input = { ...(mode === "create" ? { sku } : {}), name, price, stock, attributes, isActive: formData.get("isActive") === "on", position };
+  const input = { ...(mode === "create" ? { sku } : {}), name, price: price.value, stock: stock.value, attributes, isActive: formData.get("isActive") === "on", position: position.value };
   const failure = await captureFailure(() => mode === "create"
     ? createVariant(productId, input)
     : updateVariant(productId, variantId!, input));
@@ -187,8 +199,9 @@ export async function uploadImageAction(
   if (denied) return denied;
   const productId = readPositiveInteger(formData, "productId");
   const file = formData.get("file");
-  const position = readNonNegativeInteger(formData, "position");
-  if (!productId || !(file instanceof File) || file.size === 0 || position === null) {
+  const position = parseNumberField("position", readString(formData, "position"));
+  if ("error" in position) return fieldErrorState({ position });
+  if (!productId || !(file instanceof File) || file.size === 0) {
     return { status: "error", message: "Choose an image and provide a valid position." };
   }
   if (file.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
@@ -198,7 +211,7 @@ export async function uploadImageAction(
   body.append("file", file);
   const altText = optionalString(formData, "altText");
   if (altText) body.append("altText", altText);
-  body.append("position", String(position));
+  body.append("position", String(position.value));
   body.append("isPrimary", String(formData.get("isPrimary") === "on"));
   const failure = await captureFailure(() => uploadProductImage(productId, body));
   if (failure) return adminError(failure, "Unable to upload this image.");
@@ -214,11 +227,12 @@ export async function updateImageAction(
   if (denied) return denied;
   const productId = readPositiveInteger(formData, "productId");
   const imageId = readPositiveInteger(formData, "imageId");
-  const position = readNonNegativeInteger(formData, "position");
-  if (!productId || !imageId || position === null) return { status: "error", message: "The image metadata is invalid." };
+  const position = parseNumberField("position", readString(formData, "position"));
+  if ("error" in position) return fieldErrorState({ position });
+  if (!productId || !imageId) return { status: "error", message: "The image metadata is invalid." };
   const failure = await captureFailure(() => updateProductImage(productId, imageId, {
     altText: optionalString(formData, "altText") ?? "",
-    position,
+    position: position.value,
     isPrimary: formData.get("isPrimary") === "on",
   }));
   if (failure) return adminError(failure, "Unable to update this image.");
@@ -306,6 +320,11 @@ function adminError(error: unknown, fallback: string): AdminActionState {
   if (!(error instanceof ApiError)) return { status: "error", message: fallback };
   if (error.status === 401) redirect(buildLoginHref("/admin"));
   if (error.status === 403) return { status: "error", message: "ADMIN access is required." };
+  if (error.status === 400) {
+    // A number the backend refused for being too big: say which field.
+    const fields = fieldErrorsFromBackend(error.message);
+    if (fields) return { status: "error", message: FIELD_ERRORS_MESSAGE, fieldErrors: fields };
+  }
   if ([400, 404, 409].includes(error.status)) return { status: "error", message: error.message };
   if (error.status === 0) return { status: "error", message: "The catalog service is unavailable. Please try again." };
   return { status: "error", message: fallback };
@@ -319,9 +338,16 @@ function revalidateProduct(productId: number) { revalidateProducts(); revalidate
 function readReturnPath(formData: FormData) { const value = readString(formData, "returnPath"); return value.startsWith("/admin") && !value.startsWith("//") ? value : "/admin"; }
 function readString(formData: FormData, key: string) { const value = formData.get(key); return typeof value === "string" ? value : ""; }
 function optionalString(formData: FormData, key: string) { return readString(formData, key).trim() || undefined; }
-function parsePositiveInteger(raw: string) { if (!/^[1-9]\d*$/.test(raw)) return null; const value = Number(raw); return Number.isSafeInteger(value) ? value : null; }
-function readPositiveInteger(formData: FormData, key: string) { return parsePositiveInteger(readString(formData, key)); }
-function readNonNegativeInteger(formData: FormData, key: string) { const raw = readString(formData, key); if (!/^\d+$/.test(raw)) return null; const value = Number(raw); return Number.isSafeInteger(value) ? value : null; }
+function parsePositiveInteger(raw: string) { return parseId(raw); }
+function readPositiveInteger(formData: FormData, key: string) { return readIdField(formData, key); }
+const FIELD_ERRORS_MESSAGE = "Check the highlighted fields.";
+function fieldErrorState(parsed: Partial<Record<NumberField, { value: number } | { error: string }>>): AdminActionState {
+  const fieldErrors: FieldErrors = {};
+  for (const [field, result] of Object.entries(parsed) as Array<[NumberField, { value: number } | { error: string }]>) {
+    if ("error" in result) fieldErrors[field] = result.error;
+  }
+  return { status: "error", message: FIELD_ERRORS_MESSAGE, fieldErrors };
+}
 function parseAttributes(raw: string): Record<string, string> | null { try { const value: unknown = JSON.parse(raw || "{}"); if (!value || typeof value !== "object" || Array.isArray(value)) return null; const entries = Object.entries(value); return entries.every(([key, item]) => key.trim() && typeof item === "string") ? Object.fromEntries(entries.map(([key, item]) => [key.trim(), (item as string).trim()])) : null; } catch { return null; } }
 function capitalize(value: string) { return value.charAt(0).toUpperCase() + value.slice(1); }
 function isOrderStatus(value: string): value is OrderStatus { return ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"].includes(value); }
