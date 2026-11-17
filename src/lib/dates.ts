@@ -71,6 +71,54 @@ export function formatDate(value: string): string {
   return `${parts.day} ${MONTHS[parts.month - 1]} ${parts.year}`;
 }
 
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const CALENDAR_DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+// Today's calendar date in Vietnam, as "2026-11-17".
+export function todayInVietnam(now: Date = new Date()): string {
+  const parts = readParts(now.toISOString());
+  if (!parts) return "";
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${parts.year}-${pad(parts.month)}-${pad(parts.day)}`;
+}
+
+function readCalendarDay(day: string) {
+  const match = CALENDAR_DAY.exec(day);
+  if (!match) return null;
+  const [year, month, date] = [Number(match[1]), Number(match[2]), Number(match[3])];
+  const check = new Date(Date.UTC(year, month - 1, date));
+  if (
+    check.getUTCFullYear() !== year ||
+    check.getUTCMonth() !== month - 1 ||
+    check.getUTCDate() !== date
+  ) {
+    return null;
+  }
+  return { year, month, date, weekday: check.getUTCDay() };
+}
+
+// A calendar day the backend sends as text ("2026-11-17"): no time zone is
+// involved, so the text is read, never converted. "17 Nov 2026"
+export function formatCalendarDay(day: string): string {
+  const parts = readCalendarDay(day);
+  if (!parts) return UNAVAILABLE;
+  return `${parts.date} ${MONTHS[parts.month - 1]} ${parts.year}`;
+}
+
+// "17 Nov": for a crowded axis.
+export function formatCalendarDayShort(day: string): string {
+  const parts = readCalendarDay(day);
+  if (!parts) return UNAVAILABLE;
+  return `${parts.date} ${MONTHS[parts.month - 1]}`;
+}
+
+// "Tue 17 Nov 2026"
+export function formatCalendarDayLong(day: string): string {
+  const parts = readCalendarDay(day);
+  if (!parts) return UNAVAILABLE;
+  return `${WEEKDAYS[parts.weekday]} ${formatCalendarDay(day)}`;
+}
+
 // "3 Nov 2026, 02:43 (Vietnam time)": a deadline names its time zone.
 export function formatPaymentDeadline(value: string): string {
   const text = formatDateTime(value);

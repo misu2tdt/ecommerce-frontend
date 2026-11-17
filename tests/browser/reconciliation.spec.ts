@@ -518,7 +518,8 @@ test.describe("navigation and dashboard", () => {
           count: links.length,
         };
       });
-      expect(fit.count).toBe(10);
+      // Ten sections (Analytics is the newest) and the way back to the storefront.
+      expect(fit.count).toBe(11);
       expect(fit.pageWidth).toBeLessThanOrEqual(width);
       expect(fit.rightmost).toBeLessThanOrEqual(fit.navRight + 0.5);
       expect(fit.rightmost).toBeLessThanOrEqual(width);
