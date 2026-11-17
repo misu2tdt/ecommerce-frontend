@@ -4,9 +4,15 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { MENU_BRAND_LINKS, PRIMARY_NAV_ITEMS } from "@/lib/catalog-nav";
+import {
+  menuBrandLinks,
+  primaryNavItems,
+  type NavCatalog,
+} from "@/lib/catalog-nav";
 
-const categoryColumns = [
+// The two columns of product shortcuts; the third, the brands, is added from
+// the brands the shop has.
+const shortcutColumns = [
   {
     title: "Tops & Layers",
     links: [
@@ -28,15 +34,23 @@ const categoryColumns = [
       { label: "Active 7\" Training Shorts", href: "/products?q=shorts" },
     ],
   },
-  {
-    title: "Brand Edits",
-    links: MENU_BRAND_LINKS,
-  },
 ];
 
 // `showCollections`: whether the shop has any active collection (the header looks
-// it up); with none, the menu leaves the "Collections" link out.
-export function NavMegaMenu({ showCollections = false }: { showCollections?: boolean }) {
+// it up); with none, the menu leaves the "Collections" link out. `catalog`: the
+// categories and brands the shop has (the header looks them up), so the menu
+// never links to one that is not there.
+export function NavMegaMenu({
+  showCollections = false,
+  catalog,
+}: {
+  showCollections?: boolean;
+  catalog: NavCatalog;
+}) {
+  const categoryColumns = [
+    ...shortcutColumns,
+    { title: "Brand Edits", links: menuBrandLinks(catalog.brands) },
+  ];
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLAnchorElement>(null);
@@ -109,6 +123,26 @@ export function NavMegaMenu({ showCollections = false }: { showCollections?: boo
             aria-label="Shop categories and collections"
             className="absolute left-0 top-full z-50 mt-1 w-full min-w-[700px] rounded-md border border-neutral-200/80 bg-surface p-6 shadow-xl ring-1 ring-neutral-950/5 animate-in fade-in slide-in-from-top-1 duration-150"
           >
+            {catalog.categories.length > 0 && (
+              <div className="mb-6 border-b border-neutral-100 pb-5">
+                <Eyebrow className="mb-3 text-neutral-600">
+                  Shop by Category
+                </Eyebrow>
+                <ul className="flex flex-wrap gap-x-6 gap-y-2">
+                  {catalog.categories.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setDropdownOpen(false)}
+                        className="text-body-sm font-semibold text-neutral-700 transition hover:text-brand-strong hover:underline focus-visible:outline-2 focus-visible:outline-neutral-900"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="grid grid-cols-3 gap-8">
               {categoryColumns.map((col) => (
                 <div key={col.title}>
@@ -158,7 +192,7 @@ export function NavMegaMenu({ showCollections = false }: { showCollections?: boo
       </div>
 
       {/* Top-level direct category navigation links */}
-      {PRIMARY_NAV_ITEMS.map((item) => (
+      {primaryNavItems(catalog.categories).map((item) => (
         <Link
           key={item.href}
           href={item.href}

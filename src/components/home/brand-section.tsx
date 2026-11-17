@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { loadNavCatalog } from "@/features/catalog/nav";
 import { BANNERS, type BannerKey } from "@/lib/banners";
-import { BRANDS } from "@/lib/catalog-nav";
+import type { NavBrand } from "@/lib/catalog-nav";
 
-// The two brands with editorial pictures. Name and link come from the shared
-// brand list; the words below are this section's own.
+// The brands with editorial pictures, in display order. Name and link come from
+// the shared brand list; the words below are this section's own. A brand is shown
+// only when the shop has it (see loadNavCatalog), so the same page serves the two
+// brands of the base seed and the four that the catalog expansion adds.
 const EDITS: Array<{
   slug: string;
   banner: BannerKey;
@@ -29,9 +32,58 @@ const EDITS: Array<{
       "Heavyweight overshirts, utility cargo shorts, and tailored pleated trousers designed for clean, intentional everyday silhouettes.",
     cta: "Explore Monolith Studio",
   },
+  {
+    slug: "ardent-motion",
+    banner: "brand-ardent-motion",
+    subtitle: "Seamless Training Wear",
+    description:
+      "Seamless, supportive activewear for the studio, the gym and the street.",
+    cta: "Explore Ardent Motion",
+  },
+  {
+    slug: "hushwell",
+    banner: "brand-hushwell",
+    subtitle: "Soft Knits, Calm Shapes",
+    description:
+      "Loungewear and sleepwear in soft knits and breathable cotton, cut in calm, easy shapes.",
+    cta: "Explore Hushwell",
+  },
+  {
+    slug: "tidewell",
+    banner: "brand-tidewell",
+    subtitle: "Built for Rainy Days",
+    description:
+      "Quick-dry fabrics, sealed seams and packable shells for rainy days and humid commutes.",
+    cta: "Explore Tidewell",
+  },
+  {
+    slug: "cinder-oak",
+    banner: "brand-cinder-oak",
+    subtitle: "Heritage Casualwear",
+    description:
+      "Sturdy cotton, canvas and denim, finished to look better with wear.",
+    cta: "Explore Cinder & Oak",
+  },
 ];
 
-export function BrandSection() {
+export async function BrandSection() {
+  const { brands } = await loadNavCatalog();
+  return <BrandCards brands={brands} />;
+}
+
+// An odd last card is centred under the pair above it, at the width of one
+// column, instead of sitting alone at the left of the row (from md, where the
+// grid has two columns).
+const ODD_LAST =
+  "md:[&:last-child:nth-child(odd)]:col-span-2 md:[&:last-child:nth-child(odd)]:w-[calc(50%-0.75rem)] md:[&:last-child:nth-child(odd)]:justify-self-center";
+
+export function BrandCards({ brands }: { brands: readonly NavBrand[] }) {
+  const shown = EDITS.flatMap((edit) => {
+    const brand = brands.find((item) => item.slug === edit.slug);
+    return brand ? [{ edit, brand }] : [];
+  });
+  if (shown.length === 0) return null;
+
   return (
     <section className="py-14 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -43,11 +95,10 @@ export function BrandSection() {
         </div>
 
         <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
-          {EDITS.map((edit) => {
-            const brand = BRANDS.find((item) => item.slug === edit.slug)!;
+          {shown.map(({ edit, brand }) => {
             const banner = BANNERS[edit.banner];
             return (
-              <li key={edit.slug} className="group relative">
+              <li key={edit.slug} className={`group relative ${ODD_LAST}`}>
                 <div className="relative aspect-[3/2] overflow-hidden rounded-md bg-surface-muted">
                   {/* Decorative: the heading link below names the card. */}
                   <Image

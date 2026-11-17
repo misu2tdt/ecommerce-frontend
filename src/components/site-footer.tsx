@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { loadNavCatalog } from "@/features/catalog/nav";
 import { hasActiveCollections } from "@/features/collections/nav";
-import { FOOTER_BRANDS, FOOTER_CATEGORIES } from "@/lib/catalog-nav";
+import { footerBrands, footerCategories } from "@/lib/catalog-nav";
 import { SITE_NAME } from "@/lib/site";
 
 // 14px, not the 12px eyebrow: these name the link columns and must stay readable.
@@ -17,6 +18,8 @@ const customerLinks = [
 export async function SiteFooter() {
   // Offered only when the shop has an active collection (see hasActiveCollections).
   const showCollections = await hasActiveCollections();
+  // Only the categories and brands the shop really has (see loadNavCatalog).
+  const catalog = await loadNavCatalog();
   return (
     <footer className="border-t border-line bg-brand-strong text-neutral-400">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
@@ -39,7 +42,7 @@ export async function SiteFooter() {
           <div>
             <p className={columnTitle}>Categories</p>
             <ul className="mt-4 text-body-sm md:space-y-2.5">
-              {FOOTER_CATEGORIES.map((item) => (
+              {footerCategories(catalog.categories).map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -66,7 +69,7 @@ export async function SiteFooter() {
           <div>
             <p className={columnTitle}>Brands</p>
             <ul className="mt-4 text-body-sm md:space-y-2.5">
-              {FOOTER_BRANDS.map((item) => (
+              {footerBrands(catalog.brands).map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

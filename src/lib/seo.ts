@@ -8,7 +8,7 @@ import {
   type CollectionSort,
 } from "@/features/collections/search-params";
 import { BANNERS } from "@/lib/banners";
-import { BRANDS, CATEGORIES } from "@/lib/catalog-nav";
+import { BRANDS, CATEGORIES, type NavCatalog } from "@/lib/catalog-nav";
 import { SITE_NAME } from "@/lib/site";
 
 // Search-engine facing text and addresses, in one place.
@@ -326,14 +326,18 @@ export function productJsonLd(
 }
 
 // Fixed pages of the sitemap: the home page, the catalog, the About page, and one
-// page for every category and brand.
-export function staticSitemapPaths(): string[] {
+// page for every category and brand the shop has (by default every one this site
+// has a presentation for; the sitemap route passes the ones the API lists, so a
+// category that does not exist yet is not offered to search engines).
+export function staticSitemapPaths(
+  catalog: NavCatalog = { categories: CATEGORIES, brands: BRANDS },
+): string[] {
   return [
     "/",
     "/products",
     "/about-demo",
-    ...CATEGORIES.map((item) => item.href),
-    ...BRANDS.map((item) => item.href),
+    ...catalog.categories.map((item) => item.href),
+    ...catalog.brands.map((item) => item.href),
   ];
 }
 
@@ -359,8 +363,9 @@ export function sitemapEntries(
   siteUrl: string,
   products: SitemapProduct[],
   collections: SitemapCollection[] = [],
+  catalog?: NavCatalog,
 ): SitemapEntry[] {
-  const entries: SitemapEntry[] = staticSitemapPaths().map((path) => ({
+  const entries: SitemapEntry[] = staticSitemapPaths(catalog).map((path) => ({
     url: absoluteUrl(path, siteUrl),
   }));
   if (collections.length > 0) {

@@ -5,14 +5,19 @@ import { BANNERS } from "@/lib/banners";
 import {
   BRANDS,
   CATEGORIES,
-  FOOTER_BRANDS,
-  FOOTER_CATEGORIES,
-  MENU_BRAND_LINKS,
-  PRIMARY_NAV_ITEMS,
+  footerBrands,
+  footerCategories,
+  menuBrandLinks,
+  primaryNavItems,
+  resolveNavCatalog,
 } from "@/lib/catalog-nav";
 
 const read = (file: string) =>
   readFileSync(path.resolve(process.cwd(), file), "utf8");
+
+// What a deployment that has only the base seed shows (the catalog expansion not
+// seeded yet, or the lookup failed): the five original categories, four brands.
+const base = resolveNavCatalog({ categories: null, brands: null });
 
 test.describe("shared catalog navigation lists", () => {
   test("categories are unique and link to the catalog filter", () => {
@@ -21,6 +26,8 @@ test.describe("shared catalog navigation lists", () => {
       "Shirts & Polos",
       "Hoodies & Outerwear",
       "Pants & Shorts",
+      "Activewear",
+      "Loungewear & Sleepwear",
       "Basics & Accessories",
     ]);
     expect(new Set(CATEGORIES.map((c) => c.slug)).size).toBe(CATEGORIES.length);
@@ -39,6 +46,10 @@ test.describe("shared catalog navigation lists", () => {
       "Kanso Basics",
       "Veloce Active",
       "Monolith Studio",
+      "Ardent Motion",
+      "Hushwell",
+      "Tidewell",
+      "Cinder & Oak",
     ]);
     expect(new Set(BRANDS.map((b) => b.slug)).size).toBe(BRANDS.length);
     for (const brand of BRANDS) {
@@ -47,15 +58,18 @@ test.describe("shared catalog navigation lists", () => {
   });
 
   test("the header navigation keeps its three direct links and labels", () => {
-    expect(PRIMARY_NAV_ITEMS).toEqual([
+    const expected = [
       { name: "T-Shirts & Tops", href: "/products?category=t-shirts-tops" },
       { name: "Shirts & Polos", href: "/products?category=shirts-polos" },
       { name: "Outerwear", href: "/products?category=hoodies-outerwear" },
-    ]);
+    ];
+    expect(primaryNavItems(base.categories)).toEqual(expected);
+    // The new categories do not crowd the header bar.
+    expect(primaryNavItems(CATEGORIES)).toEqual(expected);
   });
 
   test("the mega menu keeps its brand link labels", () => {
-    expect(MENU_BRAND_LINKS).toEqual([
+    expect(menuBrandLinks(base.brands)).toEqual([
       { label: "AeroThread — Everyday Minimal", href: "/products?brand=aerothread" },
       {
         label: "Kanso Basics — Comfort Essentials",
@@ -73,7 +87,7 @@ test.describe("shared catalog navigation lists", () => {
   });
 
   test("the footer keeps its category and brand links and descriptions", () => {
-    expect(FOOTER_CATEGORIES).toEqual([
+    expect(footerCategories(base.categories)).toEqual([
       { label: "All Products", href: "/products" },
       { label: "T-Shirts & Tops", href: "/products?category=t-shirts-tops" },
       { label: "Shirts & Polos", href: "/products?category=shirts-polos" },
@@ -81,7 +95,7 @@ test.describe("shared catalog navigation lists", () => {
       { label: "Pants & Shorts", href: "/products?category=pants-shorts" },
       { label: "Basics & Accessories", href: "/products?category=basics-accessories" },
     ]);
-    expect(FOOTER_BRANDS).toEqual([
+    expect(footerBrands(base.brands)).toEqual([
       { label: "AeroThread", href: "/products?brand=aerothread", desc: "Everyday Minimal" },
       { label: "Kanso Basics", href: "/products?brand=kanso-basics", desc: "Comfort Essentials" },
       { label: "Veloce Active", href: "/products?brand=veloce-active", desc: "Performance Apparel" },
@@ -89,12 +103,39 @@ test.describe("shared catalog navigation lists", () => {
     ]);
   });
 
+  test("the new categories and brands appear in the footer and the menu once they exist", () => {
+    const full = resolveNavCatalog({
+      categories: CATEGORIES.map((item) => item.slug),
+      brands: BRANDS.map((item) => item.slug),
+    });
+    expect(footerCategories(full.categories).map((item) => item.label)).toEqual([
+      "All Products",
+      "T-Shirts & Tops",
+      "Shirts & Polos",
+      "Hoodies & Outerwear",
+      "Pants & Shorts",
+      "Activewear",
+      "Loungewear & Sleepwear",
+      "Basics & Accessories",
+    ]);
+    expect(footerBrands(full.brands).map((item) => item.label)).toEqual(
+      BRANDS.map((item) => item.label),
+    );
+    expect(menuBrandLinks(full.brands).map((item) => item.href)).toContain(
+      "/products?brand=cinder-oak",
+    );
+  });
+
   test("no list has duplicate hrefs", () => {
+    const full = resolveNavCatalog({
+      categories: CATEGORIES.map((item) => item.slug),
+      brands: BRANDS.map((item) => item.slug),
+    });
     for (const list of [
-      PRIMARY_NAV_ITEMS,
-      FOOTER_CATEGORIES,
-      FOOTER_BRANDS,
-      MENU_BRAND_LINKS,
+      primaryNavItems(full.categories),
+      footerCategories(full.categories),
+      footerBrands(full.brands),
+      menuBrandLinks(full.brands),
     ]) {
       const hrefs = list.map((item) => item.href);
       expect(new Set(hrefs).size).toBe(hrefs.length);
@@ -128,14 +169,20 @@ test.describe("shared catalog navigation lists", () => {
 });
 
 test.describe("banner constants", () => {
-  test("hold the nine banners as Cloudinary https urls: 3:2, and the hero-wide one 16:9", () => {
+  test("hold the fifteen banners as Cloudinary https urls: 3:2, and the hero-wide one 16:9", () => {
     expect(Object.keys(BANNERS).sort()).toEqual([
       "banner-hero",
       "banner-hero-wide",
+      "brand-ardent-motion",
+      "brand-cinder-oak",
+      "brand-hushwell",
       "brand-monolith-studio",
+      "brand-tidewell",
       "brand-veloce-active",
+      "category-activewear",
       "category-basics-accessories",
       "category-hoodies-outerwear",
+      "category-loungewear-sleepwear",
       "category-pants-shorts",
       "category-shirts-polos",
       "category-t-shirts-tops",

@@ -1,5 +1,6 @@
 // Editorial banner photos used on the home page. Most are landscape 3:2;
-// banner-hero-wide is 16:9 (1672x941).
+// banner-hero-wide is 16:9 (1672x941). The banner-collection-* pictures are not
+// here: a collection's picture is its own heroImageUrl, which the API returns.
 //
 // Copied from the banner entries of the backend's demo-images.json
 // (ecommerce-backend/src/database/seeds/demo-images.json), which the backend's
@@ -51,6 +52,18 @@ export const BANNERS = {
     width: 1536,
     height: 1024,
   },
+  // Added with the catalog expansion (two categories, four brands). These come
+  // from the later upload, so their version numbers differ from the ones above.
+  "category-activewear": {
+    url: `${BASE}/v1794909338/evergreen/demo/category-activewear.jpg`,
+    width: 1536,
+    height: 1024,
+  },
+  "category-loungewear-sleepwear": {
+    url: `${BASE}/v1794909340/evergreen/demo/category-loungewear-sleepwear.jpg`,
+    width: 1536,
+    height: 1024,
+  },
   "brand-monolith-studio": {
     url: `${BASE}/v1793215357/evergreen/demo/brand-monolith-studio.png`,
     width: 1536,
@@ -58,6 +71,26 @@ export const BANNERS = {
   },
   "brand-veloce-active": {
     url: `${BASE}/v1793215358/evergreen/demo/brand-veloce-active.png`,
+    width: 1536,
+    height: 1024,
+  },
+  "brand-ardent-motion": {
+    url: `${BASE}/v1794909333/evergreen/demo/brand-ardent-motion.jpg`,
+    width: 1536,
+    height: 1024,
+  },
+  "brand-cinder-oak": {
+    url: `${BASE}/v1794909334/evergreen/demo/brand-cinder-oak.jpg`,
+    width: 1536,
+    height: 1024,
+  },
+  "brand-hushwell": {
+    url: `${BASE}/v1794909335/evergreen/demo/brand-hushwell.jpg`,
+    width: 1536,
+    height: 1024,
+  },
+  "brand-tidewell": {
+    url: `${BASE}/v1794909338/evergreen/demo/brand-tidewell.jpg`,
     width: 1536,
     height: 1024,
   },

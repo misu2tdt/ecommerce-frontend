@@ -117,3 +117,23 @@ export function getCategories(): Promise<Category[]> {
 export function getBrands(): Promise<Brand[]> {
   return apiFetch<Brand[]>("/brands");
 }
+
+// How long the menus, the footer and the home page keep the list of categories
+// and brands that exist, so they do not add backend calls to every page view. A
+// change made in the admin shows at once (see revalidateCatalog); a change made
+// by the seed shows within this time.
+export const CATALOG_NAV_REVALIDATE_SECONDS = 60;
+export const CATALOG_NAV_TAG = "catalog-nav";
+
+const navCache = {
+  revalidate: CATALOG_NAV_REVALIDATE_SECONDS,
+  tags: [CATALOG_NAV_TAG],
+};
+
+export function getNavCategories(): Promise<Category[]> {
+  return apiFetch<Category[]>("/categories", { next: navCache });
+}
+
+export function getNavBrands(): Promise<Brand[]> {
+  return apiFetch<Brand[]>("/brands", { next: navCache });
+}

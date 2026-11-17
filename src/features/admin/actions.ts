@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { CATALOG_NAV_TAG } from "@/features/catalog/api";
 import { getCurrentUser } from "@/features/auth/current-user";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
@@ -310,7 +311,9 @@ function adminError(error: unknown, fallback: string): AdminActionState {
   return { status: "error", message: fallback };
 }
 
-function revalidateCatalog() { revalidatePath("/admin"); revalidatePath("/admin/categories"); revalidatePath("/admin/brands"); revalidatePath("/admin/products"); revalidatePath("/products"); }
+// A category or brand change also shows in the menus, the footer and the home
+// page, which keep the list of what exists for a minute (see getNavCategories).
+function revalidateCatalog() { revalidatePath("/admin"); revalidatePath("/admin/categories"); revalidatePath("/admin/brands"); revalidatePath("/admin/products"); revalidatePath("/products"); updateTag(CATALOG_NAV_TAG); }
 function revalidateProducts() { revalidatePath("/admin"); revalidatePath("/admin/products"); revalidatePath("/products"); }
 function revalidateProduct(productId: number) { revalidateProducts(); revalidatePath(`/admin/products/${productId}`); revalidatePath("/products/[slug]", "page"); }
 function readReturnPath(formData: FormData) { const value = readString(formData, "returnPath"); return value.startsWith("/admin") && !value.startsWith("//") ? value : "/admin"; }

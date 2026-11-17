@@ -3,6 +3,7 @@ import { logoutAction } from "@/features/auth/actions";
 import { getCurrentUser } from "@/features/auth/current-user";
 import { resolveHeaderSession } from "@/features/auth/header-session";
 import { getSessionToken } from "@/features/auth/session";
+import { loadNavCatalog } from "@/features/catalog/nav";
 import { hasActiveCollections } from "@/features/collections/nav";
 import { SITE_NAME } from "@/lib/site";
 import { DemoAccountsLink } from "./demo-accounts-link";
@@ -22,6 +23,8 @@ export async function SiteHeader() {
   // "Collections" is offered in the menus only when the shop has one. The answer
   // is kept for a few minutes and a failed lookup just means "no".
   const showCollections = await hasActiveCollections();
+  // The categories and brands the menus list are the ones the shop really has.
+  const catalog = await loadNavCatalog();
   // The drawer only needs to know whether to offer account links.
   const drawerUser =
     session.kind === "user"
@@ -49,7 +52,11 @@ export async function SiteHeader() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
           {/* Left: Mobile trigger & Brand Logo */}
           <div className="flex min-w-0 items-center gap-1 sm:gap-3">
-            <MobileNav user={drawerUser} showCollections={showCollections} />
+            <MobileNav
+              user={drawerUser}
+              showCollections={showCollections}
+              catalog={catalog}
+            />
             <Link
               href="/"
               aria-label={SITE_NAME}
@@ -62,7 +69,7 @@ export async function SiteHeader() {
 
           {/* Center: Desktop Mega Navigation (needs ~1280px; below that the drawer is used) */}
           <div className="hidden xl:flex xl:min-w-0 xl:flex-1 xl:justify-center">
-            <NavMegaMenu showCollections={showCollections} />
+            <NavMegaMenu showCollections={showCollections} catalog={catalog} />
           </div>
 
           {/* Right: Search, Wishlist, Cart, Account */}

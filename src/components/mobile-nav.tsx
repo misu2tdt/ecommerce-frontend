@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { logoutAction } from "@/features/auth/actions";
-import { BRANDS, FOOTER_CATEGORIES } from "@/lib/catalog-nav";
+import { footerCategories, type NavCatalog } from "@/lib/catalog-nav";
 import { DEMO_ACCOUNTS_PATH } from "@/lib/site";
 import { HeaderSearch } from "./header-search";
 
@@ -15,6 +15,8 @@ interface MobileNavProps {
   // Whether the shop has any active collection; with none the drawer leaves the
   // "Collections" link out.
   showCollections?: boolean;
+  // The categories and brands the shop has (the header looks them up).
+  catalog: NavCatalog;
 }
 
 export function MobileNav(props: MobileNavProps) {
@@ -53,7 +55,11 @@ function MobileNavTriggerFallback() {
   );
 }
 
-function MobileNavContent({ user, showCollections = false }: MobileNavProps) {
+function MobileNavContent({
+  user,
+  showCollections = false,
+  catalog,
+}: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -226,7 +232,7 @@ function MobileNavContent({ user, showCollections = false }: MobileNavProps) {
                   Catalog
                 </Eyebrow>
                 <nav className="space-y-1">
-                  {FOOTER_CATEGORIES.map((cat) => (
+                  {footerCategories(catalog.categories).map((cat) => (
                     <Link
                       key={cat.href}
                       href={cat.href}
@@ -255,7 +261,7 @@ function MobileNavContent({ user, showCollections = false }: MobileNavProps) {
                   Featured Brands
                 </Eyebrow>
                 <nav className="space-y-1">
-                  {BRANDS.map((b) => (
+                  {catalog.brands.map((b) => (
                     <Link
                       key={b.href}
                       href={b.href}

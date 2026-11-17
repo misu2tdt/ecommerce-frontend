@@ -1,5 +1,6 @@
 ﻿import type { MetadataRoute } from "next";
 import { getAllProductSlugs } from "@/features/catalog/api";
+import { loadNavCatalog } from "@/features/catalog/nav";
 import { getAllCollectionSlugs } from "@/features/collections/api";
 import {
   getSiteUrl,
@@ -25,5 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {
     // No collections (or a backend that has none yet): the other pages stay.
   }
-  return sitemapEntries(getSiteUrl(), products, collections);
+  // The category and brand pages that exist (a failed lookup gives the base
+  // seed's; see loadNavCatalog).
+  const catalog = await loadNavCatalog();
+  return sitemapEntries(getSiteUrl(), products, collections, catalog);
 }
