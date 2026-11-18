@@ -5,8 +5,8 @@ managing the catalog. It is the frontend of a portfolio project: it talks to a
 separate NestJS API (the backend repository), which owns the data, the money
 rules and the payments.
 
-- Live demo: <https://ecommerce-frontend-kappa-sage.vercel.app>
-- What is real and what is simulated: <https://ecommerce-frontend-kappa-sage.vercel.app/about-demo>
+- Live demo: <https://verve-shop.vercel.app>
+- What is real and what is simulated: <https://verve-shop.vercel.app/about-demo>
 - Backend repository: <https://github.com/misu2tdt/ecommerce-backend> (its README explains the order and payment rules in depth)
 - This repository: <https://github.com/misu2tdt/ecommerce-frontend>
 
