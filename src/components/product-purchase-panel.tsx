@@ -176,7 +176,7 @@ export function ProductPurchasePanel({
     if (low === high || high === 0) {
       return formatVnd(low);
     }
-    return `${formatVnd(low)} â€“ ${formatVnd(high)}`;
+    return `${formatVnd(low)} – ${formatVnd(high)}`;
   }, [selectedVariant, variants, minPrice, maxPrice]);
 
   // Compute compare-at price & discount percent
@@ -464,7 +464,7 @@ export function ProductPurchasePanel({
                     {secondaryLabel}
                   </p>
                   <p className="mt-1 text-body-sm text-neutral-600">
-                    {formatVnd(v.price)} â€” {inStock ? `${v.stock} in stock` : "Out of stock"}
+                    {formatVnd(v.price)} &mdash; {inStock ? `${v.stock} in stock` : "Out of stock"}
                   </p>
                 </button>
               );
@@ -509,7 +509,7 @@ export function ProductPurchasePanel({
                 aria-label="Decrease quantity"
                 className="flex h-11 w-11 items-center justify-center rounded-l-md text-title font-bold text-neutral-700 hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40"
               >
-                âˆ’
+                &minus;
               </button>
               <input
                 id="quantity-input"
@@ -597,7 +597,7 @@ export function ProductPurchasePanel({
                 href="/cart"
                 className="font-bold underline underline-offset-2 hover:text-brand-strong focus-visible:outline-2 focus-visible:outline-brand"
               >
-                View Bag â†’
+                View Bag &rarr;
               </Link>
             )}
           </div>

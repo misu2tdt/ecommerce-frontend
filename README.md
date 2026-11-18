@@ -232,7 +232,7 @@ What is actually in place, and tested where noted:
 
 | Suite | Command | Count |
 | --- | --- | --- |
-| Unit | `npm run test:unit` | 393 tests |
+| Unit | `npm run test:unit` | 396 tests |
 | Browser smoke | `npm run test:smoke` | 255 tests, plus 2 skipped (the product-photo tests skip when the test database has no photos) |
 
 - **Unit tests** are Playwright's runner on plain functions: formatters, status
