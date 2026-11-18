@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ActiveFilterChips } from "@/components/active-filter-chips";
-import { CatalogSidebar } from "@/components/catalog-sidebar";
+import { CatalogFilterBar } from "@/components/catalog-filter-bar";
 import { CatalogSortSelect } from "@/components/catalog-sort-select";
 import { FeedbackState } from "@/components/feedback-state";
 import { MobileFilterDrawer } from "@/components/mobile-filter-drawer";
@@ -105,37 +105,38 @@ export default async function ProductsPage({
       </div>
 
       {/* Main Catalog Layout */}
-      <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
-        {/* Desktop Filter Sidebar */}
-        <div className="hidden w-64 shrink-0 rounded-md border border-line bg-surface p-6 lg:block">
-          <CatalogSidebar
-            filters={filters}
-            options={filterOptions}
-            idPrefix="desktop-filter"
-          />
-        </div>
-
-        {/* Product Grid & Controls */}
-        <div className="flex-1 min-w-0">
-          {/* Top Control Bar */}
-          <div className="flex flex-col gap-4 border-b border-line pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
+      <div className="mt-8">
+        <div className="min-w-0">
+          {/* Top Control Bar. Below lg: the filter drawer button and the count,
+              then the sort. From lg: the filter bar, then the count and the sort,
+              all on one row that wraps when the screen is narrower. */}
+          <div className="flex flex-col gap-4 border-b border-line pb-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between lg:gap-x-3 lg:gap-y-3">
+            <div className="flex items-center gap-3 lg:contents">
               <MobileFilterDrawer filters={filters} options={filterOptions} />
-              <p
-                className="text-body-sm font-semibold text-neutral-600"
-                role="status"
-                aria-live="polite"
-              >
-                {pagination.total === 0
-                  ? "No products"
-                  : pagination.totalPages > 1
-                    ? `Showing ${from}–${to} of ${pagination.total} products`
-                    : `Showing ${pagination.total} ${pagination.total === 1 ? "product" : "products"}`}
-                {activeFilters && " matching filters"}
-              </p>
+              <ResultCount
+                className="lg:hidden"
+                total={pagination.total}
+                totalPages={pagination.totalPages}
+                from={from}
+                to={to}
+                filtered={activeFilters}
+              />
+              <CatalogFilterBar filters={filters} options={filterOptions} />
             </div>
 
-            <CatalogSortSelect currentSort={filters.sort} />
+            {/* From lg the count and the sort stay together on the right and wrap
+                as one when the filters need the room. */}
+            <div className="flex items-center gap-4 lg:ml-auto">
+              <ResultCount
+                className="hidden lg:block"
+                total={pagination.total}
+                totalPages={pagination.totalPages}
+                from={from}
+                to={to}
+                filtered={activeFilters}
+              />
+              <CatalogSortSelect currentSort={filters.sort} />
+            </div>
           </div>
 
           {/* Active Filter Chips */}
@@ -208,6 +209,39 @@ export default async function ProductsPage({
         </div>
       </div>
     </div>
+  );
+}
+
+// "Showing 1–12 of 26 products". It is on the page twice, once for phones (beside
+// the filter button) and once for desktop (beside the sort); only one is shown.
+function ResultCount({
+  className,
+  total,
+  totalPages,
+  from,
+  to,
+  filtered,
+}: {
+  className: string;
+  total: number;
+  totalPages: number;
+  from: number;
+  to: number;
+  filtered: boolean;
+}) {
+  return (
+    <p
+      className={`text-body-sm font-semibold text-neutral-600 ${className}`}
+      role="status"
+      aria-live="polite"
+    >
+      {total === 0
+        ? "No products"
+        : totalPages > 1
+          ? `Showing ${from}–${to} of ${total} products`
+          : `Showing ${total} ${total === 1 ? "product" : "products"}`}
+      {filtered && " matching filters"}
+    </p>
   );
 }
 

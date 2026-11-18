@@ -2,10 +2,11 @@ import type { ReactNode } from "react";
 import { cx } from "./ui/cx";
 
 // 2 columns on phones, 4 on wide screens: the card is designed for ~160px up.
-//  - "catalog": 3 columns from lg (a sidebar shares the row), 4 from xl
+//  - "catalog": 4 columns from lg (the filters sit in a bar above the grid, so
+//    the grid has the whole width)
 //  - "home": 4 columns from lg, so 8 products make two full rows
 const COLUMNS = {
-  catalog: "lg:grid-cols-3 xl:grid-cols-4",
+  catalog: "lg:grid-cols-4",
   home: "lg:grid-cols-4",
 } as const;
 

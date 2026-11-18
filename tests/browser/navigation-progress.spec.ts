@@ -4,6 +4,7 @@ import {
   NAVIGATION_START_EVENT,
 } from "../../src/lib/navigation-progress";
 import { findBannedTerms, pageText } from "./support/banned-terms";
+import { waitUntilInteractive } from "./support/interactive";
 
 // The thin bar at the top of the window while a page change is under way.
 //
@@ -34,21 +35,6 @@ async function holdPageRequests(page: Page): Promise<() => void> {
     },
   );
   return release;
-}
-
-// A click before the page is interactive would be an ordinary browser navigation,
-// which is not what is being tested. React marks every element it has taken over.
-async function waitUntilInteractive(page: Page, selector: string) {
-  await page.waitForFunction(
-    (css) => {
-      const element = document.querySelector(css);
-      return (
-        element !== null &&
-        Object.keys(element).some((key) => key.startsWith("__reactProps$"))
-      );
-    },
-    selector,
-  );
 }
 
 async function openHome(page: Page) {

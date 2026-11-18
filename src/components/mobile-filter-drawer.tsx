@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import type { CatalogFilterOptions } from "@/types/catalog";
 import type { ProductFilters } from "@/features/catalog/api";
 import { countActiveFilters } from "@/features/catalog/search-params";
-import { CatalogSidebar } from "./catalog-sidebar";
+import { CatalogFilterList } from "./catalog-filter-list";
 
 import { buttonStyles } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -235,7 +235,7 @@ function MobileFilterDrawerContent({ filters, options }: MobileFilterDrawerProps
 
             {/* Drawer Body */}
             <div className="flex-1 overflow-y-auto px-5 py-6">
-              <CatalogSidebar
+              <CatalogFilterList
                 filters={filters}
                 options={options}
                 idPrefix="mobile-filter"

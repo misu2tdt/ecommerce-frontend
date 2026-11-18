@@ -98,6 +98,10 @@ sign-in (cart, checkout, wishlist, account, orders, the payment page) redirect a
 signed-out visitor to sign in and back. The `/admin` pages check the role on the
 server; a visitor who is not an admin gets an explanation, not the page.
 
+## Catalog filters
+
+On a desktop screen (from the `lg` breakpoint) `/products` has a filter bar above the grid (`src/components/catalog-filter-bar.tsx`): one button per group (Category, Brand, Size, Color, Price) that opens a small panel, an "In stock only" toggle, "Clear all" when anything is active, and the result count and sort on the same row. A group with choices shows a badge. Below `lg` the phone drawer is used instead. Every choice changes the address, the server renders the page again, and the page number is dropped. The options and address changes for the bar and the drawer come from one place, `src/features/catalog/filter-edits.ts`.
+
 ## Page changes feel immediate
 
 - **A thin bar at the top of the window** (`src/components/navigation-progress.tsx`, rules in `src/lib/navigation-progress.ts`) starts when a visitor clicks an internal link, steps back or forward, or changes search, filters or sorting. It stays hidden for the first 100 ms so a fast change never flashes, crawls towards 90%, and finishes when the new page's address is there. It gives up by itself after 8 seconds, so it can never stay stuck. With reduced motion it does not crawl.
@@ -239,8 +243,8 @@ What is actually in place, and tested where noted:
 
 | Suite | Command | Count |
 | --- | --- | --- |
-| Unit | `npm run test:unit` | 420 tests |
-| Browser smoke | `npm run test:smoke` | 263 tests, plus 2 skipped (the product-photo tests skip when the test database has no photos) |
+| Unit | `npm run test:unit` | 442 tests |
+| Browser smoke | `npm run test:smoke` | 285 tests, plus 2 skipped (the product-photo tests skip when the test database has no photos) |
 
 - **Unit tests** are Playwright's runner on plain functions: formatters, status
   words, paging maths, request parameters (checked against what the backend

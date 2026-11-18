@@ -9,10 +9,12 @@ import { ValueStrip } from "@/components/home/value-strip";
 import { ProductCard } from "@/components/product-card";
 import { ProductGrid } from "@/components/product-grid";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { getProducts } from "@/features/catalog/api";
+import { getFirstProducts } from "@/features/catalog/api";
 import {
+  HOME_PRODUCTS_NEEDED,
   HOME_SECTION_PRODUCTS,
   loadHomeFeatured,
+  pickEverydayEssentials,
   secondSectionHeading,
 } from "@/features/collections/home";
 import { collectionPath } from "@/features/collections/search-params";
@@ -50,7 +52,9 @@ async function HomeProducts() {
   const featuredRequest = loadHomeFeatured();
 
   try {
-    products = await getProducts();
+    // Only the first products are needed (see HOME_PRODUCTS_NEEDED), not the
+    // whole catalog.
+    products = await getFirstProducts(HOME_PRODUCTS_NEEDED);
   } catch (error) {
     // Keep homepage resilient if the catalog API is unreachable during build or
     // cold start, but say why: the page only shows "temporarily unavailable",
@@ -70,10 +74,7 @@ async function HomeProducts() {
   const featuredText = featured
     ? featured.collection.description
     : featuredFallbackText;
-  const shownIds = new Set(featuredProducts.map((product) => product.id));
-  const everydayEssentials = products
-    .filter((product) => !shownIds.has(product.id))
-    .slice(0, HOME_SECTION_PRODUCTS);
+  const everydayEssentials = pickEverydayEssentials(products, featuredProducts);
 
   return (
     <>

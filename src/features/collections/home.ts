@@ -8,6 +8,25 @@ import { getCollectionProducts, getCollections } from "./api";
 export const HOME_SECTION_PRODUCTS = 8;
 const CARDS_PER_ROW = 4;
 
+// How many products of the catalog the home page needs to ask for. The first
+// section shows at most 8 (the featured collection's, or else the first 8 of the
+// catalog); the second shows the first 8 of the catalog that are not in the first.
+// At most 8 of the catalog's first 16 can be in the first section, so the first 16
+// always hold the 8 the second section wants: the whole catalog is never needed.
+export const HOME_PRODUCTS_NEEDED = HOME_SECTION_PRODUCTS * 2;
+
+// The second section's products: the catalog's first ones that the first section
+// does not already show.
+export function pickEverydayEssentials(
+  catalog: readonly ProductSummary[],
+  shown: readonly ProductSummary[],
+): ProductSummary[] {
+  const shownIds = new Set(shown.map((product) => product.id));
+  return catalog
+    .filter((product) => !shownIds.has(product.id))
+    .slice(0, HOME_SECTION_PRODUCTS);
+}
+
 // How many cards to show out of `available` products: up to 8, rounded down to a
 // whole number of rows of four so no row ends with a lone card. With fewer than
 // four products there is no whole row, so they are all shown.

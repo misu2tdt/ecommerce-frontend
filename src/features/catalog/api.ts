@@ -79,6 +79,19 @@ export function getProductsPage(
   );
 }
 
+// The first `limit` products of the catalog, in its own order, in one request (the
+// backend gives at most 48). The home page uses it instead of the whole catalog.
+export async function getFirstProducts(
+  limit: number,
+): Promise<ProductSummary[]> {
+  const { items } = await apiFetchPage<ProductSummary>(
+    "/products",
+    { query: buildProductsQuery({}) },
+    { page: 1, limit },
+  );
+  return items;
+}
+
 // Every product page address, by asking for the list page by page (48 at a time,
 // the most the backend gives). Used by the sitemap.
 export async function getAllProductSlugs(): Promise<

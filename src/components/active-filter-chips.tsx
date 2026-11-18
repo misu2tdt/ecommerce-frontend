@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import type { CatalogFilterOptions } from "@/types/catalog";
 import type { ProductFilters } from "@/features/catalog/api";
+import { clearAllFilters } from "@/features/catalog/filter-edits";
 import { formatVnd } from "@/lib/money";
-import { announceNavigation } from "@/lib/navigation-progress";
+import { useCatalogFilterUrl } from "./use-catalog-filter";
 
 interface ActiveFilterChipsProps {
   filters: ProductFilters;
@@ -21,28 +21,14 @@ export function ActiveFilterChips(props: ActiveFilterChipsProps) {
 }
 
 function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  // Every change starts again from the first page (see catalogHrefFor).
+  const { isPending, apply: updateUrl } = useCatalogFilterUrl();
 
   const chips: Array<{
     id: string;
     label: string;
     onRemove: () => void;
   }> = [];
-
-  const updateUrl = (modifier: (params: URLSearchParams) => void) => {
-    const params = new URLSearchParams(searchParams.toString());
-    // Any change of filters or sort starts again from the first page.
-    params.delete("page");
-    modifier(params);
-    const queryString = params.toString();
-    const href = queryString ? `/products?${queryString}` : "/products";
-    announceNavigation(href);
-    startTransition(() => {
-      router.push(href);
-    });
-  };
 
   // Search text chip
   if (filters.q) {
@@ -140,27 +126,8 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
 
   if (chips.length === 0) return null;
 
-  const handleClearAll = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    // Any change of filters or sort starts again from the first page.
-    params.delete("page");
-    // Clear all filters except sort
-    params.delete("q");
-    params.delete("category");
-    params.delete("brand");
-    params.delete("size");
-    params.delete("color");
-    params.delete("minPrice");
-    params.delete("maxPrice");
-    params.delete("inStock");
-
-    const queryString = params.toString();
-    const href = queryString ? `/products?${queryString}` : "/products";
-    announceNavigation(href);
-    startTransition(() => {
-      router.push(href);
-    });
-  };
+  // Every filter off; the sort stays.
+  const handleClearAll = () => updateUrl(clearAllFilters);
 
   return (
     <div className="flex flex-wrap items-center gap-2 pt-2">
