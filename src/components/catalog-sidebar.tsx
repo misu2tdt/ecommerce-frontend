@@ -6,6 +6,7 @@ import type { CatalogFilterOptions } from "@/types/catalog";
 import type { ProductFilters } from "@/features/catalog/api";
 import { PRICE_MAX_VND } from "@/lib/limits";
 import { formatVnd } from "@/lib/money";
+import { announceNavigation } from "@/lib/navigation-progress";
 
 import { buttonStyles } from "@/components/ui/button";
 import { fieldStyles } from "@/components/ui/field";
@@ -97,8 +98,10 @@ function CatalogSidebarContent({
     params.delete("page");
     modifier(params);
     const queryString = params.toString();
+    const href = queryString ? `/products?${queryString}` : "/products";
+    announceNavigation(href);
     startTransition(() => {
-      router.push(queryString ? `/products?${queryString}` : "/products");
+      router.push(href);
     });
   };
 

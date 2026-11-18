@@ -13,18 +13,22 @@ import { MobileNav } from "./mobile-nav";
 import { NavMegaMenu } from "./nav-mega-menu";
 
 export async function SiteHeader() {
-  // A failed check (rate limit, server error, network) is not "signed out": the
-  // header keeps the signed-in view and the reason goes to the server log.
-  const session = await resolveHeaderSession({
-    hasSession: async () => (await getSessionToken()) !== null,
-    loadUser: () => getCurrentUser(),
-    log: (message) => console.warn(message),
-  });
-  // "Collections" is offered in the menus only when the shop has one. The answer
-  // is kept for a few minutes and a failed lookup just means "no".
-  const showCollections = await hasActiveCollections();
-  // The categories and brands the menus list are the ones the shop really has.
-  const catalog = await loadNavCatalog();
+  // The three lookups do not depend on each other, so they run together (none of
+  // them rejects: each turns a failure into its own fallback).
+  const [session, showCollections, catalog] = await Promise.all([
+    // A failed check (rate limit, server error, network) is not "signed out": the
+    // header keeps the signed-in view and the reason goes to the server log.
+    resolveHeaderSession({
+      hasSession: async () => (await getSessionToken()) !== null,
+      loadUser: () => getCurrentUser(),
+      log: (message) => console.warn(message),
+    }),
+    // "Collections" is offered in the menus only when the shop has one. The answer
+    // is kept for a few minutes and a failed lookup just means "no".
+    hasActiveCollections(),
+    // The categories and brands the menus list are the ones the shop really has.
+    loadNavCatalog(),
+  ]);
   // The drawer only needs to know whether to offer account links.
   const drawerUser =
     session.kind === "user"

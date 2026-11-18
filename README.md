@@ -98,6 +98,13 @@ sign-in (cart, checkout, wishlist, account, orders, the payment page) redirect a
 signed-out visitor to sign in and back. The `/admin` pages check the role on the
 server; a visitor who is not an admin gets an explanation, not the page.
 
+## Page changes feel immediate
+
+- **A thin bar at the top of the window** (`src/components/navigation-progress.tsx`, rules in `src/lib/navigation-progress.ts`) starts when a visitor clicks an internal link, steps back or forward, or changes search, filters or sorting. It stays hidden for the first 100 ms so a fast change never flashes, crawls towards 90%, and finishes when the new page's address is there. It gives up by itself after 8 seconds, so it can never stay stuck. With reduced motion it does not crawl.
+- **Loading screens** exist for the catalog, product page, collections list, cart, checkout, wishlist, account, admin and the payment page. The home page streams its product sections under a placeholder, so the picture and categories are sent at once.
+- **A single collection has no loading screen on purpose.** A loading screen starts the response before the page runs, so an unknown collection could no longer answer with a real 404, which `tests/browser/collections.spec.ts` checks. The bar covers that page change instead.
+- **Independent backend calls run together:** the header's three lookups, the product page's reviews and related products, and a collection and its products.
+
 ## Try a tricky case (payment simulator)
 
 The practice payment page (`/demo-pay/[paymentId]`) has a "Try a tricky case"
@@ -232,8 +239,8 @@ What is actually in place, and tested where noted:
 
 | Suite | Command | Count |
 | --- | --- | --- |
-| Unit | `npm run test:unit` | 396 tests |
-| Browser smoke | `npm run test:smoke` | 255 tests, plus 2 skipped (the product-photo tests skip when the test database has no photos) |
+| Unit | `npm run test:unit` | 420 tests |
+| Browser smoke | `npm run test:smoke` | 263 tests, plus 2 skipped (the product-photo tests skip when the test database has no photos) |
 
 - **Unit tests** are Playwright's runner on plain functions: formatters, status
   words, paging maths, request parameters (checked against what the backend

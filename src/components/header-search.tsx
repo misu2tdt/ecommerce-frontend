@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useId, useState, useTransition } from "react";
+import { announceNavigation } from "@/lib/navigation-progress";
 
 interface HeaderSearchProps {
   id?: string;
@@ -88,12 +89,12 @@ function HeaderSearchForm({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const trimmed = query.trim();
+    const href = trimmed
+      ? `/products?q=${encodeURIComponent(trimmed)}`
+      : "/products";
+    announceNavigation(href);
     startTransition(() => {
-      if (trimmed) {
-        router.push(`/products?q=${encodeURIComponent(trimmed)}`);
-      } else {
-        router.push("/products");
-      }
+      router.push(href);
       onSearchSubmitted?.();
     });
   }

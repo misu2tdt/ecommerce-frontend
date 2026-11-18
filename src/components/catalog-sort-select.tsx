@@ -2,6 +2,7 @@
 
 import { Suspense, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { announceNavigation } from "@/lib/navigation-progress";
 import type { ProductSort } from "@/types/catalog";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -60,8 +61,10 @@ function CatalogSortSelectContent({
       params.set("sort", newSort);
     }
     const queryString = params.toString();
+    const href = queryString ? `${basePath}?${queryString}` : basePath;
+    announceNavigation(href);
     startTransition(() => {
-      router.push(queryString ? `${basePath}?${queryString}` : basePath);
+      router.push(href);
     });
   };
 

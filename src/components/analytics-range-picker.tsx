@@ -14,6 +14,7 @@ import {
   validateRange,
   type DateRange,
 } from "@/lib/analytics";
+import { announceNavigation } from "@/lib/navigation-progress";
 
 // The range of the page: three presets (links, so each has an address) and a
 // custom range checked here before anything is sent. The two date fields start
@@ -52,7 +53,9 @@ export function AnalyticsRangePicker({
       return;
     }
     setError(null);
-    router.push(analyticsHref(check.range));
+    const href = analyticsHref(check.range);
+    announceNavigation(href);
+    router.push(href);
   }
 
   return (

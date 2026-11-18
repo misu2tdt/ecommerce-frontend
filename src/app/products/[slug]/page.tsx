@@ -5,7 +5,10 @@ import { FeedbackState } from "@/components/feedback-state";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductPurchasePanel } from "@/components/product-purchase-panel";
 import { ProductSelectionProvider } from "@/components/product-selection";
-import { RelatedProducts } from "@/components/related-products";
+import {
+  RelatedProducts,
+  preloadRelatedProducts,
+} from "@/components/related-products";
 import { ReviewManager } from "@/components/review-manager";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { getProductBySlug } from "@/features/catalog/api";
@@ -68,7 +71,9 @@ export default async function ProductDetailPage({
 
   const product = result.data;
 
-  // Load reviews concurrently
+  // The related products only need the category, so their request starts now and
+  // runs beside the reviews (the section further down picks up the same answer).
+  preloadRelatedProducts(product.category.slug, product.id);
   const reviewData = await loadReviews(product.id);
 
   const hasReviews = product.reviewCount > 0 && product.averageRating !== null;

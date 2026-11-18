@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { CatalogFilterOptions } from "@/types/catalog";
 import type { ProductFilters } from "@/features/catalog/api";
 import { formatVnd } from "@/lib/money";
+import { announceNavigation } from "@/lib/navigation-progress";
 
 interface ActiveFilterChipsProps {
   filters: ProductFilters;
@@ -36,8 +37,10 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
     params.delete("page");
     modifier(params);
     const queryString = params.toString();
+    const href = queryString ? `/products?${queryString}` : "/products";
+    announceNavigation(href);
     startTransition(() => {
-      router.push(queryString ? `/products?${queryString}` : "/products");
+      router.push(href);
     });
   };
 
@@ -152,8 +155,10 @@ function ActiveFilterChipsContent({ filters, options }: ActiveFilterChipsProps) 
     params.delete("inStock");
 
     const queryString = params.toString();
+    const href = queryString ? `/products?${queryString}` : "/products";
+    announceNavigation(href);
     startTransition(() => {
-      router.push(queryString ? `/products?${queryString}` : "/products");
+      router.push(href);
     });
   };
 

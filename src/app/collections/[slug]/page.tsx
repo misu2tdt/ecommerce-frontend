@@ -50,6 +50,19 @@ const loadCollection = cache(async (slug: string): Promise<CollectionResult> => 
   }
 });
 
+// One page of the collection's products, or null when the request fails.
+async function loadCollectionProducts(
+  slug: string,
+  sort: ReturnType<typeof parseCollectionSort>,
+  page: number,
+) {
+  try {
+    return await getCollectionProductsPage(slug, sort, page);
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({
   params,
   searchParams,
@@ -86,20 +99,20 @@ export default async function CollectionPage({
   const sort = parseCollectionSort(query.sort);
   const pageParam = parsePageParam(query.page);
 
-  const result = await loadCollection(slug);
+  // The products are asked for by slug, so they do not need the collection first:
+  // both requests go out together. For an unknown collection the products answer
+  // is simply not used.
+  const [result, productsPage] = await Promise.all([
+    loadCollection(slug),
+    loadCollectionProducts(slug, sort, pageParam.page),
+  ]);
   if ("notFound" in result) notFound();
   if ("error" in result) return <Unavailable slug={slug} />;
   const { collection } = result;
+  if (!productsPage) return <Unavailable slug={slug} />;
 
-  let products: ProductSummary[];
-  let pagination: PaginationInfo;
-  try {
-    const page = await getCollectionProductsPage(slug, sort, pageParam.page);
-    products = page.items;
-    pagination = page;
-  } catch {
-    return <Unavailable slug={slug} />;
-  }
+  const products: ProductSummary[] = productsPage.items;
+  const pagination: PaginationInfo = productsPage;
 
   // An unusable page (not a number, or past the last page) goes to a real one.
   const redirectPage = pageRedirectTarget(pageParam, pagination.totalPages);

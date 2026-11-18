@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { BrandSection } from "@/components/home/brand-section";
 import { CategorySection } from "@/components/home/category-section";
 import { Hero } from "@/components/home/hero";
+import { HomeProductsSkeleton } from "@/components/home/products-skeleton";
 import { ValueStrip } from "@/components/home/value-strip";
 import { ProductCard } from "@/components/product-card";
 import { ProductGrid } from "@/components/product-grid";
@@ -26,7 +28,24 @@ const featuredFallbackText =
 const viewLink =
   "inline-flex min-h-11 items-center text-body-sm font-bold text-brand transition hover:underline focus-visible:outline-2 focus-visible:outline-brand";
 
-export default async function Home() {
+// The picture, the value strip and the categories need nothing from the products
+// request, so they are sent at once; the product sections follow under a
+// placeholder as soon as their data is in. (A loading.tsx here would be wrong: it
+// wraps every page below the root, including the 404 of an unknown collection.)
+export default function Home() {
+  return (
+    <div className="flex flex-col">
+      <Hero />
+      <ValueStrip />
+      <CategorySection />
+      <Suspense fallback={<HomeProductsSkeleton />}>
+        <HomeProducts />
+      </Suspense>
+    </div>
+  );
+}
+
+async function HomeProducts() {
   let products: ProductSummary[] = [];
   const featuredRequest = loadHomeFeatured();
 
@@ -57,11 +76,7 @@ export default async function Home() {
     .slice(0, HOME_SECTION_PRODUCTS);
 
   return (
-    <div className="flex flex-col">
-      <Hero />
-      <ValueStrip />
-      <CategorySection />
-
+    <>
       {/* FEATURED COLLECTION PRODUCT GRID */}
       <section className="border-t border-line bg-surface-muted py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -130,6 +145,6 @@ export default async function Home() {
           </div>
         </section>
       )}
-    </div>
+    </>
   );
 }
