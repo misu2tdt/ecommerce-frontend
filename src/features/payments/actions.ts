@@ -4,9 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { ApiError } from "@/lib/api";
-import { toShopperMessage } from "@/lib/shopper-messages";
-import type { Payment } from "@/types/payment";
-import { createOrderPayment } from "./api";
+import { getOrder } from "@/features/orders/api";
+import { parseSimulation, parseSimulatorScenario } from "@/lib/payment-simulator";
+import { toShopperMessage, toSimulatorMessage } from "@/lib/shopper-messages";
+import type { DemoSimulation, Payment, PaymentSnapshot } from "@/types/payment";
+import {
+  createOrderPayment,
+  getOrderPayments,
+  simulateDemoPayment,
+} from "./api";
 import { paymentLinkDecision } from "./checkout-link";
 import { demoPayHref } from "./demo-pay";
 import { readIdField } from "@/lib/ids";
@@ -80,6 +86,93 @@ export async function createPaymentAction(
     payment,
     message: decision.message,
   };
+}
+
+// ---- "Try a tricky case" on the demo payment page ------------------------------
+
+export interface SimulatorState {
+  // "done": a case ran and `simulation` holds what the backend answered.
+  // "error": nothing ran; `message` says why, in shopper words.
+  status?: "done" | "error";
+  message?: string;
+  simulation?: DemoSimulation;
+  // Counts the runs of this page, so a second run is a different result.
+  stamp?: number;
+}
+
+// Runs one tricky case. Only the payment, the order hint and the scenario come
+// from the form: the backend builds and signs every event itself.
+export async function simulateDemoPaymentAction(
+  previous: SimulatorState,
+  formData: FormData,
+): Promise<SimulatorState> {
+  const stamp = (previous.stamp ?? 0) + 1;
+  const paymentId = readPositiveInteger(formData, "paymentId");
+  const orderHint = readPositiveInteger(formData, "orderId");
+  const scenario = parseSimulatorScenario(readString(formData, "scenario"));
+  if (!paymentId || !scenario) {
+    return { status: "error", message: toSimulatorMessage(400, ""), stamp };
+  }
+
+  let answer: unknown;
+  let failure: unknown;
+  try {
+    answer = await simulateDemoPayment(paymentId, scenario);
+  } catch (error) {
+    failure = error;
+  }
+
+  if (failure instanceof ApiError && failure.status === 401) {
+    redirect(
+      buildLoginHref(
+        orderHint ? demoPayHref(paymentId, orderHint) : `/demo-pay/${paymentId}`,
+      ),
+    );
+  }
+  if (failure) {
+    const status = failure instanceof ApiError ? failure.status : 0;
+    const message = failure instanceof ApiError ? failure.message : "";
+    return {
+      status: "error",
+      message: toSimulatorMessage(status, message),
+      stamp,
+    };
+  }
+
+  const simulation = parseSimulation(answer);
+  if (!simulation) {
+    return { status: "error", message: toSimulatorMessage(400, ""), stamp };
+  }
+
+  // Nothing is revalidated here, on purpose. A Server Action that revalidates
+  // any path also refreshes the page the visitor is on, and a payment that this
+  // case just finished would turn that page into the plain "already complete"
+  // card and take the result panel with it. The order pages are not cached, so
+  // they show the new status the next time they are opened.
+  return { status: "done", simulation, stamp };
+}
+
+// The one look after a delayed event was due: the payment and the order as the
+// backend has them now. Throws when it cannot tell (the page shows a calm note).
+export async function checkDemoPaymentStatusAction(
+  paymentId: number,
+  orderId: number,
+): Promise<PaymentSnapshot> {
+  if (
+    !Number.isSafeInteger(paymentId) ||
+    paymentId < 1 ||
+    !Number.isSafeInteger(orderId) ||
+    orderId < 1
+  ) {
+    throw new Error("Invalid payment");
+  }
+  const [payments, order] = await Promise.all([
+    getOrderPayments(orderId),
+    getOrder(orderId),
+  ]);
+  const payment = payments.find((entry) => entry.id === paymentId);
+  if (!payment) throw new Error("Payment not found");
+  return { payment: payment.status, order: order.status };
 }
 
 function isSafeIdempotencyKey(value: string): boolean {

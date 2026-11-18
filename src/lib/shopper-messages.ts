@@ -71,6 +71,43 @@ export function toShopperMessage(message: string): string {
   return message;
 }
 
+// The refusals of the payment simulator on the demo payment page ("Try a tricky
+// case"), in short sentences for the visitor. Display only. The status decides
+// the sentence; for a 409 the backend's message tells which rule refused, and the
+// number of minutes in it is kept. An unknown message gets a general sentence,
+// never the backend's own wording, which talks about queues and events.
+const SIMULATOR_TRY_AGAIN = "We could not run that case. Please try again.";
+
+export function toSimulatorMessage(status: number, message: string): string {
+  if (status === 404) {
+    return "We could not find this payment, or tricky cases are not available for it.";
+  }
+  if (status === 429) {
+    return "That was a lot of tries in a short time. Please wait a minute and try again.";
+  }
+  if (status === 400) return SIMULATOR_TRY_AGAIN;
+  if (status === 0) {
+    return "Payments are unavailable right now. Please try again.";
+  }
+  if (status === 409) {
+    if (/already finished/i.test(message)) {
+      return "This payment is already finished, so no more cases can be run on it. Start a new payment from your order to try another.";
+    }
+    const minutes = message.match(/last (\d+) minutes/i);
+    if (minutes) {
+      return `This case only works on a payment started in the last ${minutes[1]} minutes. Start a new payment from your order and try again.`;
+    }
+    if (/still waiting for payment/i.test(message)) {
+      return "This case only works while the order is still waiting for payment.";
+    }
+    if (/queue|paused/i.test(message)) {
+      return "This case is paused for the moment. Try another one.";
+    }
+    return "This case cannot run right now. Try another one, or start a new payment from your order.";
+  }
+  return SIMULATOR_TRY_AGAIN;
+}
+
 // The same idea for the staff screens of collections: the backend's wording for
 // a duplicate address, products that no longer exist and the like, in plain
 // sentences that say what to do next. The backend joins several validation

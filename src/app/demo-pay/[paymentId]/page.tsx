@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { DemoPaymentForm } from "@/components/demo-payment-form";
 import { FeedbackState } from "@/components/feedback-state";
+import { PaymentSimulator } from "@/components/payment-simulator";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { buildLoginHref } from "@/features/auth/redirects";
 import { getOrders } from "@/features/orders/api";
@@ -136,6 +137,7 @@ function renderBody(result: Exclude<LoadedPayment, { unauthenticated: true }>) {
       </p>
 
       <DemoPaymentForm paymentId={payment.id} orderId={orderId} />
+      <PaymentSimulator paymentId={payment.id} orderId={orderId} />
     </div>
   );
 }
