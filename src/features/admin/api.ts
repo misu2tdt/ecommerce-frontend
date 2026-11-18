@@ -95,9 +95,6 @@ export const deleteProductImage = (productId: number, imageId: number) =>
     method: "DELETE",
   });
 
-export const getAdminOrders = () =>
-  authenticatedApiFetch<AdminOrder[]>("/admin/orders");
-
 export const getAdminOrdersPage = (page: number) =>
   authenticatedApiFetchPage<AdminOrder>("/admin/orders", page);
 
@@ -112,9 +109,6 @@ export const updateAdminOrderStatus = (
     method: "PATCH",
     body: { status },
   });
-
-export const getAdminReviews = () =>
-  authenticatedApiFetch<AdminReview[]>("/admin/reviews");
 
 export const getAdminReviewsPage = (page: number) =>
   authenticatedApiFetchPage<AdminReview>("/admin/reviews", page);

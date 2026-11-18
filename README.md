@@ -89,7 +89,7 @@ flowchart TD
   Account --> Addresses["/account/addresses"]
   Header["Header"] --> Wishlist["/wishlist"]
   Header --> Login["/login, /register"]
-  Staff["/admin: products, collections, categories, brands, orders, reviews, promotions"]
+  Staff["/admin: analytics, products, collections, categories, brands, orders, reviews, promotions"]
   About["/about-demo"]
 ```
 
@@ -97,6 +97,35 @@ Public pages: home, catalog, collections, product, About, sign-in, register. Pag
 sign-in (cart, checkout, wishlist, account, orders, the payment page) redirect a
 signed-out visitor to sign in and back. The `/admin` pages check the role on the
 server; a visitor who is not an admin gets an explanation, not the page.
+
+## Try a tricky case (payment simulator)
+
+The practice payment page (`/demo-pay/[paymentId]`) has a "Try a tricky case"
+section below the Pay, Decline and Cancel buttons. It offers four cases: the same
+success sent twice, a success that arrives after the order expired, a delayed
+success (about 10 seconds) and a tampered signature.
+
+- The page only sends the case name. The backend builds and signs every event,
+  runs it through the real payment pipeline and answers with an explanation and
+  the steps it took. The page shows that explanation, a numbered list of the steps
+  (what was sent, the result, the HTTP status) and the final payment and order
+  status. Nothing about a case is written on the frontend; result codes are turned
+  into labels in one place (`src/lib/payment-simulator.ts`).
+- It is a Server Action (`simulateDemoPaymentAction`), so the token stays on the
+  server. Errors become short shopper messages (`toSimulatorMessage`).
+- The delayed case shows a waiting note, looks once at the payment after about 12
+  seconds (`src/features/payments/delayed-wait.ts`) and never polls. If the
+  payment is still processing it says the confirmation may have been lost.
+- It needs a backend with the `POST /payments/{id}/demo/simulate` route; without
+  it the buttons answer with a "not available" message.
+
+## Admin analytics
+
+`/admin/analytics` is a staff-only page showing revenue, orders, customers and
+best sellers for a range of days. The range is chosen with a picker and kept in
+the address, so a link shows the same days to whoever opens it. A range the backend
+would refuse is never sent: the page shows the last 30 days and says why. The page
+only displays what the backend's analytics endpoints return.
 
 ## Collections
 
@@ -203,8 +232,8 @@ What is actually in place, and tested where noted:
 
 | Suite | Command | Count |
 | --- | --- | --- |
-| Unit | `npm run test:unit` | 217 tests |
-| Browser smoke | `npm run test:smoke` | 182 tests (2 product-photo tests skip when the test database has no photos) |
+| Unit | `npm run test:unit` | 393 tests |
+| Browser smoke | `npm run test:smoke` | 255 tests, plus 2 skipped (the product-photo tests skip when the test database has no photos) |
 
 - **Unit tests** are Playwright's runner on plain functions: formatters, status
   words, paging maths, request parameters (checked against what the backend

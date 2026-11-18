@@ -10,16 +10,8 @@ import type {
   UpdateCouponInput,
 } from "@/types/promotions";
 
-export function adminGetCoupons(): Promise<Coupon[]> {
-  return authenticatedApiFetch<Coupon[]>("/admin/promotions");
-}
-
 export function adminGetCouponsPage(page: number) {
   return authenticatedApiFetchPage<Coupon>("/admin/promotions", page);
-}
-
-export function adminGetCoupon(id: number): Promise<Coupon> {
-  return authenticatedApiFetch<Coupon>(`/admin/promotions/${id}`);
 }
 
 export function adminCreateCoupon(data: CreateCouponInput): Promise<Coupon> {
